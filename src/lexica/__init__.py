@@ -17,4 +17,4 @@ from .words.instruction import *
 from .words.request import *
 from .words.response import *
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
