@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from ..lexicon import Lexicon
 
-
 FormatList = Lexicon(
     name="format_list",
     indicates=[
@@ -451,4 +450,24 @@ ToneCasual = Lexicon(
 )
 
 
-__all__ = [name for name, value in list(globals().items()) if isinstance(value, Lexicon)]
+__all__ = [
+    "FormatList",
+    "FormatTable",
+    "FormatCode",
+    "FormatProse",
+    "LengthShort",
+    "LengthLong",
+    "NoPreamble",
+    "NoCaveats",
+    "CitationDemand",
+    "StepByStep",
+    "OpinionDemand",
+    "ComparisonDemand",
+    "CreativeDemand",
+    "FactualDemand",
+    "RolePlay",
+    "Revision",
+    "AdviceDemand",
+    "ToneFormal",
+    "ToneCasual",
+]

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from ..lexicon import Lexicon
 
-
 Shopping = Lexicon(
     name="shopping",
     indicates=[
@@ -352,4 +351,20 @@ People = Lexicon(
 )
 
 
-__all__ = [name for name, value in list(globals().items()) if isinstance(value, Lexicon)]
+__all__ = [
+    "Shopping",
+    "Communication",
+    "Money",
+    "HealthAppointment",
+    "Travel",
+    "Work",
+    "Household",
+    "Pets",
+    "Children",
+    "Garden",
+    "Maintenance",
+    "Media",
+    "Occasion",
+    "Location",
+    "People",
+]

@@ -3,7 +3,12 @@ from __future__ import annotations
 from ..lexicon import Lexicon
 from . import domain, instruction, request, response
 
-MODULES = {"request": request, "instruction": instruction, "response": response, "domain": domain}
+MODULES = {
+    "request": request,
+    "instruction": instruction,
+    "response": response,
+    "domain": domain,
+}
 
 LEXICONS: dict[str, Lexicon] = {
     entry.name: entry

@@ -3,6 +3,8 @@ from __future__ import annotations
 import pytest
 from pytest_examples import CodeExample, EvalExample, find_examples
 
+pytestmark = pytest.mark.integration
+
 
 @pytest.mark.parametrize("example", list(find_examples("README.md", "docs")), ids=str)
 def test_docs(example: CodeExample, eval_example: EvalExample) -> None:

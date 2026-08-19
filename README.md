@@ -1,10 +1,14 @@
 # lexica
 
-Word lists that assert, for [pydantic-evals](https://ai.pydantic.dev/evals/).
+Lexicons that score text for a concept, plus the [pydantic-evals](https://ai.pydantic.dev/evals/)
+evaluators to run them as part of a `Dataset`.
 
 A lexicon is a named set of words and phrases that signal a concept, plus the words that rule it out.
 Ninety one of them ship in the box, covering what a user asked for and what a model produced.
-They compile to pydantic-evals evaluators, so they run in the same `Dataset` as everything else.
+`.signal()`, `.fires()` and `.denied()` are plain functions over text: call them directly in a
+guardrail, a test, a CLI, or a log pipeline, no evals framework required. `.absent()` and
+`.expected()` compile the same lexicon into a pydantic-evals evaluator when you want it running
+inside a `Dataset`.
 
 ## Install
 
@@ -42,9 +46,27 @@ print(HighPriority.signal("sort it whenever, no rush"))
 `denied` is not the same as `absent`. An agent setting `priority=high` on "no rush" is wrong,
 where on a sentence with no priority wording at all it is merely unasked for.
 
-## Running it
+## Using it without an evals framework
 
-`.absent()` and `.expected()` turn a lexicon into an evaluator.
+`signal()`, `fires()` and `denied()` are the whole API surface at this layer: plain calls over a
+string. Nothing here needs `Dataset`, `Case`, or pydantic-evals in general, so a lexicon works just
+as well as a guardrail before a response goes out, a plain `assert` in a unit test, or a filter in
+a log pipeline.
+
+```py
+from lexica import Confidential
+
+
+def guard(reply: str) -> str:
+    if Confidential.fires(reply):
+        raise ValueError("reply leaks a secret, blocking send")
+    return reply
+```
+
+## Running it inside pydantic-evals
+
+`.absent()` and `.expected()` turn a lexicon into an evaluator, for when you want the same check
+running as part of a `Dataset` alongside everything else.
 
 ```py
 from pydantic_evals import Case, Dataset

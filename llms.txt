@@ -1,0 +1,25 @@
+# lexica
+
+> Lexicons that score text for a concept, plus pydantic-evals evaluators built on top
+
+lexica is not only a pydantic-evals add-on. The core API — `Lexicon.signal()`, `.fires()`,
+`.denied()` — is plain functions over a string with no evals framework involved, useful as a
+guardrail, a unit-test assertion, or a log filter. `.absent()` and `.expected()` additionally
+compile a lexicon into a pydantic-evals evaluator for use inside a `Dataset`.
+
+## Documentation
+
+- [README](README.md): install, the core `signal()`/`fires()`/`denied()` API, and both the
+  standalone and pydantic-evals ways of running a lexicon
+- [Writing a lexicon](docs/writing-a-lexicon.md): building your own `Lexicon` for a new domain
+- [Rules](docs/rules.md): `.absent()` / `.expected()`, the `when` / `unless` guards, and `Observe`
+- [Agents](docs/agents.md): checking pydantic-ai agent output, structured or plain text
+
+## Project Information
+
+- **Source Code**: https://github.com/benomahony/lexica
+- **PyPI Package**: https://pypi.org/project/lexica
+
+## AI Integration
+
+- **Agent Skill**: Claude Code skill available in `.skills/lexica/SKILL.md` for enhanced project interaction

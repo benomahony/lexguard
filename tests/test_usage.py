@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import pytest
 from pydantic_evals import Case, Dataset
 
 from lexica import (
@@ -16,6 +17,8 @@ from lexica import (
 )
 from lexica.words.response import Slop
 
+pytestmark = pytest.mark.unit
+
 
 def run(evaluators: list, prompt: str, reply: str):
     dataset = Dataset(name="d", cases=[Case(inputs=prompt)], evaluators=evaluators)
@@ -27,12 +30,16 @@ def run(evaluators: list, prompt: str, reply: str):
 
 
 def assertions(evaluators: list, prompt: str, reply: str) -> dict[str, bool]:
-    return {name: result.value for name, result in run(evaluators, prompt, reply).assertions.items()}
+    return {
+        name: result.value for name, result in run(evaluators, prompt, reply).assertions.items()
+    }
 
 
 def test_absent_reads_off_the_cue():
     assert assertions([Slop.absent()], "explain", "let us delve in") == {"no_slop": False}
-    assert assertions([Slop.absent()], "explain", "caching skips repeated work") == {"no_slop": True}
+    assert assertions([Slop.absent()], "explain", "caching skips repeated work") == {
+        "no_slop": True
+    }
 
 
 def test_expected_is_the_other_direction():
@@ -40,12 +47,18 @@ def test_expected_is_the_other_direction():
 
 
 def test_or_builds_a_set_that_keeps_its_members():
-    result = assertions([(Slop | Sycophancy | Preamble).absent()], "explain", "Great question! Certainly, let us delve in.")
+    result = assertions(
+        [(Slop | Sycophancy | Preamble).absent()],
+        "explain",
+        "Great question! Certainly, let us delve in.",
+    )
     assert result == {"no_slop": False, "no_sycophancy": False, "no_preamble": False}
 
 
 def test_named_bundles_are_cue_sets():
-    result = assertions([Servility.absent()], "explain", "Certainly! Great question, hope this helps.")
+    result = assertions(
+        [Servility.absent()], "explain", "Certainly! Great question, hope this helps."
+    )
     assert result["no_preamble"] is False
     assert result["no_sycophancy"] is False
     assert result["no_postamble"] is False
@@ -54,9 +67,11 @@ def test_named_bundles_are_cue_sets():
 
 def test_guards_are_keywords_on_the_verb():
     check = [Disclaimer.absent(when=NoCaveats)]
-    assert assertions(check, "no disclaimers please, is it enforceable", "Yes, but consult a professional.") == {
-        "no_disclaimer[when no_caveats]": False
-    }
+    assert assertions(
+        check,
+        "no disclaimers please, is it enforceable",
+        "Yes, but consult a professional.",
+    ) == {"no_disclaimer[when no_caveats]": False}
     assert assertions(check, "is it enforceable", "Yes, but consult a professional.") == {}
 
 
@@ -105,11 +120,18 @@ def test_multiword_phrases_that_wrap_still_match():
 
 def failures(evaluators: list, prompt: str, reply: str) -> dict[str, str]:
     case = run(evaluators, prompt, reply)
-    return {name: result.reason for name, result in case.assertions.items() if not result.value}
+    result = {}
+    for name, assertion in case.assertions.items():
+        if not assertion.value:
+            assert assertion.reason is not None
+            result[name] = assertion.reason
+    return result
 
 
 def test_failure_names_the_matches_and_shows_them_in_context():
-    reason = failures([Slop.absent()], "explain", "Let us delve into the intricate tapestry.")["no_slop"]
+    reason = failures([Slop.absent()], "explain", "Let us delve into the intricate tapestry.")[
+        "no_slop"
+    ]
     assert "3 slop matches" in reason
     assert '"delve"' in reason
     assert "delve -> Let us delve into the intricate tapestry." in reason
@@ -121,16 +143,20 @@ def test_failure_carries_the_fix():
 
 
 def test_failure_quotes_the_request_words_that_triggered_the_rule():
-    reason = failures([Disclaimer.absent(when=NoCaveats)], "no disclaimers please", "Consult a professional.")[
-        "no_disclaimer[when no_caveats]"
-    ]
+    reason = failures(
+        [Disclaimer.absent(when=NoCaveats)],
+        "no disclaimers please",
+        "Consult a professional.",
+    )["no_disclaimer[when no_caveats]"]
     assert 'the request asked for no_caveats: "no disclaimers"' in reason
 
 
 def test_missing_presence_lists_what_would_satisfy_it():
-    reason = failures([CitationMarker.expected(when=CitationDemand)], "explain with sources", "Caching is useful.")[
-        "has_citation_marker[when citation_demand]"
-    ]
+    reason = failures(
+        [CitationMarker.expected(when=CitationDemand)],
+        "explain with sources",
+        "Caching is useful.",
+    )["has_citation_marker[when citation_demand]"]
     assert "expected something like: according to" in reason
 
 
@@ -146,7 +172,9 @@ def test_field_is_named_in_the_failure():
         return Out(notes="a rich tapestry")
 
     case = dataset.evaluate_sync(task).cases[0]
-    assert "in notes" in case.assertions["no_slop"].reason
+    reason = case.assertions["no_slop"].reason
+    assert reason is not None
+    assert "in notes" in reason
 
 
 def test_passing_assertions_carry_no_noise():

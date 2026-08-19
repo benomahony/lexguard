@@ -1,0 +1,12 @@
+[project]
+site_name = "lexica"
+site_url = "https://Unknown.github.io/lexica"
+site_description = "Word lists that assert, for pydantic-evals"
+site_author = "Unknown"
+copyright = "&copy; 2026 Unknown"
+docs_dir = "docs"
+site_dir = "site"
+use_directory_urls = true
+
+[project.theme]
+variant = "modern"

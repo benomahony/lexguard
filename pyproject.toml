@@ -1,7 +1,7 @@
 [project]
 name = "lexica"
 version = "0.1.0"
-description = "Word lists that assert, for pydantic-evals"
+description = "Lexicons that score text for a concept, with pydantic-evals evaluators built in"
 requires-python = ">=3.12"
 dependencies = [
     "pydantic-ai-slim>=2.31.1",
@@ -18,5 +18,93 @@ packages = ["src/lexica"]
 [dependency-groups]
 dev = [
     "pytest>=8.0",
+    "pytest-cov>=6.0.0",
     "pytest-examples>=0.0.18",
+    "pytest-xdist>=3.0.0",
+    "ruff>=0.3.0",
+    "basedpyright>=1.10.0",
+    "prek>=0.1.0",
+    "vulture>=2.11",
+    "bandit>=1.7.0",
+    "deptry>=0.12.0",
+    "bump-my-version>=0.28.0",
+    "zensical>=0.0.10",
 ]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.ruff.lint.per-file-ignores]
+"src/lexica/__init__.py" = ["F403"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+    "--cov=lexica",
+    "--cov-branch",
+    "--cov-report=term-missing",
+    "--strict-markers",
+]
+markers = [
+    "unit: Fast unit tests (no subprocess, can run in parallel with -n auto)",
+    "integration: Slow integration tests (subprocess, run sequentially)",
+]
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.bandit]
+exclude_dirs = ["tests"]
+skips = ["B101"]
+
+[tool.basedpyright]
+include = ["src/lexica"]
+typeCheckingMode = "standard"
+
+[tool.deptry]
+extend_exclude = ["tests"]
+
+[tool.deptry.per_rule_ignores]
+DEP002 = ["pytest", "pytest-cov", "pytest-examples", "pytest-xdist", "ruff", "basedpyright", "prek", "vulture", "bandit", "deptry", "bump-my-version", "zensical"]
+DEP003 = ["lexica", "pydantic"]
+
+[tool.bumpversion]
+current_version = "0.1.0"
+parse = "(?P<major>\\d+)\\.(?P<minor>\\d+)\\.(?P<patch>\\d+)"
+serialize = ["{major}.{minor}.{patch}"]
+search = "{current_version}"
+replace = "{new_version}"
+regex = false
+ignore_missing_version = false
+tag = true
+sign_tags = false
+tag_name = "v{new_version}"
+tag_message = "Bump version: {current_version} → {new_version}"
+allow_dirty = false
+commit = true
+message = "Bump version: {current_version} → {new_version}"
+commit_args = ""
+
+[[tool.bumpversion.files]]
+filename = "pyproject.toml"
+search = "version = \"{current_version}\""
+replace = "version = \"{new_version}\""
+
+[[tool.bumpversion.files]]
+filename = "src/lexica/__init__.py"
+search = "__version__ = \"{current_version}\""
+replace = "__version__ = \"{new_version}\""

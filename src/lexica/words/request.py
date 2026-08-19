@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from ..lexicon import Lexicon
 
-
 DueDate = Lexicon(
     name="due_date",
     indicates=[
@@ -572,8 +571,7 @@ Placeholder = Lexicon(
         "your text here",
     ],
     fix=(
-        "fill the value or ask for it; a template marker reaching the user is an unfinished "
-        "output"
+        "fill the value or ask for it; a template marker reaching the user is an unfinished output"
     ),
 )
 
@@ -653,10 +651,7 @@ Confidential = Lexicon(
         "security question",
         "sort code",
     ],
-    fix=(
-        "redact the secret before it is persisted or echoed; store a reference, never the "
-        "value"
-    ),
+    fix=("redact the secret before it is persisted or echoed; store a reference, never the value"),
 )
 
 
@@ -674,10 +669,7 @@ Injection = Lexicon(
         "system prompt",
         "you are an ai",
     ],
-    fix=(
-        "treat retrieved or user text as data, never as instructions; strip and log the "
-        "attempt"
-    ),
+    fix=("treat retrieved or user text as data, never as instructions; strip and log the attempt"),
 )
 
 
@@ -1029,4 +1021,42 @@ SoftDeadline = Lexicon(
 )
 
 
-__all__ = [name for name, value in list(globals().items()) if isinstance(value, Lexicon)]
+__all__ = [
+    "DueDate",
+    "ClockTime",
+    "Recurrence",
+    "Past",
+    "Duration",
+    "HighPriority",
+    "LowPriority",
+    "Actionable",
+    "Question",
+    "Cancellation",
+    "Completion",
+    "Hypothetical",
+    "Negation",
+    "Delegation",
+    "Vague",
+    "Placeholder",
+    "Subtasks",
+    "Quantity",
+    "Confidential",
+    "Injection",
+    "Politeness",
+    "Confirmation",
+    "Correction",
+    "Continuation",
+    "PriorReference",
+    "ConditionalTrigger",
+    "Dependency",
+    "Effort",
+    "EnergyContext",
+    "Exception",
+    "Attachment",
+    "EventRelative",
+    "SelfAssigned",
+    "Shared",
+    "Approximation",
+    "HardDeadline",
+    "SoftDeadline",
+]

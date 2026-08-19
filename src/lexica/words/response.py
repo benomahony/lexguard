@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from ..lexicon import Lexicon
 
-
 Preamble = Lexicon(
     name="preamble",
     indicates=[
@@ -24,10 +23,7 @@ Preamble = Lexicon(
         "sure",
         "to answer your question",
     ],
-    fix=(
-        "drop the opener and start with the answer; the first sentence should carry "
-        "information"
-    ),
+    fix=("drop the opener and start with the answer; the first sentence should carry information"),
 )
 
 
@@ -326,10 +322,7 @@ TransitionSlop = Lexicon(
         "thus",
         "to conclude",
     ],
-    fix=(
-        "cut the connective; if the link between paragraphs needs stating, restructure "
-        "instead"
-    ),
+    fix=("cut the connective; if the link between paragraphs needs stating, restructure instead"),
 )
 
 
@@ -519,4 +512,25 @@ CitationMarker = Lexicon(
 )
 
 
-__all__ = [name for name, value in list(globals().items()) if isinstance(value, Lexicon)]
+__all__ = [
+    "Preamble",
+    "Postamble",
+    "Sycophancy",
+    "Hedging",
+    "Overclaim",
+    "Disclaimer",
+    "Refusal",
+    "SelfReference",
+    "Anthropomorphic",
+    "Slop",
+    "TransitionSlop",
+    "ContrastCliche",
+    "EmptyIntensifier",
+    "UnsourcedAuthority",
+    "Apology",
+    "UncertaintyAdmission",
+    "SystemLeak",
+    "EngagementBait",
+    "Padding",
+    "CitationMarker",
+]
