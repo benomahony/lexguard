@@ -22,9 +22,9 @@ Estimate = Lexicon(
 )
 
 print(Estimate.signal("that should take roughly a week"))
-# > present
+#> present
 print(Estimate.signal("it depends on how many clients hold session state"))
-# > denied
+#> denied
 ```
 
 ## Write for precision, not recall
@@ -40,9 +40,9 @@ Loose = Lexicon(name="loose", indicates=["just", "simple"])
 Tight = Lexicon(name="tight", indicates=["plug and play", "out of the box", "drop in"])
 
 print(Loose.signal("just checking you got my last message"))
-# > present
+#> present
 print(Tight.signal("just checking you got my last message"))
-# > absent
+#> absent
 ```
 
 ## rules_out is where the judgement lives
@@ -54,11 +54,11 @@ wording then resolves to `denied` instead of firing both.
 from lexica import HardDeadline, SoftDeadline
 
 print(HardDeadline.signal("this must be in by friday"))
-# > present
+#> present
 print(HardDeadline.signal("ideally by friday"))
-# > denied
+#> denied
 print(SoftDeadline.signal("ideally friday, but it is a hard deadline"))
-# > denied
+#> denied
 ```
 
 ## Extending what ships
@@ -75,11 +75,11 @@ HouseStyle = Slop.extend(
 )
 
 print(len(Slop.indicates), len(HouseStyle.indicates))
-# > 50 54
+#> 50 54
 print(HouseStyle.signal("going forward we will utilise a new approach"))
-# > present
+#> present
 print(Slop.signal("going forward we will utilise a new approach"))
-# > absent
+#> absent
 ```
 
 ## Grouping
@@ -103,9 +103,9 @@ print(Bloat.signals("moreover, it is essentially a tapestry"))
 from lexica import GROUPS, Sycophancy
 
 print(Sycophancy)
-# > Lexicon(sycophancy, 17 indicators, 0 blockers)
+#> Lexicon(sycophancy, 17 indicators, 0 blockers)
 print(Sycophancy.examples())
-# > ['brilliant question', 'excellent point', 'excellent question', 'good catch']
+#> ['brilliant question', 'excellent point', 'excellent question', 'good catch']
 print({name: len(group) for name, group in GROUPS.items()})
-# > {'request': 37, 'instruction': 19, 'response': 20, 'domain': 15}
+#> {'request': 37, 'instruction': 19, 'response': 20, 'domain': 15}
 ```

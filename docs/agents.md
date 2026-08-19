@@ -23,7 +23,7 @@ report = Dataset(
     evaluators=[Bloat.absent(), Servility.absent()],
 ).evaluate_sync(task)
 print(sorted(name for name, result in report.cases[0].assertions.items() if not result.value))
-# > ['no_postamble', 'no_slop', 'no_sycophancy']
+#> ['no_postamble', 'no_slop', 'no_sycophancy']
 ```
 
 The task unwraps `.output` because a rule stringifies whatever it is handed, and an
@@ -102,7 +102,7 @@ report = Dataset(
     evaluators=[Overclaim.absent(), UncertaintyAdmission.expected()],
 ).evaluate_sync(task)
 print({name: result.value for name, result in report.cases[0].assertions.items()})
-# > {'no_overclaim': False, 'has_uncertainty_admission': False}
+#> {'no_overclaim': False, 'has_uncertainty_admission': False}
 ```
 
 ## Alongside the built in evaluators

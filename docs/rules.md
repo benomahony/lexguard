@@ -76,9 +76,9 @@ did_not = Dataset(
 ).evaluate_sync(agent)
 
 print({name: result.value for name, result in asked.cases[0].assertions.items()})
-# > {'has_citation_marker[when citation_demand]': False}
+#> {'has_citation_marker[when citation_demand]': False}
 print(did_not.cases[0].assertions)
-# > {}
+#> {}
 ```
 
 ## Scoping to a field
@@ -116,7 +116,7 @@ report = Dataset(
     ],
 ).evaluate_sync(agent)
 print({name: result.value for name, result in report.cases[0].assertions.items()})
-# > {'no_confidential': False, 'no_confidential_2': True, 'no_overclaim': False}
+#> {'no_confidential': False, 'no_confidential_2': True, 'no_overclaim': False}
 ```
 
 Two rules named `no_confidential` collapse to one key. Scope a lexicon to one field per suite, or the
@@ -143,7 +143,7 @@ report = Dataset(
     evaluators=[Observe([Hedging, Disclaimer])],
 ).evaluate_sync(agent)
 print({name: label.value for name, label in report.cases[0].labels.items()})
-# > {'hedging': 'present', 'disclaimer': 'absent'}
+#> {'hedging': 'present', 'disclaimer': 'absent'}
 print(report.cases[0].assertions)
-# > {}
+#> {}
 ```

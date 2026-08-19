@@ -24,9 +24,9 @@ A lexicon on its own only observes. Naming a polarity turns it into a verdict.
 from lexica import Slop
 
 print(Slop.signal("let us delve into the intricate tapestry"))
-# > present
+#> present
 print(Slop.signal("caching skips repeated work"))
-# > absent
+#> absent
 ```
 
 Lexicons are three valued, not two. `rules_out` exists so that wording which merely shares
@@ -36,11 +36,11 @@ vocabulary with a concept does not count as the concept.
 from lexica import HighPriority, Recurrence
 
 print(Recurrence.signal("bin day every tuesday"))
-# > present
+#> present
 print(Recurrence.signal("i do that every so often"))
-# > denied
+#> denied
 print(HighPriority.signal("sort it whenever, no rush"))
-# > denied
+#> denied
 ```
 
 `denied` is not the same as `absent`. An agent setting `priority=high` on "no rush" is wrong,
@@ -85,7 +85,7 @@ dataset = Dataset(
 )
 report = dataset.evaluate_sync(agent)
 print(sorted(name for name, result in report.cases[0].assertions.items() if not result.value))
-# > ['no_postamble', 'no_slop', 'no_sycophancy']
+#> ['no_postamble', 'no_slop', 'no_sycophancy']
 ```
 
 ## Failures tell you what to change
