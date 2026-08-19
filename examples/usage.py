@@ -7,7 +7,7 @@ from pydantic_ai import Agent
 from pydantic_ai.models.test import TestModel
 from pydantic_evals import Case, Dataset
 
-from lexica import (
+from lexguard import (
     AdviceDemand,
     Bloat,
     CitationDemand,

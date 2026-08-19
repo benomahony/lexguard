@@ -15,7 +15,7 @@ lexicon fires. `unless` runs it only if it does not.
 ```py
 from pydantic_evals import Case, Dataset
 
-from lexica import AdviceDemand, Disclaimer, NoCaveats
+from lexguard import AdviceDemand, Disclaimer, NoCaveats
 
 
 async def agent(prompt: str) -> str:
@@ -58,7 +58,7 @@ otherwise fill a dashboard with green from rules that never ran.
 ```py
 from pydantic_evals import Case, Dataset
 
-from lexica import CitationDemand, CitationMarker
+from lexguard import CitationDemand, CitationMarker
 
 
 async def agent(prompt: str) -> str:
@@ -89,7 +89,7 @@ print(did_not.cases[0].assertions)
 from pydantic import BaseModel
 from pydantic_evals import Case, Dataset
 
-from lexica import Confidential, Overclaim
+from lexguard import Confidential, Overclaim
 
 
 class Ticket(BaseModel):
@@ -130,7 +130,7 @@ anyone decides it should fail a build.
 ```py
 from pydantic_evals import Case, Dataset
 
-from lexica import Disclaimer, Hedging, Observe
+from lexguard import Disclaimer, Hedging, Observe
 
 
 async def agent(prompt: str) -> str:

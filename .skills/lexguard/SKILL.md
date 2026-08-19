@@ -1,11 +1,11 @@
 ---
-name: lexica
-description: Help users work with lexica. Use when the user asks about lexica features, usage, or wants to check text (agent output, user requests, structured fields) for a concept like slop, sycophancy, disclaimers, or confidentiality — with or without pydantic-evals.
+name: lexguard
+description: Help users work with lexguard. Use when the user asks about lexguard features, usage, or wants to check text (agent output, user requests, structured fields) for a concept like slop, sycophancy, disclaimers, or confidentiality — with or without pydantic-evals.
 ---
 
-# lexica Skill
+# lexguard Skill
 
-lexica is a library of lexicons: named sets of words and phrases that signal a concept, plus the
+lexguard is a library of lexicons: named sets of words and phrases that signal a concept, plus the
 words that rule it out. Ninety one ship in the box, covering both what a user asked for and what a
 model produced. It is **not only** a pydantic-evals add-on — the core matching API is plain
 functions over a string, useful anywhere you want to check text, and pydantic-evals evaluators are
@@ -19,11 +19,11 @@ Use this skill when:
   similar patterns in text (agent output or user requests)
 - The user wants a guardrail, unit-test assertion, or log filter that fires on specific wording,
   with no evals framework involved
-- The user is writing pydantic-evals `Dataset`/`Case` evaluations and wants lexica's evaluators
+- The user is writing pydantic-evals `Dataset`/`Case` evaluations and wants lexguard's evaluators
   alongside their own
 - The user wants to define a lexicon for their own domain (`Lexicon(...)`, `.extend()`, `|` to
   group lexicons)
-- The user asks about lexica's API, guards (`when`/`unless`), or scoping to a field
+- The user asks about lexguard's API, guards (`when`/`unless`), or scoping to a field
   (`field="notes"`, `field="items[]"`)
 
 ## Two ways to run a lexicon
@@ -32,7 +32,7 @@ Use this skill when:
 no `Case`, nothing from pydantic-evals needs to run:
 
 ```python
-from lexica import Confidential
+from lexguard import Confidential
 
 
 def guard(reply: str) -> str:
@@ -46,7 +46,7 @@ def guard(reply: str) -> str:
 
 ```python
 from pydantic_evals import Case, Dataset
-from lexica import Servility, Slop
+from lexguard import Servility, Slop
 
 dataset = Dataset(
     name="prose",
@@ -69,7 +69,7 @@ dataset = Dataset(
 - `Observe([lexicons])` — a pydantic-evals evaluator that records labels instead of assertions, for
   measuring before enforcing
 
-## Prebuilt suites (`lexica.suites`)
+## Prebuilt suites (`lexguard.suites`)
 
 - `Bloat`, `Servility`, `Leakage`, `Overreach` — `Bundle`s grouping related output lexicons
 - `PROSE` — the four bundles above, as a list of evaluators
@@ -84,5 +84,5 @@ dataset = Dataset(
 - [docs/rules.md](../../docs/rules.md) — `.absent()`/`.expected()`, `when`/`unless` guards, field
   scoping, `Observe`
 - [docs/agents.md](../../docs/agents.md) — checking pydantic-ai agent output, plain or structured
-- `src/lexica/words/` — the shipped lexicons, grouped by `domain`, `instruction`, `request`,
+- `src/lexguard/words/` — the shipped lexicons, grouped by `domain`, `instruction`, `request`,
   `response`

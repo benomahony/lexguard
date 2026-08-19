@@ -66,17 +66,17 @@ repos:
         require_serial: true
       - id: vulture
         name: vulture
-        entry: uv run vulture src/lexica/ --min-confidence 80
+        entry: uv run vulture src/lexguard/ --min-confidence 80
         language: system
         types: [python]
-        files: ^src/lexica/
+        files: ^src/lexguard/
         pass_filenames: false
         require_serial: true
       - id: bandit
         name: bandit
-        entry: uv run bandit -c pyproject.toml -r src/lexica/
+        entry: uv run bandit -c pyproject.toml -r src/lexguard/
         language: system
-        files: ^src/lexica/
+        files: ^src/lexguard/
         exclude: ^tests/
         pass_filenames: false
       - id: deptry

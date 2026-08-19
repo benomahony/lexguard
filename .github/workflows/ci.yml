@@ -31,10 +31,10 @@ jobs:
         run: uv run basedpyright
 
       - name: Run unit tests (parallel)
-        run: uv run pytest -m unit -n auto --cov=src/lexica --cov-report=term-missing
+        run: uv run pytest -m unit -n auto --cov=src/lexguard --cov-report=term-missing
 
       - name: Run integration tests (sequential)
-        run: uv run pytest -m integration --cov=src/lexica --cov-append --cov-report=term-missing
+        run: uv run pytest -m integration --cov=src/lexguard --cov-append --cov-report=term-missing
 
   publish:
     needs: test
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/lexica
+      url: https://pypi.org/p/lexguard
     permissions:
       id-token: write
       contents: write

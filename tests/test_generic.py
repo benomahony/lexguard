@@ -3,8 +3,8 @@ from __future__ import annotations
 import pytest
 from pydantic_evals import Case, Dataset
 
-from lexica.suites import GENERIC
-from lexica.words import instruction, response
+from lexguard.suites import GENERIC
+from lexguard.words import instruction, response
 
 pytestmark = pytest.mark.unit
 

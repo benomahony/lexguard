@@ -8,7 +8,7 @@ from pydantic_ai import Agent
 from pydantic_ai.models.test import TestModel
 from pydantic_evals import Case, Dataset
 
-from lexica import Bloat, Servility
+from lexguard import Bloat, Servility
 
 agent = Agent(TestModel(custom_output_text="Great question! Let us delve in. Hope this helps!"))
 
@@ -41,7 +41,7 @@ from pydantic_ai import Agent
 from pydantic_ai.models.test import TestModel
 from pydantic_evals import Case, Dataset
 
-from lexica import Confidential
+from lexguard import Confidential
 
 
 class Ticket(BaseModel):
@@ -87,7 +87,7 @@ from pydantic_ai import Agent
 from pydantic_ai.models.test import TestModel
 from pydantic_evals import Case, Dataset
 
-from lexica import Overclaim, UncertaintyAdmission
+from lexguard import Overclaim, UncertaintyAdmission
 
 agent = Agent(TestModel(custom_output_text="This is guaranteed to work, it never fails."))
 

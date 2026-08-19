@@ -1,6 +1,6 @@
 [project]
-site_name = "lexica"
-site_url = "https://benomahony.github.io/lexica"
+site_name = "lexguard"
+site_url = "https://benomahony.github.io/lexguard"
 site_description = "Lexicons that score text for a concept, with pydantic-evals evaluators built in"
 site_author = "benomahony"
 copyright = "&copy; 2026 benomahony"

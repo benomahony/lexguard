@@ -3,7 +3,7 @@
 A lexicon is data. Three lists and a sentence.
 
 ```py
-from lexica import Lexicon
+from lexguard import Lexicon
 
 Estimate = Lexicon(
     name="estimate",
@@ -34,7 +34,7 @@ costs you one caught case. Prefer phrases over bare words when the bare word is 
 `"just"` appears in "just a simple drop in" and also in "just checking". `"plug and play"` does not.
 
 ```py
-from lexica import Lexicon
+from lexguard import Lexicon
 
 Loose = Lexicon(name="loose", indicates=["just", "simple"])
 Tight = Lexicon(name="tight", indicates=["plug and play", "out of the box", "drop in"])
@@ -51,7 +51,7 @@ Pair lexicons that describe opposite ends of the same axis and have each rule th
 wording then resolves to `denied` instead of firing both.
 
 ```py
-from lexica import HardDeadline, SoftDeadline
+from lexguard import HardDeadline, SoftDeadline
 
 print(HardDeadline.signal("this must be in by friday"))
 #> present
@@ -67,7 +67,7 @@ print(SoftDeadline.signal("ideally friday, but it is a hard deadline"))
 shared list rather than forking it.
 
 ```py
-from lexica import Slop
+from lexguard import Slop
 
 HouseStyle = Slop.extend(
     indicates=["at this moment in time", "going forward", "in order to", "utilise"],
@@ -88,7 +88,7 @@ print(Slop.signal("going forward we will utilise a new approach"))
 blurred verdict.
 
 ```py
-from lexica import Padding, Slop, TransitionSlop
+from lexguard import Padding, Slop, TransitionSlop
 
 Bloat = Slop | TransitionSlop | Padding
 print(Bloat.signals("moreover, it is essentially a tapestry"))
@@ -100,7 +100,7 @@ print(Bloat.signals("moreover, it is essentially a tapestry"))
 ## Inspecting
 
 ```py
-from lexica import GROUPS, Sycophancy
+from lexguard import GROUPS, Sycophancy
 
 print(Sycophancy)
 #> Lexicon(sycophancy, 17 indicators, 0 blockers)

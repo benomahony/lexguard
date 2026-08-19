@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from pydantic_evals import Case, Dataset
 
-from lexica import (
+from lexguard import (
     AdviceDemand,
     CitationDemand,
     CitationMarker,
@@ -15,7 +15,7 @@ from lexica import (
     Servility,
     Sycophancy,
 )
-from lexica.words.response import Slop
+from lexguard.words.response import Slop
 
 pytestmark = pytest.mark.unit
 

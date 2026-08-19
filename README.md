@@ -1,4 +1,4 @@
-# lexica
+# lexguard
 
 Lexicons that score text for a concept, plus the [pydantic-evals](https://ai.pydantic.dev/evals/)
 evaluators to run them as part of a `Dataset`.
@@ -13,7 +13,7 @@ inside a `Dataset`.
 ## Install
 
 ```bash
-uv add lexica
+uv add lexguard
 ```
 
 ## The idea
@@ -21,7 +21,7 @@ uv add lexica
 A lexicon on its own only observes. Naming a polarity turns it into a verdict.
 
 ```py
-from lexica import Slop
+from lexguard import Slop
 
 print(Slop.signal("let us delve into the intricate tapestry"))
 #> present
@@ -33,7 +33,7 @@ Lexicons are three valued, not two. `rules_out` exists so that wording which mer
 vocabulary with a concept does not count as the concept.
 
 ```py
-from lexica import HighPriority, Recurrence
+from lexguard import HighPriority, Recurrence
 
 print(Recurrence.signal("bin day every tuesday"))
 #> present
@@ -54,7 +54,7 @@ as well as a guardrail before a response goes out, a plain `assert` in a unit te
 a log pipeline.
 
 ```py
-from lexica import Confidential
+from lexguard import Confidential
 
 
 def guard(reply: str) -> str:
@@ -71,7 +71,7 @@ running as part of a `Dataset` alongside everything else.
 ```py
 from pydantic_evals import Case, Dataset
 
-from lexica import Servility, Slop
+from lexguard import Servility, Slop
 
 
 async def agent(prompt: str) -> str:
@@ -93,7 +93,7 @@ print(sorted(name for name, result in report.cases[0].assertions.items() if not 
 ```py
 from pydantic_evals import Case, Dataset
 
-from lexica import Slop
+from lexguard import Slop
 
 
 async def agent(prompt: str) -> str:

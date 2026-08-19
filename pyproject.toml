@@ -1,6 +1,6 @@
 [project]
-name = "lexica"
-version = "0.1.1"
+name = "lexguard"
+version = "0.1.0"
 description = "Lexicons that score text for a concept, with pydantic-evals evaluators built in"
 requires-python = ">=3.12"
 dependencies = [
@@ -13,7 +13,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/lexica"]
+packages = ["src/lexguard"]
 
 [dependency-groups]
 dev = [
@@ -46,12 +46,12 @@ select = ["E", "F", "W", "I", "N"]
 quote-style = "double"
 
 [tool.ruff.lint.per-file-ignores]
-"src/lexica/__init__.py" = ["F403"]
+"src/lexguard/__init__.py" = ["F403"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = [
-    "--cov=lexica",
+    "--cov=lexguard",
     "--cov-branch",
     "--cov-report=term-missing",
     "--strict-markers",
@@ -76,7 +76,7 @@ exclude_dirs = ["tests"]
 skips = ["B101"]
 
 [tool.basedpyright]
-include = ["src/lexica"]
+include = ["src/lexguard"]
 typeCheckingMode = "standard"
 
 [tool.deptry]
@@ -84,7 +84,7 @@ extend_exclude = ["tests"]
 
 [tool.deptry.per_rule_ignores]
 DEP002 = ["pytest", "pytest-cov", "pytest-examples", "pytest-xdist", "ruff", "basedpyright", "prek", "vulture", "bandit", "deptry", "bump-my-version", "zensical"]
-DEP003 = ["lexica", "pydantic"]
+DEP003 = ["lexguard", "pydantic"]
 
 [tool.bumpversion]
 current_version = "0.1.1"
@@ -109,6 +109,6 @@ search = "version = \"{current_version}\""
 replace = "version = \"{new_version}\""
 
 [[tool.bumpversion.files]]
-filename = "src/lexica/__init__.py"
+filename = "src/lexguard/__init__.py"
 search = "__version__ = \"{current_version}\""
 replace = "__version__ = \"{new_version}\""

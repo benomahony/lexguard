@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-from lexica.lexicon import Lexicon
-from lexica.words import domain, instruction, request, response
+from lexguard.lexicon import Lexicon
+from lexguard.words import domain, instruction, request, response
 
 pytestmark = pytest.mark.unit
 
