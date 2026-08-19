@@ -34,6 +34,10 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+# pytest-examples (tests/test_docs.py) is the source of truth for the Python examples embedded
+# in Markdown docs, and expects its own `#>` output-comment convention. Keep ruff off .md files
+# so its markdown-code formatting doesn't fight that convention.
+extend-exclude = ["*.md"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N"]

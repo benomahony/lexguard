@@ -1,12 +1,22 @@
 [project]
 site_name = "lexica"
-site_url = "https://Unknown.github.io/lexica"
-site_description = "Word lists that assert, for pydantic-evals"
-site_author = "Unknown"
-copyright = "&copy; 2026 Unknown"
+site_url = "https://benomahony.github.io/lexica"
+site_description = "Lexicons that score text for a concept, with pydantic-evals evaluators built in"
+site_author = "benomahony"
+copyright = "&copy; 2026 benomahony"
 docs_dir = "docs"
 site_dir = "site"
 use_directory_urls = true
 
 [project.theme]
 variant = "modern"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+toggle = { icon = "material/brightness-7", name = "Switch to dark mode" }
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+toggle = { icon = "material/brightness-4", name = "Switch to light mode" }
