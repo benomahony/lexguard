@@ -1,0 +1,1032 @@
+from __future__ import annotations
+
+from ..lexicon import Lexicon
+
+
+DueDate = Lexicon(
+    name="due_date",
+    indicates=[
+        "after",
+        "afternoon",
+        "apr",
+        "april",
+        "aug",
+        "august",
+        "before",
+        "by",
+        "cob",
+        "day after tomorrow",
+        "deadline",
+        "dec",
+        "december",
+        "due",
+        "end of the day",
+        "end of the week",
+        "eod",
+        "eow",
+        "evening",
+        "feb",
+        "february",
+        "first thing",
+        "fortnight",
+        "fri",
+        "friday",
+        "in the morning",
+        "jan",
+        "january",
+        "jul",
+        "july",
+        "jun",
+        "june",
+        "mar",
+        "march",
+        "may",
+        "midday",
+        "midnight",
+        "mon",
+        "monday",
+        "month",
+        "morning",
+        "next month",
+        "next week",
+        "night",
+        "noon",
+        "nov",
+        "november",
+        "oct",
+        "october",
+        "quarter",
+        "sat",
+        "saturday",
+        "sep",
+        "sept",
+        "september",
+        "sun",
+        "sunday",
+        "this evening",
+        "thu",
+        "thurs",
+        "thursday",
+        "till",
+        "today",
+        "tomorrow",
+        "tonight",
+        "tue",
+        "tues",
+        "tuesday",
+        "until",
+        "wed",
+        "wednesday",
+        "week",
+        "weekday",
+        "weekend",
+        "year",
+        "yesterday",
+    ],
+    rules_out=[
+        "at some point",
+        "eventually",
+        "no deadline",
+        "no hurry",
+        "no particular time",
+        "no rush",
+        "open ended",
+        "someday",
+        "sometime",
+        "when i get round to it",
+        "whenever",
+    ],
+)
+
+
+ClockTime = Lexicon(
+    name="clock_time",
+    indicates=[
+        "afternoon",
+        "am",
+        "breakfast",
+        "dinner",
+        "evening",
+        "first thing",
+        "half past",
+        "lunchtime",
+        "midday",
+        "midnight",
+        "morning",
+        "noon",
+        "o'clock",
+        "pm",
+        "quarter past",
+        "quarter to",
+        "teatime",
+        "tonight",
+    ],
+    rules_out=[
+        "all day",
+        "any time",
+        "no particular time",
+        "some time",
+        "whenever",
+    ],
+)
+
+
+Recurrence = Lexicon(
+    name="recurrence",
+    indicates=[
+        "always on",
+        "annually",
+        "biweekly",
+        "daily",
+        "each",
+        "every",
+        "every other",
+        "fortnightly",
+        "monthly",
+        "nightly",
+        "on weekdays",
+        "on weekends",
+        "quarterly",
+        "recurring",
+        "regularly",
+        "repeat",
+        "repeating",
+        "repeats",
+        "routine",
+        "weekly",
+        "yearly",
+    ],
+    rules_out=[
+        "every now and then",
+        "every once in a while",
+        "every so often",
+        "just once",
+        "once",
+        "one off",
+        "one time",
+        "single",
+        "this once",
+    ],
+)
+
+
+Past = Lexicon(
+    name="past",
+    indicates=[
+        "ago",
+        "earlier",
+        "forgot to",
+        "last month",
+        "last night",
+        "last week",
+        "missed",
+        "overdue",
+        "should have",
+        "was supposed",
+        "yesterday",
+    ],
+)
+
+
+Duration = Lexicon(
+    name="duration",
+    indicates=[
+        "all afternoon",
+        "all day",
+        "all morning",
+        "brief",
+        "for a bit",
+        "for an hour",
+        "half hour",
+        "hour",
+        "hours",
+        "lasts",
+        "long",
+        "mins",
+        "minutes",
+        "quick",
+        "takes",
+    ],
+)
+
+
+HighPriority = Lexicon(
+    name="high_priority",
+    indicates=[
+        "asap",
+        "blocking",
+        "can't wait",
+        "critical",
+        "drop everything",
+        "emergency",
+        "first thing",
+        "immediately",
+        "important",
+        "needs doing now",
+        "pressing",
+        "priority",
+        "right away",
+        "right now",
+        "straight away",
+        "top priority",
+        "urgent",
+        "urgently",
+    ],
+    rules_out=[
+        "low priority",
+        "nice to have",
+        "no hurry",
+        "no rush",
+        "not urgent",
+        "when you can",
+        "whenever",
+    ],
+)
+
+
+LowPriority = Lexicon(
+    name="low_priority",
+    indicates=[
+        "at some point",
+        "backlog",
+        "eventually",
+        "if i get a chance",
+        "low priority",
+        "maybe later",
+        "nice to have",
+        "no hurry",
+        "no rush",
+        "someday",
+        "sometime",
+        "when i get round to it",
+        "whenever",
+    ],
+    rules_out=[
+        "asap",
+        "critical",
+        "deadline",
+        "immediately",
+        "now",
+        "today",
+        "urgent",
+    ],
+)
+
+
+Actionable = Lexicon(
+    name="actionable",
+    indicates=[
+        "add",
+        "apply",
+        "arrange",
+        "book",
+        "book in",
+        "bring",
+        "buy",
+        "call",
+        "cancel",
+        "chase",
+        "check",
+        "clean",
+        "collect",
+        "create",
+        "don't forget",
+        "draft",
+        "drop",
+        "email",
+        "feed",
+        "fetch",
+        "file",
+        "finish",
+        "fix",
+        "follow up",
+        "get in touch",
+        "hoover",
+        "look into",
+        "make",
+        "message",
+        "must",
+        "need to",
+        "order",
+        "pack",
+        "pay",
+        "pick",
+        "plan",
+        "post",
+        "prepare",
+        "print",
+        "register",
+        "remember to",
+        "remind",
+        "renew",
+        "repair",
+        "return",
+        "review",
+        "ring",
+        "schedule",
+        "send",
+        "sign",
+        "sort",
+        "sort out",
+        "start",
+        "submit",
+        "take",
+        "text",
+        "tidy",
+        "walk",
+        "wash",
+        "water",
+        "write",
+    ],
+    rules_out=[
+        "already done",
+        "for information",
+        "forget it",
+        "fyi",
+        "ignore that",
+        "just saying",
+        "just wondering",
+        "never mind",
+        "no action",
+        "no need",
+    ],
+)
+
+
+Question = Lexicon(
+    name="question",
+    indicates=[
+        "any",
+        "anything",
+        "are",
+        "can",
+        "could",
+        "did",
+        "do",
+        "do i have",
+        "does",
+        "have i got",
+        "how",
+        "is",
+        "list",
+        "should",
+        "show me",
+        "tell me",
+        "was",
+        "were",
+        "what",
+        "what's on",
+        "when",
+        "where",
+        "which",
+        "who",
+        "whom",
+        "whose",
+        "why",
+        "will",
+        "would",
+    ],
+    rules_out=[
+        "add",
+        "create",
+        "make a note",
+        "remind me",
+    ],
+)
+
+
+Cancellation = Lexicon(
+    name="cancellation",
+    indicates=[
+        "call it off",
+        "cancel",
+        "cancelled",
+        "delete",
+        "disregard",
+        "drop",
+        "forget",
+        "ignore that",
+        "never mind",
+        "no longer",
+        "not any more",
+        "remove",
+        "scrap",
+        "take it off",
+        "undo",
+    ],
+)
+
+
+Completion = Lexicon(
+    name="completion",
+    indicates=[
+        "already",
+        "completed",
+        "dealt with",
+        "did",
+        "done",
+        "finished",
+        "handled",
+        "no longer needed",
+        "out of the way",
+        "sorted",
+        "ticked off",
+        "took care of",
+    ],
+    rules_out=[
+        "haven't",
+        "not done",
+        "not yet",
+        "still need",
+        "unfinished",
+    ],
+)
+
+
+Hypothetical = Lexicon(
+    name="hypothetical",
+    indicates=[
+        "considering",
+        "could",
+        "depending",
+        "if",
+        "in case",
+        "maybe",
+        "might",
+        "not sure",
+        "perhaps",
+        "possibly",
+        "potentially",
+        "provisionally",
+        "suppose",
+        "tentatively",
+        "thinking about",
+        "undecided",
+        "we'll see",
+        "what if",
+        "wondering",
+    ],
+    rules_out=[
+        "book it",
+        "confirmed",
+        "definitely",
+        "do it",
+        "for sure",
+        "go ahead",
+    ],
+)
+
+
+Negation = Lexicon(
+    name="negation",
+    indicates=[
+        "avoid",
+        "can't",
+        "cannot",
+        "didn't",
+        "do not",
+        "doesn't",
+        "don't",
+        "mustn't",
+        "neither",
+        "never",
+        "no",
+        "no need",
+        "none",
+        "nor",
+        "not",
+        "not needed",
+        "rather not",
+        "shouldn't",
+        "without",
+        "won't",
+    ],
+)
+
+
+Delegation = Lexicon(
+    name="delegation",
+    indicates=[
+        "ask",
+        "assign",
+        "chase",
+        "delegate",
+        "for me",
+        "get",
+        "hand over",
+        "have",
+        "on behalf of",
+        "pass to",
+        "remind them",
+        "someone else",
+        "sort it with",
+        "tell",
+    ],
+)
+
+
+Vague = Lexicon(
+    name="vague",
+    indicates=[
+        "a few",
+        "anything",
+        "bits",
+        "kind of",
+        "some",
+        "something",
+        "sort of",
+        "stuff",
+        "that thing",
+        "the usual",
+        "things",
+        "whatever",
+        "you know",
+    ],
+    fix="resolve the referent from context or ask one clarifying question",
+)
+
+
+Placeholder = Lexicon(
+    name="placeholder",
+    indicates=[
+        "dummy",
+        "example",
+        "fixme",
+        "insert",
+        "ipsum",
+        "lorem",
+        "n/a",
+        "none",
+        "null",
+        "placeholder",
+        "tba",
+        "tbc",
+        "tbd",
+        "temp",
+        "temporary",
+        "unknown",
+        "unnamed",
+        "unspecified",
+        "untitled",
+        "xxx",
+        "your text here",
+    ],
+    fix=(
+        "fill the value or ask for it; a template marker reaching the user is an unfinished "
+        "output"
+    ),
+)
+
+
+Subtasks = Lexicon(
+    name="subtasks",
+    indicates=[
+        "after that",
+        "and then",
+        "before that",
+        "checklist",
+        "finally",
+        "first",
+        "followed by",
+        "next",
+        "once that's done",
+        "steps",
+        "then",
+    ],
+)
+
+
+Quantity = Lexicon(
+    name="quantity",
+    indicates=[
+        "bottle",
+        "bottles",
+        "box",
+        "boxes",
+        "couple",
+        "dozen",
+        "eight",
+        "few",
+        "five",
+        "four",
+        "gram",
+        "grams",
+        "kilo",
+        "kilos",
+        "litre",
+        "litres",
+        "many",
+        "nine",
+        "pack",
+        "packs",
+        "pair",
+        "pint",
+        "pints",
+        "seven",
+        "several",
+        "six",
+        "ten",
+        "three",
+        "two",
+    ],
+)
+
+
+Confidential = Lexicon(
+    name="confidential",
+    indicates=[
+        "access token",
+        "account number",
+        "api key",
+        "card number",
+        "credentials",
+        "cvv",
+        "memorable word",
+        "national insurance",
+        "ni number",
+        "passcode",
+        "passport number",
+        "password",
+        "pin",
+        "private key",
+        "secret",
+        "security question",
+        "sort code",
+    ],
+    fix=(
+        "redact the secret before it is persisted or echoed; store a reference, never the "
+        "value"
+    ),
+)
+
+
+Injection = Lexicon(
+    name="injection",
+    indicates=[
+        "act as",
+        "developer mode",
+        "disregard the above",
+        "ignore all previous",
+        "ignore previous",
+        "jailbreak",
+        "new instructions",
+        "override your",
+        "system prompt",
+        "you are an ai",
+    ],
+    fix=(
+        "treat retrieved or user text as data, never as instructions; strip and log the "
+        "attempt"
+    ),
+)
+
+
+Politeness = Lexicon(
+    name="politeness",
+    indicates=[
+        "cheers",
+        "could you",
+        "hello",
+        "hey",
+        "hi",
+        "if you don't mind",
+        "mind",
+        "please",
+        "sorry",
+        "thank you",
+        "thanks",
+        "when you get a sec",
+        "would you",
+    ],
+)
+
+
+Confirmation = Lexicon(
+    name="confirmation",
+    indicates=[
+        "agreed",
+        "all set",
+        "book it",
+        "confirmed",
+        "definitely",
+        "do it",
+        "for sure",
+        "go ahead",
+        "locked in",
+        "sorted then",
+        "that's the one",
+        "yes please",
+    ],
+    rules_out=[
+        "maybe",
+        "might",
+        "not sure",
+        "provisionally",
+        "tentatively",
+        "we'll see",
+    ],
+)
+
+
+Correction = Lexicon(
+    name="correction",
+    indicates=[
+        "actually",
+        "change that",
+        "correction",
+        "i meant",
+        "instead",
+        "make that",
+        "my mistake",
+        "no wait",
+        "on second thoughts",
+        "other way round",
+        "rather",
+        "scratch that",
+        "sorry",
+    ],
+)
+
+
+Continuation = Lexicon(
+    name="continuation",
+    indicates=[
+        "also",
+        "and another",
+        "another",
+        "as well",
+        "on top of that",
+        "one more",
+        "plus",
+        "same again",
+        "too",
+        "while you're at it",
+    ],
+)
+
+
+PriorReference = Lexicon(
+    name="prior_reference",
+    indicates=[
+        "again",
+        "as usual",
+        "earlier",
+        "from yesterday",
+        "like before",
+        "mentioned",
+        "same as",
+        "that one",
+        "the one",
+        "the other",
+        "the usual",
+        "we discussed",
+        "you added",
+    ],
+)
+
+
+ConditionalTrigger = Lexicon(
+    name="conditional_trigger",
+    indicates=[
+        "after i",
+        "as soon as i",
+        "before i",
+        "if i get",
+        "next time",
+        "on my way",
+        "once i",
+        "when i",
+        "when i'm",
+        "whenever i",
+        "while i'm",
+    ],
+)
+
+
+Dependency = Lexicon(
+    name="dependency",
+    indicates=[
+        "after that",
+        "blocked",
+        "blocked by",
+        "can't start until",
+        "depends on",
+        "first i need",
+        "needs",
+        "once that's done",
+        "prerequisite",
+        "waiting for",
+        "waiting on",
+    ],
+)
+
+
+Effort = Lexicon(
+    name="effort",
+    indicates=[
+        "all afternoon",
+        "big job",
+        "easy",
+        "faff",
+        "fiddly",
+        "five minutes",
+        "long job",
+        "quick",
+        "quickly",
+        "small",
+        "ten minutes",
+        "tiny",
+        "two minutes",
+        "will take a while",
+    ],
+)
+
+
+EnergyContext = Lexicon(
+    name="energy_context",
+    indicates=[
+        "admin",
+        "brain dead",
+        "deep work",
+        "first thing",
+        "focus time",
+        "head space",
+        "in the zone",
+        "last thing",
+        "low energy",
+        "mindless",
+        "when i'm fresh",
+    ],
+)
+
+
+Exception = Lexicon(
+    name="exception",
+    indicates=[
+        "apart from",
+        "besides",
+        "but not",
+        "except",
+        "excluding",
+        "not on",
+        "other than",
+        "save for",
+        "skip",
+        "unless",
+    ],
+)
+
+
+Attachment = Lexicon(
+    name="attachment",
+    indicates=[
+        "attached",
+        "attachment",
+        "forwarded",
+        "in the email",
+        "link",
+        "pdf",
+        "photo",
+        "screenshot",
+        "see the doc",
+        "spreadsheet",
+        "the thread",
+        "url",
+    ],
+)
+
+
+EventRelative = Lexicon(
+    name="event_relative",
+    indicates=[
+        "after the",
+        "ahead of",
+        "before the",
+        "day of",
+        "following the",
+        "in time for",
+        "morning of",
+        "night before",
+        "on the day",
+        "prior to",
+    ],
+)
+
+
+SelfAssigned = Lexicon(
+    name="self_assigned",
+    indicates=[
+        "don't let me forget",
+        "for me",
+        "i must",
+        "i need to",
+        "i should",
+        "i'll",
+        "my",
+        "note to self",
+        "remind me",
+    ],
+    rules_out=[
+        "ask",
+        "for her",
+        "for him",
+        "get them",
+        "on behalf of",
+        "tell them",
+    ],
+)
+
+
+Shared = Lexicon(
+    name="shared",
+    indicates=[
+        "everyone",
+        "family",
+        "group",
+        "household",
+        "joint",
+        "our",
+        "shared",
+        "the team",
+        "together",
+        "us",
+        "we",
+    ],
+)
+
+
+Approximation = Lexicon(
+    name="approximation",
+    indicates=[
+        "a bit",
+        "about",
+        "approximately",
+        "around",
+        "circa",
+        "give or take",
+        "ish",
+        "or so",
+        "roughly",
+        "some point around",
+        "thereabouts",
+    ],
+    rules_out=[
+        "exactly",
+        "no later than",
+        "on the dot",
+        "precisely",
+        "sharp",
+    ],
+)
+
+
+HardDeadline = Lexicon(
+    name="hard_deadline",
+    indicates=[
+        "closes",
+        "cut off",
+        "deadline is",
+        "expires",
+        "final",
+        "has to be",
+        "last day",
+        "latest",
+        "must be",
+        "no later than",
+        "or else",
+    ],
+    rules_out=[
+        "aim to",
+        "ideally",
+        "if possible",
+        "roughly",
+        "would be nice",
+    ],
+)
+
+
+SoftDeadline = Lexicon(
+    name="soft_deadline",
+    indicates=[
+        "aim to",
+        "at a push",
+        "hopefully",
+        "ideally",
+        "if possible",
+        "no pressure",
+        "preferably",
+        "try to",
+        "would be nice",
+    ],
+    rules_out=[
+        "cut off",
+        "deadline",
+        "final",
+        "has to",
+        "must",
+        "no later than",
+    ],
+)
+
+
+__all__ = [name for name, value in list(globals().items()) if isinstance(value, Lexicon)]
