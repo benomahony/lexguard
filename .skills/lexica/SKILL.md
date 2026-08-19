@@ -34,6 +34,7 @@ no `Case`, nothing from pydantic-evals needs to run:
 ```python
 from lexica import Confidential
 
+
 def guard(reply: str) -> str:
     if Confidential.fires(reply):
         raise ValueError("reply leaks a secret, blocking send")
