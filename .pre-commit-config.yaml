@@ -81,7 +81,7 @@ repos:
         pass_filenames: false
       - id: deptry
         name: deptry
-        entry: uv run deptry . --extend-exclude "\.venv|tests"
+        entry: uv run deptry . --extend-exclude "\.venv|tests|examples"
         language: system
         pass_filenames: false
         require_serial: true

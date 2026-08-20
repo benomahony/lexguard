@@ -55,6 +55,11 @@ def test_or_builds_a_set_that_keeps_its_members():
     assert result == {"no_slop": False, "no_sycophancy": False, "no_preamble": False}
 
 
+def test_bundle_expected_checks_every_member():
+    result = assertions([(Politeness | CitationMarker).expected()], "hi", "4")
+    assert result == {"has_politeness": False, "has_citation_marker": False}
+
+
 def test_named_bundles_are_cue_sets():
     result = assertions(
         [Servility.absent()], "explain", "Certainly! Great question, hope this helps."

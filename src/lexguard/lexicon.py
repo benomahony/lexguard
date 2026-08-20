@@ -28,7 +28,7 @@ def phrases(words: Collection[str]) -> str | None:
     if not multiword:
         return None
     pattern = "|".join(rf"\b{re.escape(word)}\b" for word in multiword)
-    assert pattern.count("|") == len(multiword) - 1
+    # a word containing a literal "|" adds its own escaped "\|", so count() can't check the join
     assert pattern.startswith(r"\b")
     return pattern
 
@@ -165,6 +165,14 @@ class Lexicon:
         assert self in rule.lexicons
         return rule
 
+    def spec(self, wanted: bool = False, **guards: Any) -> Any:
+        from .rulespec import RuleSpec
+
+        result = RuleSpec(lexicons=[self], wanted=wanted, **guards)
+        assert result.wanted is wanted
+        assert self in result.lexicons
+        return result
+
     def _any(self, text: str, words: Collection[str], pattern: str | None) -> bool:
         folded = self._fold(text)
         if pattern and re.search(pattern, folded):
@@ -178,8 +186,8 @@ class Lexicon:
     @staticmethod
     def _fold(text: str) -> str:
         result = unicodedata.normalize("NFKC", text).casefold()
+        # casefold() can decompose what NFKC just composed (e.g. "ῶ"), so result may not stay NFKC
         assert result == result.casefold()
-        assert unicodedata.normalize("NFKC", result) == result
         return result
 
 
@@ -209,6 +217,14 @@ class Bundle:
         assert rule.wanted is True
         assert set(rule.lexicons) == set(self.members)
         return rule
+
+    def spec(self, wanted: bool = False, **guards: Any) -> Any:
+        from .rulespec import RuleSpec
+
+        result = RuleSpec(lexicons=list(self.members), wanted=wanted, **guards)
+        assert result.wanted is wanted
+        assert set(result.lexicons) == set(self.members)
+        return result
 
     def signals(self, text: str) -> dict[str, Signal]:
         result = {member.name: member.signal(text) for member in self.members}

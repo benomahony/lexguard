@@ -1,11 +1,9 @@
 from .lexicon import Bundle as Bundle
 from .lexicon import Lexicon as Lexicon
 from .lexicon import Signal as Signal
-from .rule import Observe as Observe
-from .rule import Rule as Rule
-from .suites import ADHERENCE as ADHERENCE
-from .suites import GENERIC as GENERIC
-from .suites import PROSE as PROSE
+from .rulespec import ObserveSpec as ObserveSpec
+from .rulespec import RuleSpec as RuleSpec
+from .rulespec import Verdict as Verdict
 from .suites import Bloat as Bloat
 from .suites import Leakage as Leakage
 from .suites import Overreach as Overreach

@@ -1,11 +1,19 @@
 [project]
 name = "lexguard"
 version = "0.1.0"
-description = "Lexicons that score text for a concept, with pydantic-evals evaluators built in"
+description = "Lexicons that score text for a concept, with evaluators for pydantic-evals, DeepEval, and Inspect AI"
 requires-python = ">=3.12"
-dependencies = [
-    "pydantic-ai-slim>=2.31.1",
+dependencies = []
+
+[project.optional-dependencies]
+pydantic-evals = [
     "pydantic-evals>=1.0",
+]
+deepeval = [
+    "deepeval>=4.1.8",
+]
+inspect-ai = [
+    "inspect-ai>=0.3.259",
 ]
 
 [build-system]
@@ -29,6 +37,11 @@ dev = [
     "deptry>=0.12.0",
     "bump-my-version>=0.28.0",
     "zensical>=0.0.10",
+    "pydantic-ai-slim>=2.31.1",
+    "pydantic-evals>=1.0",
+    "deepeval>=4.1.8",
+    "inspect-ai>=0.3.259",
+    "hypothesis>=6.165.10",
 ]
 
 [tool.ruff]
@@ -80,10 +93,10 @@ include = ["src/lexguard"]
 typeCheckingMode = "standard"
 
 [tool.deptry]
-extend_exclude = ["tests"]
+extend_exclude = ["tests", "examples"]
 
 [tool.deptry.per_rule_ignores]
-DEP002 = ["pytest", "pytest-cov", "pytest-examples", "pytest-xdist", "ruff", "basedpyright", "prek", "vulture", "bandit", "deptry", "bump-my-version", "zensical"]
+DEP002 = ["pytest", "pytest-cov", "pytest-examples", "pytest-xdist", "ruff", "basedpyright", "prek", "vulture", "bandit", "deptry", "bump-my-version", "zensical", "pydantic-ai-slim", "hypothesis"]
 DEP003 = ["lexguard", "pydantic"]
 
 [tool.bumpversion]

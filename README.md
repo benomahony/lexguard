@@ -1,19 +1,28 @@
-# lexguard
+# Lexguard
 
-Lexicons that score text for a concept, plus the [pydantic-evals](https://ai.pydantic.dev/evals/)
-evaluators to run them as part of a `Dataset`.
+Lexicons that score text for a concept, plus evaluators for
+[pydantic-evals](https://ai.pydantic.dev/evals/), [DeepEval](https://deepeval.com/), and
+[Inspect AI](https://inspect.aisi.org.uk/) built on top.
 
 A lexicon is a named set of words and phrases that signal a concept, plus the words that rule it out.
 Ninety one of them ship in the box, covering what a user asked for and what a model produced.
 `.signal()`, `.fires()` and `.denied()` are plain functions over text: call them directly in a
-guardrail, a test, a CLI, or a log pipeline, no evals framework required. `.absent()` and
-`.expected()` compile the same lexicon into a pydantic-evals evaluator when you want it running
-inside a `Dataset`.
+guardrail, a test, a CLI, or a log pipeline, no evals framework required. `.spec()` compiles the
+same lexicon into a framework-agnostic `RuleSpec`, which `.absent()` / `.expected()` and the
+[integrations](docs/integrations.md) turn into an evaluator for whichever framework you use.
 
 ## Install
 
 ```bash
 uv add lexguard
+```
+
+The core has no dependencies. Each eval framework is its own extra:
+
+```bash
+uv add "lexguard[pydantic-evals]"
+uv add "lexguard[deepeval]"
+uv add "lexguard[inspect-ai]"
 ```
 
 ## The idea
@@ -117,6 +126,7 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 - [Writing a lexicon](docs/writing-a-lexicon.md) for your own domain
 - [Rules](docs/rules.md) and the `when` / `unless` guards
 - [Agents](docs/agents.md) under test with pydantic-ai
+- [Integrations](docs/integrations.md): DeepEval, Inspect AI, and the framework-agnostic `RuleSpec`
 
 ## Prior art
 
