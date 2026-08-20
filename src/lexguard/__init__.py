@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from importlib import import_module
+
 from .lexicon import Bundle as Bundle
 from .lexicon import Lexicon as Lexicon
 from .lexicon import Signal as Signal
@@ -16,3 +20,25 @@ from .words.request import *
 from .words.response import *
 
 __version__ = "0.1.3"
+
+_PYDANTIC_EVALS_SOURCE = {
+    "Rule": "rule",
+    "Observe": "rule",
+    "PROSE": "suites",
+    "ADHERENCE": "suites",
+    "GENERIC": "suites",
+}
+
+
+def __getattr__(name: str) -> object:
+    # deferred so importing lexguard never requires pydantic-evals until these are touched
+    source = _PYDANTIC_EVALS_SOURCE.get(name)
+    if source is None:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    try:
+        module = import_module(f".{source}", __name__)
+        return getattr(module, name)
+    except ImportError as err:
+        raise ImportError(
+            f"lexguard.{name} needs pydantic-evals: pip install 'lexguard[pydantic-evals]'"
+        ) from err
