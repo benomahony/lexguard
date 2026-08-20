@@ -104,8 +104,9 @@ print(Slop.fires("let us circle back"))
 ```
 
 [examples/self_improving.py](../examples/self_improving.py) runs the whole loop as a real
-pydantic-ai agent: the lexicon is a dependency, the agent flags its own misses through a tool, and
-the grown guard is loaded into the next `agent.run(...)` — the capability-creation pattern from
+pydantic-ai agent that flags its own misses through a tool and writes the grown guard back out as a
+`Slop.extend(...)` module — lexicons stay code, so the authored guard is an ordinary file the next
+`agent.run(...)` imports. That is the runtime capability-creation pattern from
 [pydantic-ai-harness](https://github.com/pydantic/pydantic-ai-harness), with a lexicon as the
 capability the agent extends.
 
