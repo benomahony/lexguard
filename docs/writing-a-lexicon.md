@@ -82,6 +82,30 @@ print(Slop.signal("going forward we will utilise a new approach"))
 #> absent
 ```
 
+## Learning from misses
+
+`extend()` is also the primitive a self-improving agent uses to grow its own guard. Every phrase a
+reviewer flags that the guard let through is folded back in, so the next draft is scored against a
+lexicon that learned from the last one.
+
+```py
+from lexguard import Slop
+
+guard = Slop
+print(guard.fires("let us circle back"))
+#> False
+
+# a reviewer flags "circle back" as filler the shipped guard never knew
+guard = guard.extend(indicates=["circle back", "move the needle"])
+print(guard.fires("let us circle back"))
+#> True
+print(Slop.fires("let us circle back"))
+#> False
+```
+
+[examples/self_improving.py](../examples/self_improving.py) runs the whole loop: score a draft,
+fold in what was missed, and watch the lexicon converge on the wording the agent keeps reaching for.
+
 ## Grouping
 
 `|` builds a set that keeps its members, so you still get one assertion per lexicon rather than one
