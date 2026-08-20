@@ -8,6 +8,10 @@ docs_dir = "docs"
 site_dir = "site"
 use_directory_urls = true
 
+[project.plugins.macros]
+module_name = "docs/macros"
+render_by_default = false
+
 [project.theme]
 variant = "modern"
 

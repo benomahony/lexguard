@@ -3,6 +3,7 @@
 </p>
 
 # Lexguard
+
 Lexicons that score text for a concept, plus evaluators for
 [pydantic-evals](https://ai.pydantic.dev/evals/), [DeepEval](https://deepeval.com/), and
 [Inspect AI](https://inspect.aisi.org.uk/) built on top.
@@ -12,7 +13,7 @@ Ninety one of them ship in the box, covering what a user asked for and what a mo
 `.signal()`, `.fires()` and `.denied()` are plain functions over text: call them directly in a
 guardrail, a test, a CLI, or a log pipeline, no evals framework required. `.spec()` compiles the
 same lexicon into a framework-agnostic `RuleSpec`, which `.absent()` / `.expected()` and the
-[integrations](docs/integrations.md) turn into an evaluator for whichever framework you use.
+[integrations](docs/integrations/index.md) turn into an evaluator for whichever framework you use.
 
 ## Install
 
@@ -126,10 +127,13 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 
 ## Docs
 
+- [Lexicons](docs/lexicons/index.md): every lexicon that ships in the box, generated from
+  source, one page per group
 - [Writing a lexicon](docs/writing-a-lexicon.md) for your own domain
 - [Rules](docs/rules.md) and the `when` / `unless` guards
 - [Agents](docs/agents.md) under test with pydantic-ai
-- [Integrations](docs/integrations.md): DeepEval, Inspect AI, and the framework-agnostic `RuleSpec`
+- [Integrations](docs/integrations/index.md): pydantic-evals, DeepEval, Inspect AI, and the
+  framework-agnostic `RuleSpec`, each with its own page
 
 ## Prior art
 

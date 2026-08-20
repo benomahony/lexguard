@@ -14,11 +14,17 @@ optional extra (`lexguard[pydantic-evals]`, `lexguard[deepeval]`, `lexguard[insp
 
 - [README](README.md): install, the core `signal()`/`fires()`/`denied()` API, and both the
   standalone and framework-integrated ways of running a lexicon
+- [Lexicons](docs/lexicons/index.md): every lexicon that ships in the box, rendered from
+  `lexguard.words` and `lexguard.suites` at build time, one page per group —
+  [Request](docs/lexicons/request.md), [Instruction](docs/lexicons/instruction.md),
+  [Response](docs/lexicons/response.md), [Domain](docs/lexicons/domain.md), and
+  [Bundles](docs/lexicons/bundles.md)
 - [Writing a lexicon](docs/writing-a-lexicon.md): building your own `Lexicon` for a new domain
 - [Rules](docs/rules.md): `.absent()` / `.expected()`, the `when` / `unless` guards, and `Observe`
 - [Agents](docs/agents.md): checking pydantic-ai agent output, structured or plain text
-- [Integrations](docs/integrations.md): the framework-agnostic `RuleSpec`, plus DeepEval and
-  Inspect AI adapters
+- [Integrations](docs/integrations/index.md): the framework-agnostic `RuleSpec`, with its own
+  page per framework — [pydantic-evals](docs/integrations/pydantic-evals.md),
+  [DeepEval](docs/integrations/deepeval.md), [Inspect AI](docs/integrations/inspect-ai.md)
 
 ## Project Information
 
