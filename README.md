@@ -1,7 +1,6 @@
+<img src="docs/assets/lexguard.png" alt="lexguard" width="50%">
+
 # Lexguard
-
-![Lexguard](./docs/images/lexguard.png)
-
 Lexicons that score text for a concept, plus evaluators for
 [pydantic-evals](https://ai.pydantic.dev/evals/), [DeepEval](https://deepeval.com/), and
 [Inspect AI](https://inspect.aisi.org.uk/) built on top.
