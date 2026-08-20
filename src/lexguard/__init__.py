@@ -19,7 +19,7 @@ from .words.instruction import *
 from .words.request import *
 from .words.response import *
 
-__version__ = "0.1.6"
+__version__ = "0.1.7"
 
 _PYDANTIC_EVALS_SOURCE = {
     "Rule": "rule",
