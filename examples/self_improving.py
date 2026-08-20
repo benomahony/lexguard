@@ -31,10 +31,9 @@ live guard does not yet know.
 
 from __future__ import annotations
 
-import importlib.util
+import runpy
 import tempfile
 from dataclasses import dataclass, field
-from itertools import count
 from pathlib import Path
 
 from pydantic_ai import Agent, RunContext
@@ -68,18 +67,17 @@ def render_source(indicates: list[str], rules_out: list[str]) -> str:
 
 
 def load_guard(path: Path) -> Lexicon:
-    """Load (and thereby validate) the authored guard, the way the next run would."""
-    name = f"authored_guard_{next(_loads)}"
-    spec = importlib.util.spec_from_file_location(name, path)
-    assert spec and spec.loader, f"cannot import authored guard at {path}"
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)  # runs the source; a broken edit would raise here
-    guard = module.GUARD
+    """Import the authored guard the way the next run's orchestrator would.
+
+    A lexicon persists as code (``Slop.extend(...)``), so loading it is a plain import:
+    ``run_path`` executes the module fresh — validating the edit, since a broken one raises
+    here — and hands back its ``GUARD``. This is the same primitive pydantic-ai's
+    capability-creation uses to load an authored capability into the next ``agent.run(...)``,
+    just over a module whose only export is data.
+    """
+    guard = runpy.run_path(str(path))["GUARD"]
     assert isinstance(guard, Lexicon), "authored module must define a GUARD lexicon"
     return guard
-
-
-_loads = count()
 
 
 @dataclass
