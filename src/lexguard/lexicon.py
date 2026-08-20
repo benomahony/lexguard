@@ -17,6 +17,17 @@ class Signal(StrEnum):
     absent = "absent"
 
 
+def parse(raw: Collection[str]) -> list[str]:
+    # a bare string is a paste — split it into terms on newlines and commas. A real collection
+    # (a list, an agent's JSON array) is one term per entry, so a phrase keeps its commas. This is
+    # what lets you drop a raw brain-dump straight in instead of quoting every line by hand.
+    if isinstance(raw, str):
+        result = [piece for line in raw.splitlines() for piece in line.split(",")]
+        assert not isinstance(result, str)
+        return result
+    return list(raw)
+
+
 def tidy(words: Collection[str]) -> frozenset[str]:
     result = frozenset(" ".join(word.split()).casefold() for word in words if word.strip())
     assert all(word for word in result), "tidy() must drop blank entries"
@@ -91,8 +102,7 @@ def _fix_field(fix: str) -> str:
             current = token
         else:
             current += token
-    if current:
-        chunks.append(current)
+    chunks.append(current)  # fix is non-empty, so the final chunk always carries the last word
     assert "".join(chunks) == fix, "_fix_field must preserve the string exactly"
     if len(chunks) < 2:
         return single  # a single unsplittable word — parens would not help
@@ -122,8 +132,8 @@ class Lexicon:
 
     def __post_init__(self) -> None:
         assert self.name, "lexicon must have a name"
-        object.__setattr__(self, "indicates", tidy(self.indicates))
-        object.__setattr__(self, "rules_out", tidy(self.rules_out))
+        object.__setattr__(self, "indicates", tidy(parse(self.indicates)))
+        object.__setattr__(self, "rules_out", tidy(parse(self.rules_out)))
         object.__setattr__(self, "fix", " ".join(self.fix.split()))
         object.__setattr__(self, "_indicate", phrases(self.indicates))
         object.__setattr__(self, "_rule_out", phrases(self.rules_out))

@@ -125,6 +125,37 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 """
 ```
 
+## From the command line
+
+Installing lexguard puts a `lexguard` command on your path (no extra dependencies). `draft` is the
+on-ramp: pipe a raw list of terms — a brain-dump, a spreadsheet column, an agent's proposal — and it
+prints a cleaned, sorted, ruff-formatted `Lexicon` binding ready to paste into a module. It is
+`ruff format` for keyword lists.
+
+```console
+$ pbpaste | lexguard draft vague --fix "resolve the referent or ask one clarifying question"
+Vague = Lexicon(
+    name="vague",
+    indicates=[
+        "at some point",
+        "circle back",
+        "some stuff",
+    ],
+    fix="resolve the referent or ask one clarifying question",
+)
+
+$ lexguard draft house_style < brainstorm.txt >> mylexicons.py
+```
+
+`ls` lists the built-ins by group and `show` prints one as paste-able code, so you can fork or
+extend a shipped lexicon:
+
+```console
+$ lexguard ls
+response (20): Anthropomorphic, Apology, CitationMarker, ... Slop, Sycophancy, ...
+$ lexguard show slop >> mylexicons.py
+```
+
 ## Docs
 
 - [Lexicons](docs/lexicons/index.md): every lexicon that ships in the box, generated from

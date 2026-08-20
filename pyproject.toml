@@ -16,6 +16,9 @@ inspect-ai = [
     "inspect-ai>=0.3.259",
 ]
 
+[project.scripts]
+lexguard = "lexguard.cli:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
