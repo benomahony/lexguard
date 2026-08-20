@@ -82,6 +82,61 @@ print(Slop.signal("going forward we will utilise a new approach"))
 #> absent
 ```
 
+## Promote to code
+
+A lexicon is a judgement artifact. It belongs in a module that is reviewed, diffed, tested, and
+versioned — not round-tripped through JSON. When terms are curated at runtime (an agent proposing
+additions in a self-improvement loop, say), they are transient data until a human commits them.
+`as_code()` is that promotion step: it returns paste-able Python that reconstructs the lexicon.
+
+```py
+from lexguard import Lexicon
+
+Vague = Lexicon(
+    name="vague",
+    indicates=["circle back", "at some point", "some stuff"],
+    fix="resolve the referent or ask one clarifying question",
+)
+
+print(Vague.as_code())
+"""
+Lexicon(
+    name="vague",
+    indicates=[
+        "at some point",
+        "circle back",
+        "some stuff",
+    ],
+    fix="resolve the referent or ask one clarifying question",
+)
+"""
+```
+
+Terms are sorted, so re-emitting the same lexicon is byte-identical and the only thing a diff shows
+is a term that actually changed. The output is `ruff`/`black` formatted and one term per line, so a
+proposed addition is a one-line diff a reviewer can approve on sight.
+
+A lexicon built with `extend()` remembers what it grew from. Pass `base` — the variable the parent
+is bound to — and `as_code()` emits just the delta, preserving provenance instead of copying the
+whole list. `extend()` takes a `name` so the derived lexicon serialises under its own name.
+
+```py
+from lexguard import Slop
+
+House = Slop.extend(indicates=["going forward", "utilise"], name="house_slop")
+
+print(House.as_code(base="Slop"))
+"""
+Slop.extend(
+    indicates=[
+        "going forward",
+        "utilise",
+    ],
+    name="house_slop",
+)
+"""
+```
+
 ## Grouping
 
 `|` builds a set that keeps its members, so you still get one assertion per lexicon rather than one

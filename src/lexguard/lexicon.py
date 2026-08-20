@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import re
 import unicodedata
 from collections.abc import Collection
@@ -33,6 +34,72 @@ def phrases(words: Collection[str]) -> str | None:
     return pattern
 
 
+def literal(term: str) -> str:
+    # a Python string literal for `term`, quoted the way ruff/black would: prefer double
+    # quotes, fall back to single only when that escapes fewer inner quotes. Escaping matches
+    # repr() so apostrophes ("what's"), backslashes, and control chars all survive eval().
+    quote = "'" if term.count('"') > term.count("'") else '"'
+    out = [quote]
+    for ch in term:
+        if ch == quote or ch == "\\":
+            out.append("\\" + ch)
+        elif ch == "\n":
+            out.append("\\n")
+        elif ch == "\r":
+            out.append("\\r")
+        elif ch == "\t":
+            out.append("\\t")
+        elif ch.isprintable():
+            out.append(ch)
+        elif ord(ch) <= 0xFF:
+            out.append(f"\\x{ord(ch):02x}")
+        elif ord(ch) <= 0xFFFF:
+            out.append(f"\\u{ord(ch):04x}")
+        else:
+            out.append(f"\\U{ord(ch):08x}")
+    out.append(quote)
+    result = "".join(out)
+    assert ast.literal_eval(result) == term, "literal() must parse back to the same string"
+    return result
+
+
+def _terms(key: str, terms: Collection[str]) -> str:
+    # one term per line, sorted for a deterministic (byte-identical) re-emit, trailing comma so
+    # black keeps the list exploded — every term owns a line, so the review diff is one term wide
+    ordered = sorted(terms)
+    if not ordered:
+        return f"    {key}=[],"
+    body = "".join(f"        {literal(term)},\n" for term in ordered)
+    result = f"    {key}=[\n{body}    ],"
+    assert result.count(",\n") == len(ordered), "_terms must put every term on its own line"
+    return result
+
+
+def _fix_field(fix: str) -> str:
+    # `fix=` on one line when it fits; otherwise split at word boundaries into implicit string
+    # concatenation (each piece keeps its trailing space) so the whole thing stays under the line
+    # length — the same shape the shipped lexicons hand-wrap to, and stable under ruff format.
+    single = f"    fix={literal(fix)},"
+    if len(single) <= 100:
+        return single
+    tokens = [word + " " for word in fix.split(" ")[:-1]] + fix.split(" ")[-1:]
+    chunks: list[str] = []
+    current = ""
+    for token in tokens:
+        if current and len(literal(current + token)) > 92:  # 92 == 100 - len("        ")
+            chunks.append(current)
+            current = token
+        else:
+            current += token
+    if current:
+        chunks.append(current)
+    assert "".join(chunks) == fix, "_fix_field must preserve the string exactly"
+    if len(chunks) < 2:
+        return single  # a single unsplittable word — parens would not help
+    body = "".join(f"        {literal(chunk)}\n" for chunk in chunks)
+    return f"    fix=(\n{body}    ),"
+
+
 def snippet(text: str, start: int, end: int, width: int = 34) -> str:
     assert 0 <= start <= end <= len(text)
     left = max(0, start - width)
@@ -51,6 +118,7 @@ class Lexicon:
     fix: str = ""
     _indicate: str | None = field(init=False, repr=False, compare=False)
     _rule_out: str | None = field(init=False, repr=False, compare=False)
+    _base: Lexicon | None = field(init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         assert self.name, "lexicon must have a name"
@@ -59,6 +127,7 @@ class Lexicon:
         object.__setattr__(self, "fix", " ".join(self.fix.split()))
         object.__setattr__(self, "_indicate", phrases(self.indicates))
         object.__setattr__(self, "_rule_out", phrases(self.rules_out))
+        object.__setattr__(self, "_base", None)
         assert all(word not in self.rules_out for word in self.indicates), (
             f"{self.name}: a phrase cannot both indicate and rule out the same concept"
         )
@@ -138,16 +207,65 @@ class Lexicon:
         indicates: Collection[str] = (),
         rules_out: Collection[str] = (),
         fix: str = "",
+        name: str | None = None,
     ) -> Lexicon:
         lexicon = Lexicon(
-            name=self.name,
+            name=name or self.name,
             indicates=[*self.indicates, *indicates],
             rules_out=[*self.rules_out, *rules_out],
             fix=fix or self.fix,
         )
-        assert lexicon.name == self.name
+        # remember what we grew from so as_code(base=...) can emit the delta, not a flat copy
+        object.__setattr__(lexicon, "_base", self)
+        assert lexicon.name == (name or self.name)
         assert all(word in lexicon.indicates for word in self.indicates)
+        assert lexicon._base is self
         return lexicon
+
+    def as_code(self, base: str | None = None) -> str:
+        """Emit this lexicon as paste-able Python source.
+
+        A lexicon is a judgement artifact: it belongs in code, reviewed and diffed, not
+        round-tripped through JSON. This returns a `Lexicon(...)` expression (ruff/black
+        formatted, terms sorted so re-emitting is byte-identical) ready to paste into a module.
+
+        Pass `base` — the variable name the parent is bound to — to emit a derived lexicon as
+        `<base>.extend(indicates=[...delta])`, keeping provenance and shrinking the diff to only
+        the terms this lexicon added. Requires that it was built with `.extend()`.
+        """
+        if base is not None:
+            return self._as_extend(base)
+        lines = ["Lexicon(", f"    name={literal(self.name)},", _terms("indicates", self.indicates)]
+        if self.rules_out:
+            lines.append(_terms("rules_out", self.rules_out))
+        if self.fix:
+            lines.append(_fix_field(self.fix))
+        lines.append(")")
+        result = "\n".join(lines)
+        assert result.startswith("Lexicon(\n") and result.endswith("\n)")
+        return result
+
+    def _as_extend(self, base: str) -> str:
+        if self._base is None:
+            raise ValueError(
+                f"{self.name!r} was not built with .extend(); call .as_code() with no base "
+                "for a flat definition"
+            )
+        lines = [f"{base}.extend("]
+        added_indicates = frozenset(self.indicates) - frozenset(self._base.indicates)
+        added_rules_out = frozenset(self.rules_out) - frozenset(self._base.rules_out)
+        if added_indicates:
+            lines.append(_terms("indicates", added_indicates))
+        if added_rules_out:
+            lines.append(_terms("rules_out", added_rules_out))
+        if self.name != self._base.name:
+            lines.append(f"    name={literal(self.name)},")
+        if self.fix != self._base.fix:
+            lines.append(_fix_field(self.fix))
+        # nothing new to say — a no-op extend still parses and round-trips to the base
+        result = f"{base}.extend()" if len(lines) == 1 else "\n".join((*lines, ")"))
+        assert result.startswith(f"{base}.extend(")
+        return result
 
     def absent(self, **guards: Any) -> Any:
         from .rule import Rule
