@@ -1,6 +1,6 @@
 [project]
 name = "lexguard"
-version = "0.1.0"
+version = "0.1.5"
 description = "Lexicons that score text for a concept, with evaluators for pydantic-evals, DeepEval, and Inspect AI"
 requires-python = ">=3.12"
 dependencies = []

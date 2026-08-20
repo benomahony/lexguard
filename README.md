@@ -1,4 +1,6 @@
-<img src="docs/assets/lexguard.png" alt="lexguard" width="50%">
+<p align="center">
+  <img src="docs/assets/lexguard.png" alt="lexguard" width="50%">
+</p>
 
 # Lexguard
 Lexicons that score text for a concept, plus evaluators for
