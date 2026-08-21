@@ -111,20 +111,21 @@ Vague = Lexicon(
 print(Vague.as_code())
 """
 Lexicon(
-    name="vague",
+    name='vague',
     indicates=[
-        "at some point",
-        "circle back",
-        "some stuff",
+        'at some point',
+        'circle back',
+        'some stuff',
     ],
-    fix="resolve the referent or ask one clarifying question",
+    fix='resolve the referent or ask one clarifying question',
 )
 """
 ```
 
 Terms are sorted, so re-emitting the same lexicon is byte-identical and the only thing a diff shows
-is a term that actually changed. The output is `ruff`/`black` formatted and one term per line, so a
-proposed addition is a one-line diff a reviewer can approve on sight.
+is a term that actually changed. One term per line means a proposed addition is a one-line diff a
+reviewer can approve on sight. (The output is `repr`-quoted; a `ruff`/`black` project will normalise
+the quotes to double on the first format.)
 
 ## Grouping
 

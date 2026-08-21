@@ -1,15 +1,13 @@
 from __future__ import annotations
 
 import ast
-import shutil
-import subprocess
 
 import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
 from lexguard import LEXICONS, Lexicon
-from lexguard.lexicon import literal, tidy
+from lexguard.lexicon import tidy
 
 pytestmark = pytest.mark.unit
 
@@ -54,7 +52,7 @@ def test_constructor_rejects_a_bare_string_instead_of_exploding_it():
         Lexicon(name="x", indicates=["a"], rules_out="b")
 
 
-def test_flat_definition_matches_the_house_style():
+def test_flat_definition_shape():
     lexicon = Lexicon(
         name="vague",
         indicates=["circle back", "at some point"],
@@ -63,15 +61,15 @@ def test_flat_definition_matches_the_house_style():
     )
     assert lexicon.as_code() == (
         "Lexicon(\n"
-        '    name="vague",\n'
+        "    name='vague',\n"
         "    indicates=[\n"
-        '        "at some point",\n'
-        '        "circle back",\n'
+        "        'at some point',\n"
+        "        'circle back',\n"
         "    ],\n"
         "    rules_out=[\n"
-        '        "by friday",\n'
+        "        'by friday',\n"
         "    ],\n"
-        '    fix="ask one clarifying question",\n'
+        "    fix='ask one clarifying question',\n"
         ")"
     )
 
@@ -84,25 +82,19 @@ def test_empty_rules_out_and_fix_are_omitted():
 
 def test_terms_are_one_per_line_with_trailing_commas():
     code = Lexicon(name="x", indicates=["a", "b", "c"]).as_code()
-    assert '        "a",\n        "b",\n        "c",\n' in code
+    assert "        'a',\n        'b',\n        'c',\n" in code
 
 
-def test_apostrophes_use_double_quotes_and_round_trip():
-    lexicon = Lexicon(name="x", indicates=["what's next", "don't"])
-    assert '"what\'s next"' in lexicon.as_code()
-    assert eval(lexicon.as_code(), {"Lexicon": Lexicon}) == lexicon  # noqa: S307
-
-
-def test_embedded_double_quote_falls_back_to_single_quotes():
-    lexicon = Lexicon(name="x", indicates=['he said "hi"'])
-    assert "'he said \"hi\"'" in lexicon.as_code()
+def test_terms_with_quotes_round_trip():
+    # repr() handles the escaping: apostrophes and embedded double quotes both survive eval()
+    lexicon = Lexicon(name="x", indicates=["what's next", 'he said "hi"'])
     assert eval(lexicon.as_code(), {"Lexicon": Lexicon}) == lexicon  # noqa: S307
 
 
 def test_fix_is_emitted_on_a_single_line():
     fix = "end on the last substantive sentence " * 4
     code = Lexicon(name="x", indicates=["a"], fix=fix).as_code()
-    assert f"    fix={literal(fix.strip())}," in code
+    assert f"    fix={fix.strip()!r}," in code
     assert eval(code, {"Lexicon": Lexicon}).fix == fix.strip()  # noqa: S307
 
 
@@ -112,27 +104,3 @@ def test_every_shipped_lexicon_round_trips_and_is_stable(lexicon: Lexicon):
     rebuilt = eval(code, {"Lexicon": Lexicon})  # noqa: S307
     assert rebuilt == lexicon
     assert rebuilt.as_code() == code
-
-
-@given(st.text(max_size=40))
-def test_literal_round_trips_and_prefers_double_quotes(text):
-    assert eval(literal(text)) == text  # noqa: S307
-    # single quotes only appear as the outer quote when they escape fewer inner quotes
-    if text.count('"') <= text.count("'"):
-        assert literal(text).startswith('"')
-
-
-@pytest.mark.integration
-@pytest.mark.skipif(shutil.which("ruff") is None, reason="ruff not on PATH")
-def test_emitted_source_survives_ruff_format_unchanged(tmp_path):
-    source = "from lexguard import Lexicon\n\n" + "\n\n".join(
-        f"_{name} = {lexicon.as_code()}" for name, lexicon in LEXICONS.items()
-    )
-    path = tmp_path / "emitted.py"
-    path.write_text(source + "\n")
-    check = subprocess.run(
-        ["ruff", "format", "--line-length", "100", "--check", str(path)],
-        capture_output=True,
-        text=True,
-    )
-    assert check.returncode == 0, check.stdout + check.stderr

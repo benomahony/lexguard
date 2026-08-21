@@ -33,40 +33,13 @@ def phrases(words: Collection[str]) -> str | None:
     return pattern
 
 
-def literal(term: str) -> str:
-    # a Python string literal for `term`, quoted the way ruff/black would: prefer double
-    # quotes, fall back to single only when that escapes fewer inner quotes. Escaping matches
-    # repr() so apostrophes ("what's"), backslashes, and control chars all survive eval().
-    quote = "'" if term.count('"') > term.count("'") else '"'
-    out = [quote]
-    for ch in term:
-        if ch == quote or ch == "\\":
-            out.append("\\" + ch)
-        elif ch == "\n":
-            out.append("\\n")
-        elif ch == "\r":
-            out.append("\\r")
-        elif ch == "\t":
-            out.append("\\t")
-        elif ch.isprintable():
-            out.append(ch)
-        elif ord(ch) <= 0xFF:
-            out.append(f"\\x{ord(ch):02x}")
-        elif ord(ch) <= 0xFFFF:
-            out.append(f"\\u{ord(ch):04x}")
-        else:
-            out.append(f"\\U{ord(ch):08x}")
-    out.append(quote)
-    return "".join(out)
-
-
 def _terms(key: str, terms: Collection[str]) -> str:
     # one term per line, sorted for a deterministic (byte-identical) re-emit, trailing comma so
     # black keeps the list exploded — every term owns a line, so the review diff is one term wide
     ordered = sorted(terms)
     if not ordered:
         return f"    {key}=[],"
-    body = "".join(f"        {literal(term)},\n" for term in ordered)
+    body = "".join(f"        {term!r},\n" for term in ordered)
     return f"    {key}=[\n{body}    ],"
 
 
@@ -178,14 +151,14 @@ class Lexicon:
         """Emit this lexicon as paste-able Python source.
 
         A lexicon is a judgement artifact: it belongs in code, reviewed and diffed, not
-        round-tripped through JSON. This returns a `Lexicon(...)` expression (ruff/black
-        formatted, terms sorted so re-emitting is byte-identical) ready to paste into a module.
+        round-tripped through JSON. This returns a `Lexicon(...)` expression, terms sorted so
+        re-emitting is byte-identical, ready to paste into a module.
         """
-        lines = ["Lexicon(", f"    name={literal(self.name)},", _terms("indicates", self.indicates)]
+        lines = ["Lexicon(", f"    name={self.name!r},", _terms("indicates", self.indicates)]
         if self.rules_out:
             lines.append(_terms("rules_out", self.rules_out))
         if self.fix:
-            lines.append(f"    fix={literal(self.fix)},")
+            lines.append(f"    fix={self.fix!r},")
         lines.append(")")
         return "\n".join(lines)
 
