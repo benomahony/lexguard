@@ -20,6 +20,8 @@ optional extra (`lexguard[pydantic-evals]`, `lexguard[deepeval]`, `lexguard[insp
   [Response](docs/lexicons/response.md), [Domain](docs/lexicons/domain.md), and
   [Bundles](docs/lexicons/bundles.md)
 - [Writing a lexicon](docs/writing-a-lexicon.md): building your own `Lexicon` for a new domain
+- [Mining a lexicon](docs/mining.md): suggesting `indicates` / `rules_out` candidates from labelled
+  success/failure OTel traces, with confounder adjustment and held-out validation
 - [Rules](docs/rules.md): `.absent()` / `.expected()`, the `when` / `unless` guards, and `Observe`
 - [Agents](docs/agents.md): checking pydantic-ai agent output, structured or plain text
 - [Integrations](docs/integrations/index.md): the framework-agnostic `RuleSpec`, with its own

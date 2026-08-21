@@ -16,6 +16,13 @@ class Signal(StrEnum):
     absent = "absent"
 
 
+def fold(text: str) -> str:
+    result = unicodedata.normalize("NFKC", text).casefold()
+    # casefold() can decompose what NFKC just composed (e.g. "ῶ"), so result may not stay NFKC
+    assert result == result.casefold()
+    return result
+
+
 def tidy(words: Collection[str]) -> frozenset[str]:
     result = frozenset(" ".join(word.split()).casefold() for word in words if word.strip())
     assert all(word for word in result), "tidy() must drop blank entries"
@@ -185,10 +192,7 @@ class Lexicon:
 
     @staticmethod
     def _fold(text: str) -> str:
-        result = unicodedata.normalize("NFKC", text).casefold()
-        # casefold() can decompose what NFKC just composed (e.g. "ῶ"), so result may not stay NFKC
-        assert result == result.casefold()
-        return result
+        return fold(text)
 
 
 @dataclass(frozen=True)

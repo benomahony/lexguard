@@ -130,6 +130,7 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 - [Lexicons](docs/lexicons/index.md): every lexicon that ships in the box, generated from
   source, one page per group
 - [Writing a lexicon](docs/writing-a-lexicon.md) for your own domain
+- [Mining a lexicon](docs/mining.md) from labelled success/failure OTel traces
 - [Rules](docs/rules.md) and the `when` / `unless` guards
 - [Agents](docs/agents.md) under test with pydantic-ai
 - [Integrations](docs/integrations/index.md): pydantic-evals, DeepEval, Inspect AI, and the
