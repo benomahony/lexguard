@@ -105,6 +105,48 @@ print(normalize(judge(bad)))
 Pass it as `mine(traces, label=judge)`. Use `from_attribute("eval.passed")` instead when the
 verdict is already stored on the trace, so you are not re-running a judge you have already paid for.
 
+## Offline batch or online stream
+
+`mine()` is a one-shot over a batch — reach for it with a dump of pre-labelled production traces.
+When traces arrive continuously, use a `Miner` instead: `observe()` each run as it lands, labelling
+with anything (a live judge here), and `suggest()` whenever you want the current picture. It keeps
+only additive counters plus a bounded window of recent bodies for snippets, so memory does not grow
+with the stream, and its state pickles for checkpointing.
+
+```py
+from lexguard.mine import Message, Miner, Trace
+
+
+def resp(tid: str, text: str) -> Trace:
+    return Trace(tid, (Message("assistant", text, "response"),))
+
+
+def judge(trace: Trace) -> str:
+    answer = trace.text("response")
+    # your live judge; swap the body for a real model call
+    return "failure" if "sorry" in answer or "apologies" in answer else "success"
+
+
+fail = ["sorry, i'm not sure this is right", "apologies, i cannot be certain here"]
+ok = ["run the migration then restart", "set the timeout to thirty seconds"]
+
+miner = Miner()
+for i in range(30):
+    for text in (fail[i % 2], ok[i % 2]):
+        trace = resp(f"{i}-{text[:4]}", text)
+        miner.observe(trace, judge(trace))  # label each run as it streams in
+
+print(miner)
+#> Miner(group='response', n=60, base_rate=0.50)
+print("sorry" in {c.phrase for c in miner.suggest().indicates})
+#> True
+```
+
+`mine(traces, label=...)` is exactly this under the hood: a `Miner` fed the whole batch, then asked
+once. Give `Miner` its own `label` (`Miner(label=from_attribute("eval.passed"))`) and `extend()` a
+batch or `observe(trace)` a single trace without repeating the labeller each call. The same
+`group`, `confounders`, and `max_ngram` options apply.
+
 ## Adjusting for confounders
 
 Raw counts are a trap. If a hard task both fails more and uses distinctive vocabulary, that

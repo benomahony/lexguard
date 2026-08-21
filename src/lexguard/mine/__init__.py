@@ -5,6 +5,10 @@ eval verdict, a heuristic) and it ranks the words and phrases whose presence tra
 adjusted for confounders you name, and splits them into `indicates` and `rules_out` candidates for
 you to curate into a `Lexicon`.
 
+Works offline and online. Offline, `mine()` takes a batch of pre-labelled production traces at
+once. Online, a `Miner` accumulates evidence as you `observe()` traces one at a time, labelling
+each with anything you like, and `suggest()` reports from whatever it has seen so far.
+
 Zero third-party dependencies, like the core: OTLP is JSON and the statistics are stdlib maths.
 """
 
@@ -14,8 +18,10 @@ from .labels import Label as Label
 from .labels import Labeller as Labeller
 from .labels import from_attribute as from_attribute
 from .labels import normalize as normalize
+from .report import DEFAULT_LENGTH_EDGES as DEFAULT_LENGTH_EDGES
 from .report import STOPWORDS as STOPWORDS
 from .report import Candidate as Candidate
+from .report import Miner as Miner
 from .report import Scorecard as Scorecard
 from .report import Suggestions as Suggestions
 from .report import evaluate as evaluate
@@ -31,10 +37,12 @@ from .traces import extract_traces as extract_traces
 __all__ = [
     "Association",
     "Candidate",
+    "DEFAULT_LENGTH_EDGES",
     "GROUP",
     "Label",
     "Labeller",
     "Message",
+    "Miner",
     "STOPWORDS",
     "Scorecard",
     "Suggestions",

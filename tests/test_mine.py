@@ -7,6 +7,7 @@ import pytest
 from lexguard.lexicon import Lexicon
 from lexguard.mine import (
     Label,
+    Miner,
     Trace,
     associate,
     evaluate,
@@ -278,3 +279,79 @@ def test_evaluate_scores_a_lexicon_on_held_out_traces():
     card = evaluate(lex, held_out, label=from_attribute("eval.passed"))
     assert card.precision == 1.0 and card.recall == 1.0 and card.f1 == 1.0
     assert card.n == 4 and card.support == 2
+
+
+# --- online mining -------------------------------------------------------------------------------
+
+
+def _stream():
+    for i in range(30):
+        yield _trace(f"f{i}", "sorry, i'm not sure this is right", passed=False)
+        yield _trace(f"s{i}", "run migrate then restart the worker", passed=True)
+
+
+def test_online_observe_matches_offline_mine():
+    traces = list(_stream())
+    offline = mine(traces, label=from_attribute("eval.passed"))
+    miner = Miner()
+    for trace in traces:
+        miner.observe(trace, trace.attributes["eval.passed"])  # label as you go, with anything
+    online = miner.suggest()
+    assert [c.phrase for c in online.indicates] == [c.phrase for c in offline.indicates]
+    assert [c.phrase for c in online.rules_out] == [c.phrase for c in offline.rules_out]
+    assert online.n == offline.n == 60
+
+
+def test_observe_accepts_any_verdict_shape():
+    miner = Miner()
+    miner.observe(_trace("a", "sorry not sure", passed=False), "fail")
+    miner.observe(_trace("b", "deploy now", passed=True), True)
+    miner.observe(_trace("c", "restart worker", passed=True), 1)
+    assert miner.n == 3 and miner.failures == 1
+
+
+def test_observe_can_abstain_with_none():
+    miner = Miner()
+    miner.observe(_trace("a", "sorry", passed=False), None)
+    assert miner.n == 0
+
+
+def test_miner_polls_as_evidence_accumulates():
+    miner = Miner()
+    # too little to clear the false-discovery cut yet
+    for i in range(2):
+        miner.observe(_trace(f"f{i}", "sorry not sure", passed=False), Label.failure)
+        miner.observe(_trace(f"s{i}", "deploy the worker", passed=True), Label.success)
+    assert miner.suggest().indicates == ()
+    # keep streaming and the signal emerges from the same miner
+    for i in range(2, 30):
+        miner.observe(_trace(f"f{i}", "sorry not sure", passed=False), Label.failure)
+        miner.observe(_trace(f"s{i}", "deploy the worker", passed=True), Label.success)
+    assert "sorry" in {c.phrase for c in miner.suggest().indicates}
+
+
+def test_miner_default_label_and_extend():
+    miner = Miner(label=from_attribute("eval.passed"))
+    miner.extend(list(_stream()))  # labeller comes from the miner
+    assert "sorry" in {c.phrase for c in miner.suggest().indicates}
+    # a bare observe() with no outcome also uses the stored labeller
+    miner.observe(_trace("x", "sorry again", passed=False))
+    assert miner.n == 61
+
+
+def test_miner_observe_without_label_is_an_error():
+    with pytest.raises(AssertionError):
+        Miner().observe(_trace("a", "sorry", passed=False))
+
+
+def test_miner_state_pickles_for_checkpointing():
+    import pickle
+
+    miner = Miner(confounders=("length",))
+    for trace in _stream():
+        miner.observe(trace, trace.attributes["eval.passed"])
+    restored = pickle.loads(pickle.dumps(miner))
+    assert restored.n == miner.n
+    assert [c.phrase for c in restored.suggest().indicates] == [
+        c.phrase for c in miner.suggest().indicates
+    ]
