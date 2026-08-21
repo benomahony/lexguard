@@ -17,17 +17,6 @@ class Signal(StrEnum):
     absent = "absent"
 
 
-def parse(raw: Collection[str]) -> list[str]:
-    # a bare string is a paste — split it into terms on newlines and commas. A real collection
-    # (a list, an agent's JSON array) is one term per entry, so a phrase keeps its commas. This is
-    # what lets you drop a raw brain-dump straight in instead of quoting every line by hand.
-    if isinstance(raw, str):
-        result = [piece for line in raw.splitlines() for piece in line.split(",")]
-        assert not isinstance(result, str)
-        return result
-    return list(raw)
-
-
 def tidy(words: Collection[str]) -> frozenset[str]:
     result = frozenset(" ".join(word.split()).casefold() for word in words if word.strip())
     assert all(word for word in result), "tidy() must drop blank entries"
@@ -132,8 +121,12 @@ class Lexicon:
 
     def __post_init__(self) -> None:
         assert self.name, "lexicon must have a name"
-        object.__setattr__(self, "indicates", tidy(parse(self.indicates)))
-        object.__setattr__(self, "rules_out", tidy(parse(self.rules_out)))
+        # a bare string is a Collection[str] of characters — reject it loudly rather than tidy it
+        # into single-letter terms; callers with raw text split it into a list themselves
+        assert not isinstance(self.indicates, str), "indicates takes a list of terms, not a string"
+        assert not isinstance(self.rules_out, str), "rules_out takes a list of terms, not a string"
+        object.__setattr__(self, "indicates", tidy(self.indicates))
+        object.__setattr__(self, "rules_out", tidy(self.rules_out))
         object.__setattr__(self, "fix", " ".join(self.fix.split()))
         object.__setattr__(self, "_indicate", phrases(self.indicates))
         object.__setattr__(self, "_rule_out", phrases(self.rules_out))

@@ -4,8 +4,14 @@ import argparse
 import re
 import sys
 
-from .lexicon import Lexicon, parse
+from .lexicon import Lexicon
 from .words import GROUPS, LEXICONS
+
+
+def _terms(text: str) -> list[str]:
+    # raw text is only untyped at the CLI boundary; split a paste into terms on newlines and commas
+    # here, so the Lexicon constructor stays strict about taking a real list
+    return [piece for line in text.splitlines() for piece in line.split(",")]
 
 
 def _slug(name: str) -> str:
@@ -23,12 +29,12 @@ def _symbol(name: str) -> str:
 
 
 def draft(args: argparse.Namespace) -> int:
-    terms = parse(sys.stdin.read())
+    terms = _terms(sys.stdin.read())
     if not any(term.strip() for term in terms):
         print("no terms on stdin; pipe or type one term per line", file=sys.stderr)
         return 2
     name = _slug(args.name)
-    lexicon = Lexicon(name=name, indicates=terms, rules_out=args.rules_out, fix=args.fix)
+    lexicon = Lexicon(name=name, indicates=terms, rules_out=_terms(args.rules_out), fix=args.fix)
     lines = ["from lexguard import Lexicon", ""] if args.want_import else []
     lines.append(f"{_symbol(name)} = {lexicon.as_code()}")
     print("\n".join(lines))
