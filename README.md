@@ -136,11 +136,18 @@ $ lexguard slop >> mylexicons.py    # then add or remove terms in code
 ```
 
 With no name it lists every lexicon, one per line, so it composes. Pipe it into a fuzzy finder for
-a browse-with-preview picker — the preview command is `lexguard` itself:
+a browse-with-preview picker — the preview command is `lexguard` itself. For a syntax-highlighted
+preview, run the source through [bat](https://github.com/sharkdp/bat) and pass `--ansi`. Drop a
+shell function in your `~/.zshrc`:
 
-```console
-$ lexguard | fzf --preview 'lexguard {}'
+```zsh
+lexg() {
+  lexguard | fzf --ansi --preview 'lexguard {} | bat -l python --color=always --style=plain'
+}
 ```
+
+Then `lexg` opens the picker; select a lexicon and `lexguard <name> >> mylexicons.py` pulls it into
+your code. Plain `lexguard | fzf --preview 'lexguard {}'` works without bat, just uncoloured.
 
 ## Docs
 

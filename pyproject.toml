@@ -89,9 +89,7 @@ exclude_lines = [
 
 [tool.bandit]
 exclude_dirs = ["tests"]
-# B101: asserts are the house style. B404/B603: `lexguard` shells out to fzf for its optional
-# picker (fixed argv, no shell, absolute path from shutil.which).
-skips = ["B101", "B404", "B603"]
+skips = ["B101"]
 
 [tool.basedpyright]
 include = ["src/lexguard"]
