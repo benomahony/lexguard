@@ -128,11 +128,11 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 ## From the command line
 
 Installing lexguard puts a `lexguard` command on your path (no extra dependencies). It exists to get
-the built-in lexicons into your own code. Name one and it prints a paste-able `Lexicon` binding you
-append to a module and edit as source — reviewed, diffed, owned:
+the built-in lexicons into your own code. Name one and it prints the `Lexicon(...)` source; bind it
+under a name in your module and edit it there — reviewed, diffed, owned:
 
 ```console
-$ lexguard slop >> mylexicons.py    # then add or remove terms in code
+$ echo "HouseSlop = $(lexguard slop)" >> mylexicons.py    # then add or remove terms in code
 ```
 
 With no name it lists every lexicon, one per line, so it composes. Pipe it into a fuzzy finder for
@@ -146,8 +146,8 @@ lexg() {
 }
 ```
 
-Then `lexg` opens the picker; select a lexicon and `lexguard <name> >> mylexicons.py` pulls it into
-your code. Plain `lexguard | fzf --preview 'lexguard {}'` works without bat, just uncoloured.
+Then `lexg` opens the picker with a live preview of each lexicon's source. Plain
+`lexguard | fzf --preview 'lexguard {}'` works without bat, just uncoloured.
 
 ## Docs
 

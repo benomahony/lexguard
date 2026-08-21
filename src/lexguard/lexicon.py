@@ -33,16 +33,6 @@ def phrases(words: Collection[str]) -> str | None:
     return pattern
 
 
-def _terms(key: str, terms: Collection[str]) -> str:
-    # one term per line, sorted for a deterministic (byte-identical) re-emit, trailing comma so
-    # black keeps the list exploded — every term owns a line, so the review diff is one term wide
-    ordered = sorted(terms)
-    if not ordered:
-        return f"    {key}=[],"
-    body = "".join(f"        {term!r},\n" for term in ordered)
-    return f"    {key}=[\n{body}    ],"
-
-
 def snippet(text: str, start: int, end: int, width: int = 34) -> str:
     assert 0 <= start <= end <= len(text)
     left = max(0, start - width)
@@ -152,11 +142,16 @@ class Lexicon:
 
         A lexicon is a judgement artifact: it belongs in code, reviewed and diffed, not
         round-tripped through JSON. This returns a `Lexicon(...)` expression, terms sorted so
-        re-emitting is byte-identical, ready to paste into a module.
+        re-emitting is byte-identical, one per line so a diff is one term wide.
         """
-        lines = ["Lexicon(", f"    name={self.name!r},", _terms("indicates", self.indicates)]
+
+        def block(key: str, terms: Collection[str]) -> str:
+            body = "".join(f"        {term!r},\n" for term in sorted(terms))
+            return f"    {key}=[\n{body}    ]," if terms else f"    {key}=[],"
+
+        lines = ["Lexicon(", f"    name={self.name!r},", block("indicates", self.indicates)]
         if self.rules_out:
-            lines.append(_terms("rules_out", self.rules_out))
+            lines.append(block("rules_out", self.rules_out))
         if self.fix:
             lines.append(f"    fix={self.fix!r},")
         lines.append(")")

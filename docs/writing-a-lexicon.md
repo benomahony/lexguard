@@ -63,12 +63,12 @@ print(SoftDeadline.signal("ideally friday, but it is a hard deadline"))
 
 ## Building on what ships
 
-The built-ins are not a framework to subclass; they are source to copy. `lexguard show slop` prints
-the definition — append it to your module and edit the list like any other code, so your house
-version is reviewed, diffed, and owned rather than assembled at import time.
+The built-ins are not a framework to subclass; they are source to copy. `lexguard slop` prints the
+definition — bind it under a name in your module and edit the list like any other code, so your
+house version is reviewed, diffed, and owned rather than assembled at import time.
 
 ```console
-$ lexguard slop >> mylexicons.py    # then add or remove terms in code
+$ echo "HouseSlop = $(lexguard slop)" >> mylexicons.py    # then add or remove terms in code
 ```
 
 If you are genuinely composing at runtime — folding in an externally derived word list, say — build

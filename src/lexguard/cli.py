@@ -6,11 +6,6 @@ import sys
 from .words import LEXICONS
 
 
-def _binding(name: str) -> str:
-    # snake_case name -> the "Slop = ..." / "DueDate = ..." form the built-ins are bound under
-    return "".join(part.capitalize() for part in name.split("_"))
-
-
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="lexguard",
@@ -31,7 +26,7 @@ def main(argv: list[str] | None = None) -> int:
     if lexicon is None:
         print(f"no lexicon named {query!r}; run 'lexguard' to list them", file=sys.stderr)
         return 2
-    print(f"{_binding(lexicon.name)} = {lexicon.as_code()}")
+    print(lexicon.as_code())
     return 0
 
 

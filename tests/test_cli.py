@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import pytest
 
-import lexguard
 from lexguard import LEXICONS, Lexicon
-from lexguard.cli import _binding, main
+from lexguard.cli import main
 
 pytestmark = pytest.mark.unit
 
@@ -14,25 +13,18 @@ def test_bare_command_lists_every_lexicon_one_per_line(capsys):
     assert capsys.readouterr().out.splitlines() == sorted(LEXICONS)
 
 
-def test_name_prints_a_binding_that_round_trips(capsys):
+def test_name_prints_source_that_round_trips(capsys):
     assert main(["slop"]) == 0
     out = capsys.readouterr().out
-    assert out.startswith("Slop = ")
-    namespace: dict[str, object] = {"Lexicon": Lexicon}
-    exec(out, namespace)  # noqa: S102
-    assert namespace["Slop"] == LEXICONS["slop"]
+    assert out.startswith("Lexicon(")
+    assert eval(out, {"Lexicon": Lexicon}) == LEXICONS["slop"]  # noqa: S307
 
 
 def test_name_is_case_insensitive(capsys):
     assert main(["SLOP"]) == 0
-    assert capsys.readouterr().out.startswith("Slop = ")
+    assert capsys.readouterr().out.startswith("Lexicon(")
 
 
 def test_unknown_name_is_an_error(capsys):
     assert main(["nope"]) == 2
     assert "no lexicon named" in capsys.readouterr().err
-
-
-def test_binding_reconstructs_every_export_symbol():
-    assert _binding("due_date") == "DueDate"
-    assert all(hasattr(lexguard, _binding(name)) for name in LEXICONS)
