@@ -213,8 +213,10 @@ def structured_output() -> None:
     report.print(include_reasons=True)
 
 
-HouseStyle = Slop.extend(
+HouseStyle = Lexicon(
+    name="house_style",
     indicates=[
+        *Slop.indicates,
         "at this moment in time",
         "going forward",
         "in order to",
