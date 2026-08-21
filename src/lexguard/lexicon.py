@@ -75,30 +75,6 @@ def _terms(key: str, terms: Collection[str]) -> str:
     return result
 
 
-def _fix_field(fix: str) -> str:
-    # `fix=` on one line when it fits; otherwise split at word boundaries into implicit string
-    # concatenation (each piece keeps its trailing space) so the whole thing stays under the line
-    # length — the same shape the shipped lexicons hand-wrap to, and stable under ruff format.
-    single = f"    fix={literal(fix)},"
-    if len(single) <= 100:
-        return single
-    tokens = [word + " " for word in fix.split(" ")[:-1]] + fix.split(" ")[-1:]
-    chunks: list[str] = []
-    current = ""
-    for token in tokens:
-        if current and len(literal(current + token)) > 92:  # 92 == 100 - len("        ")
-            chunks.append(current)
-            current = token
-        else:
-            current += token
-    chunks.append(current)  # fix is non-empty, so the final chunk always carries the last word
-    assert "".join(chunks) == fix, "_fix_field must preserve the string exactly"
-    if len(chunks) < 2:
-        return single  # a single unsplittable word — parens would not help
-    body = "".join(f"        {literal(chunk)}\n" for chunk in chunks)
-    return f"    fix=(\n{body}    ),"
-
-
 def snippet(text: str, start: int, end: int, width: int = 34) -> str:
     assert 0 <= start <= end <= len(text)
     left = max(0, start - width)
@@ -214,7 +190,7 @@ class Lexicon:
         if self.rules_out:
             lines.append(_terms("rules_out", self.rules_out))
         if self.fix:
-            lines.append(_fix_field(self.fix))
+            lines.append(f"    fix={literal(self.fix)},")
         lines.append(")")
         result = "\n".join(lines)
         assert result.startswith("Lexicon(\n") and result.endswith("\n)")

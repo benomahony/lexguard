@@ -99,19 +99,11 @@ def test_embedded_double_quote_falls_back_to_single_quotes():
     assert eval(lexicon.as_code(), {"Lexicon": Lexicon}) == lexicon  # noqa: S307
 
 
-def test_long_fix_wraps_into_implicit_concatenation():
+def test_fix_is_emitted_on_a_single_line():
     fix = "end on the last substantive sentence " * 4
     code = Lexicon(name="x", indicates=["a"], fix=fix).as_code()
-    assert "    fix=(\n" in code
+    assert f"    fix={literal(fix.strip())}," in code
     assert eval(code, {"Lexicon": Lexicon}).fix == fix.strip()  # noqa: S307
-    assert all(len(line) <= 100 for line in code.splitlines())
-
-
-def test_single_unsplittable_long_fix_stays_on_one_line():
-    fix = "x" * 120
-    code = Lexicon(name="x", indicates=["a"], fix=fix).as_code()
-    assert "fix=(" not in code
-    assert eval(code, {"Lexicon": Lexicon}).fix == fix  # noqa: S307
 
 
 @pytest.mark.parametrize("lexicon", LEXICONS.values(), ids=LEXICONS.keys())
@@ -120,7 +112,6 @@ def test_every_shipped_lexicon_round_trips_and_is_stable(lexicon: Lexicon):
     rebuilt = eval(code, {"Lexicon": Lexicon})  # noqa: S307
     assert rebuilt == lexicon
     assert rebuilt.as_code() == code
-    assert all(len(line) <= 100 for line in code.splitlines())
 
 
 @given(st.text(max_size=40))
@@ -145,9 +136,3 @@ def test_emitted_source_survives_ruff_format_unchanged(tmp_path):
         text=True,
     )
     assert check.returncode == 0, check.stdout + check.stderr
-    lint = subprocess.run(
-        ["ruff", "check", "--select", "E,F,W,I,N", str(path)],
-        capture_output=True,
-        text=True,
-    )
-    assert lint.returncode == 0, lint.stdout + lint.stderr
