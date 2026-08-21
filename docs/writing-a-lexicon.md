@@ -68,7 +68,7 @@ the definition — append it to your module and edit the list like any other cod
 version is reviewed, diffed, and owned rather than assembled at import time.
 
 ```console
-$ lexguard show slop >> mylexicons.py    # then add or remove terms in code
+$ lexguard slop >> mylexicons.py    # then add or remove terms in code
 ```
 
 If you are genuinely composing at runtime — folding in an externally derived word list, say — build

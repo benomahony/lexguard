@@ -128,13 +128,20 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 ## From the command line
 
 Installing lexguard puts a `lexguard` command on your path (no extra dependencies). It exists to get
-the built-in lexicons into your own code: `ls` lists them by group, and `show` prints one as a
-paste-able `Lexicon` binding you append to a module and edit as source — reviewed, diffed, owned.
+the built-in lexicons into your own code. Name one and it prints a paste-able `Lexicon` binding you
+append to a module and edit as source — reviewed, diffed, owned:
 
 ```console
-$ lexguard ls
-response (20): Anthropomorphic, Apology, CitationMarker, ... Slop, Sycophancy, ...
-$ lexguard show slop >> mylexicons.py    # then add or remove terms in code
+$ lexguard slop >> mylexicons.py    # then add or remove terms in code
+```
+
+With no name it lists every lexicon, one per line. Run interactively with a fuzzy finder on your
+PATH ([fzf](https://github.com/junegunn/fzf) or [skim](https://github.com/skim-rs/skim), or set
+`LEXGUARD_PICKER` to any other), that same bare command opens a picker with a live source preview.
+Piped, it stays a plain list, so you can always compose your own:
+
+```console
+$ lexguard | fzf --preview 'lexguard {}'    # the picker, spelled out
 ```
 
 ## Docs

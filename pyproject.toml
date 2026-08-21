@@ -89,7 +89,9 @@ exclude_lines = [
 
 [tool.bandit]
 exclude_dirs = ["tests"]
-skips = ["B101"]
+# B101: asserts are the house invariant style. B404/B603: the CLI deliberately shells out to fzf
+# (fixed argv, no shell, resolved absolute path) for its interactive picker.
+skips = ["B101", "B404", "B603"]
 
 [tool.basedpyright]
 include = ["src/lexguard"]
