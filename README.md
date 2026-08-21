@@ -127,27 +127,12 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 
 ## From the command line
 
-Installing lexguard puts a `lexguard` command on your path (no extra dependencies). It exists to get
-the built-in lexicons into your own code. Name one and it prints the `Lexicon(...)` source; bind it
-under a name in your module and edit it there — reviewed, diffed, owned:
+`lexguard` lists the built-in lexicons, one per line; `lexguard <name>` prints one as `Lexicon(...)`
+source to paste into your code. Pipe the list into a fuzzy finder to browse with a preview:
 
 ```console
-$ echo "HouseSlop = $(lexguard slop)" >> mylexicons.py    # then add or remove terms in code
+$ lexguard | fzf --preview 'lexguard {}'
 ```
-
-With no name it lists every lexicon, one per line, so it composes. Pipe it into a fuzzy finder for
-a browse-with-preview picker — the preview command is `lexguard` itself. For a syntax-highlighted
-preview, run the source through [bat](https://github.com/sharkdp/bat) and pass `--ansi`. Drop a
-shell function in your `~/.zshrc`:
-
-```zsh
-lexg() {
-  lexguard | fzf --ansi --preview 'lexguard {} | bat -l python --color=always --style=plain'
-}
-```
-
-Then `lexg` opens the picker with a live preview of each lexicon's source. Plain
-`lexguard | fzf --preview 'lexguard {}'` works without bat, just uncoloured.
 
 ## Docs
 

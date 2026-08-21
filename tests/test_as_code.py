@@ -60,17 +60,8 @@ def test_flat_definition_shape():
         fix="ask one clarifying question",
     )
     assert lexicon.as_code() == (
-        "Lexicon(\n"
-        "    name='vague',\n"
-        "    indicates=[\n"
-        "        'at some point',\n"
-        "        'circle back',\n"
-        "    ],\n"
-        "    rules_out=[\n"
-        "        'by friday',\n"
-        "    ],\n"
-        "    fix='ask one clarifying question',\n"
-        ")"
+        "Lexicon(name='vague', indicates=['at some point', 'circle back'], "
+        "rules_out=['by friday'], fix='ask one clarifying question')"
     )
 
 
@@ -80,22 +71,10 @@ def test_empty_rules_out_and_fix_are_omitted():
     assert "fix" not in code
 
 
-def test_terms_are_one_per_line_with_trailing_commas():
-    code = Lexicon(name="x", indicates=["a", "b", "c"]).as_code()
-    assert "        'a',\n        'b',\n        'c',\n" in code
-
-
 def test_terms_with_quotes_round_trip():
     # repr() handles the escaping: apostrophes and embedded double quotes both survive eval()
     lexicon = Lexicon(name="x", indicates=["what's next", 'he said "hi"'])
     assert eval(lexicon.as_code(), {"Lexicon": Lexicon}) == lexicon  # noqa: S307
-
-
-def test_fix_is_emitted_on_a_single_line():
-    fix = "end on the last substantive sentence " * 4
-    code = Lexicon(name="x", indicates=["a"], fix=fix).as_code()
-    assert f"    fix={fix.strip()!r}," in code
-    assert eval(code, {"Lexicon": Lexicon}).fix == fix.strip()  # noqa: S307
 
 
 @pytest.mark.parametrize("lexicon", LEXICONS.values(), ids=LEXICONS.keys())

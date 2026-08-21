@@ -138,24 +138,16 @@ class Lexicon:
         return result
 
     def as_code(self) -> str:
-        """Emit this lexicon as paste-able Python source.
+        """A paste-able `Lexicon(...)` expression, terms sorted for byte-identical re-emits.
 
-        A lexicon is a judgement artifact: it belongs in code, reviewed and diffed, not
-        round-tripped through JSON. This returns a `Lexicon(...)` expression, terms sorted so
-        re-emitting is byte-identical, one per line so a diff is one term wide.
+        Compact — run it through your formatter to lay it out for review.
         """
-
-        def block(key: str, terms: Collection[str]) -> str:
-            body = "".join(f"        {term!r},\n" for term in sorted(terms))
-            return f"    {key}=[\n{body}    ]," if terms else f"    {key}=[],"
-
-        lines = ["Lexicon(", f"    name={self.name!r},", block("indicates", self.indicates)]
+        fields: dict[str, object] = {"name": self.name, "indicates": sorted(self.indicates)}
         if self.rules_out:
-            lines.append(block("rules_out", self.rules_out))
+            fields["rules_out"] = sorted(self.rules_out)
         if self.fix:
-            lines.append(f"    fix={self.fix!r},")
-        lines.append(")")
-        return "\n".join(lines)
+            fields["fix"] = self.fix
+        return "Lexicon(" + ", ".join(f"{key}={value!r}" for key, value in fields.items()) + ")"
 
     def absent(self, **guards: Any) -> Any:
         from .rule import Rule

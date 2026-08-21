@@ -64,12 +64,7 @@ print(SoftDeadline.signal("ideally friday, but it is a hard deadline"))
 ## Building on what ships
 
 The built-ins are not a framework to subclass; they are source to copy. `lexguard slop` prints the
-definition — bind it under a name in your module and edit the list like any other code, so your
-house version is reviewed, diffed, and owned rather than assembled at import time.
-
-```console
-$ echo "HouseSlop = $(lexguard slop)" >> mylexicons.py    # then add or remove terms in code
-```
+definition — paste it into your module, name it, and edit the list like any other code.
 
 If you are genuinely composing at runtime — folding in an externally derived word list, say — build
 a new lexicon from the parts:
@@ -102,30 +97,14 @@ additions in a self-improvement loop, say), they are transient data until a huma
 ```py
 from lexguard import Lexicon
 
-Vague = Lexicon(
-    name="vague",
-    indicates=["circle back", "at some point", "some stuff"],
-    fix="resolve the referent or ask one clarifying question",
-)
+vague = Lexicon(name="vague", indicates=["circle back", "at some point"])
 
-print(Vague.as_code())
-"""
-Lexicon(
-    name='vague',
-    indicates=[
-        'at some point',
-        'circle back',
-        'some stuff',
-    ],
-    fix='resolve the referent or ask one clarifying question',
-)
-"""
+print(vague.as_code())
+#> Lexicon(name='vague', indicates=['at some point', 'circle back'])
 ```
 
-Terms are sorted, so re-emitting the same lexicon is byte-identical and the only thing a diff shows
-is a term that actually changed. One term per line means a proposed addition is a one-line diff a
-reviewer can approve on sight. (The output is `repr`-quoted; a `ruff`/`black` project will normalise
-the quotes to double on the first format.)
+Terms are sorted, so re-emitting the same lexicon is byte-identical and a diff shows only the terms
+that changed. The output is a compact expression; run it through your formatter to lay it out.
 
 ## Grouping
 

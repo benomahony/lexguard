@@ -18,6 +18,7 @@ inspect-ai = [
 
 [project.scripts]
 lexguard = "lexguard.cli:main"
+lg = "lexguard.cli:main"
 
 [build-system]
 requires = ["hatchling"]
