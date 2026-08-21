@@ -4,14 +4,7 @@ import argparse
 import re
 import sys
 
-from .lexicon import Lexicon
 from .words import GROUPS, LEXICONS
-
-
-def _terms(text: str) -> list[str]:
-    # raw text is only untyped at the CLI boundary; split a paste into terms on newlines and commas
-    # here, so the Lexicon constructor stays strict about taking a real list
-    return [piece for line in text.splitlines() for piece in line.split(",")]
 
 
 def _slug(name: str) -> str:
@@ -26,19 +19,6 @@ def _symbol(name: str) -> str:
     result = "".join(part.capitalize() for part in re.split(r"[^a-z0-9]+", name) if part)
     assert "_" not in result
     return result
-
-
-def draft(args: argparse.Namespace) -> int:
-    terms = _terms(sys.stdin.read())
-    if not any(term.strip() for term in terms):
-        print("no terms on stdin; pipe or type one term per line", file=sys.stderr)
-        return 2
-    name = _slug(args.name)
-    lexicon = Lexicon(name=name, indicates=terms, rules_out=_terms(args.rules_out), fix=args.fix)
-    lines = ["from lexguard import Lexicon", ""] if args.want_import else []
-    lines.append(f"{_symbol(name)} = {lexicon.as_code()}")
-    print("\n".join(lines))
-    return 0
 
 
 def ls(args: argparse.Namespace) -> int:
@@ -64,38 +44,20 @@ def show(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="lexguard",
-        description="Curate lexicons as reviewable code, straight from the terminal.",
+        description="Discover the built-in lexicons and pull them into your code as source.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
-
-    p_draft = sub.add_parser(
-        "draft",
-        help="turn raw terms on stdin into a paste-able Lexicon definition",
-        description="Read raw terms on stdin (one per line or comma-separated) and print a "
-        "cleaned, sorted, ruff-formatted Lexicon binding ready to paste into a module.",
-    )
-    p_draft.add_argument("name", help="the lexicon's name (normalised to snake_case)")
-    p_draft.add_argument("--fix", default="", help="the one-line fix advice for the lexicon")
-    p_draft.add_argument(
-        "--rules-out",
-        default="",
-        dest="rules_out",
-        metavar="TERMS",
-        help="terms that rule the concept out (comma-separated)",
-    )
-    p_draft.add_argument(
-        "--import",
-        action="store_true",
-        dest="want_import",
-        help="also emit the 'from lexguard import Lexicon' line",
-    )
-    p_draft.set_defaults(func=draft)
 
     p_ls = sub.add_parser("ls", help="list the built-in lexicons by group")
     p_ls.set_defaults(func=ls)
 
-    p_show = sub.add_parser("show", help="print a built-in lexicon as paste-able code to fork")
-    p_show.add_argument("name", help="the built-in lexicon's name, e.g. slop")
+    p_show = sub.add_parser(
+        "show",
+        help="print a built-in lexicon as paste-able code to own and edit",
+        description="Print a built-in lexicon as a paste-able Lexicon binding. Append it to a "
+        "module ('lexguard show slop >> mylexicons.py') and edit the terms as code.",
+    )
+    p_show.add_argument("name", help="the built-in lexicon's name or symbol, e.g. slop or Slop")
     p_show.set_defaults(func=show)
 
     return parser

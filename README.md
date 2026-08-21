@@ -127,33 +127,14 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 
 ## From the command line
 
-Installing lexguard puts a `lexguard` command on your path (no extra dependencies). `draft` is the
-on-ramp: pipe a raw list of terms — a brain-dump, a spreadsheet column, an agent's proposal — and it
-prints a cleaned, sorted, ruff-formatted `Lexicon` binding ready to paste into a module. It is
-`ruff format` for keyword lists.
-
-```console
-$ pbpaste | lexguard draft vague --fix "resolve the referent or ask one clarifying question"
-Vague = Lexicon(
-    name="vague",
-    indicates=[
-        "at some point",
-        "circle back",
-        "some stuff",
-    ],
-    fix="resolve the referent or ask one clarifying question",
-)
-
-$ lexguard draft house_style < brainstorm.txt >> mylexicons.py
-```
-
-`ls` lists the built-ins by group and `show` prints one as paste-able code, so you can fork or
-extend a shipped lexicon:
+Installing lexguard puts a `lexguard` command on your path (no extra dependencies). It exists to get
+the built-in lexicons into your own code: `ls` lists them by group, and `show` prints one as a
+paste-able `Lexicon` binding you append to a module and edit as source — reviewed, diffed, owned.
 
 ```console
 $ lexguard ls
 response (20): Anthropomorphic, Apology, CitationMarker, ... Slop, Sycophancy, ...
-$ lexguard show slop >> mylexicons.py
+$ lexguard show slop >> mylexicons.py    # then add or remove terms in code
 ```
 
 ## Docs
@@ -170,6 +151,6 @@ $ lexguard show slop >> mylexicons.py
 
 The slop word lists overlap heavily with
 [slop-forensics](https://github.com/sam-paech/slop-forensics), which derives them statistically
-rather than by hand. Point `Lexicon.extend()` at that list if you want the empirical version.
-The abstain semantics, where a lexicon that does not apply records nothing rather than a free pass,
-is the same idea as a Snorkel labelling function returning `None`.
+rather than by hand. Fold that list into a `Slop` copy in your own module if you want the empirical
+version. The abstain semantics, where a lexicon that does not apply records nothing rather than a
+free pass, is the same idea as a Snorkel labelling function returning `None`.

@@ -61,22 +61,32 @@ print(SoftDeadline.signal("ideally friday, but it is a hard deadline"))
 #> denied
 ```
 
-## Extending what ships
+## Building on what ships
 
-`extend()` returns a new lexicon and keeps the original intact, so house style sits on top of the
-shared list rather than forking it.
+The built-ins are not a framework to subclass; they are source to copy. `lexguard show slop` prints
+the definition — append it to your module and edit the list like any other code, so your house
+version is reviewed, diffed, and owned rather than assembled at import time.
+
+```console
+$ lexguard show slop >> mylexicons.py    # then add or remove terms in code
+```
+
+If you are genuinely composing at runtime — folding in an externally derived word list, say — build
+a new lexicon from the parts:
 
 ```py
-from lexguard import Slop
+from lexguard import Lexicon, Slop
 
-HouseStyle = Slop.extend(
-    indicates=["at this moment in time", "going forward", "in order to", "utilise"],
+HouseSlop = Lexicon(
+    name="house_slop",
+    indicates=[*Slop.indicates, "going forward", "utilise"],
+    rules_out=Slop.rules_out,
     fix="house style: prefer the shorter word",
 )
 
-print(len(Slop.indicates), len(HouseStyle.indicates))
-#> 50 54
-print(HouseStyle.signal("going forward we will utilise a new approach"))
+print(len(Slop.indicates), len(HouseSlop.indicates))
+#> 50 52
+print(HouseSlop.signal("going forward we will utilise a new approach"))
 #> present
 print(Slop.signal("going forward we will utilise a new approach"))
 #> absent
@@ -115,27 +125,6 @@ Lexicon(
 Terms are sorted, so re-emitting the same lexicon is byte-identical and the only thing a diff shows
 is a term that actually changed. The output is `ruff`/`black` formatted and one term per line, so a
 proposed addition is a one-line diff a reviewer can approve on sight.
-
-A lexicon built with `extend()` remembers what it grew from. Pass `base` — the variable the parent
-is bound to — and `as_code()` emits just the delta, preserving provenance instead of copying the
-whole list. `extend()` takes a `name` so the derived lexicon serialises under its own name.
-
-```py
-from lexguard import Slop
-
-House = Slop.extend(indicates=["going forward", "utilise"], name="house_slop")
-
-print(House.as_code(base="Slop"))
-"""
-Slop.extend(
-    indicates=[
-        "going forward",
-        "utilise",
-    ],
-    name="house_slop",
-)
-"""
-```
 
 ## Grouping
 

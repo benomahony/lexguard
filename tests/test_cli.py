@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import io
-
 import pytest
 
 import lexguard
@@ -11,55 +9,10 @@ from lexguard.cli import _slug, _symbol, main
 pytestmark = pytest.mark.unit
 
 
-def feed(monkeypatch, text: str) -> None:
-    monkeypatch.setattr("sys.stdin", io.StringIO(text))
-
-
 def run_binding(out: str) -> object:
     namespace: dict[str, object] = {"Lexicon": Lexicon}
     exec(out, namespace)  # noqa: S102
     return namespace
-
-
-def test_draft_cleans_and_sorts_a_raw_blob(monkeypatch, capsys):
-    feed(monkeypatch, "circle back\nat some point\nSome Stuff\ncircle back\n")
-    assert main(["draft", "vague"]) == 0
-    out = capsys.readouterr().out
-    namespace = run_binding(out)
-    lexicon = namespace["Vague"]
-    assert isinstance(lexicon, Lexicon)
-    assert lexicon.name == "vague"
-    assert sorted(lexicon.indicates) == ["at some point", "circle back", "some stuff"]
-
-
-def test_draft_splits_on_commas_and_newlines(monkeypatch, capsys):
-    feed(monkeypatch, "a, b\nc")
-    main(["draft", "x"])
-    lexicon = run_binding(capsys.readouterr().out)["X"]
-    assert sorted(lexicon.indicates) == ["a", "b", "c"]
-
-
-def test_draft_carries_fix_and_rules_out(monkeypatch, capsys):
-    feed(monkeypatch, "going forward\nutilise")
-    main(["draft", "House Style", "--fix", "prefer the shorter word", "--rules-out", "on brand"])
-    out = capsys.readouterr().out
-    lexicon = run_binding(out)["HouseStyle"]
-    assert lexicon.name == "house_style"
-    assert lexicon.fix == "prefer the shorter word"
-    assert "on brand" in lexicon.rules_out
-
-
-def test_draft_import_flag_emits_the_import_line(monkeypatch, capsys):
-    feed(monkeypatch, "utilise")
-    main(["draft", "x", "--import"])
-    out = capsys.readouterr().out
-    assert out.startswith("from lexguard import Lexicon\n\n")
-
-
-def test_draft_on_empty_stdin_is_an_error(monkeypatch, capsys):
-    feed(monkeypatch, "   \n\n")
-    assert main(["draft", "x"]) == 2
-    assert "no terms" in capsys.readouterr().err
 
 
 def test_ls_lists_every_group_with_importable_symbols(capsys):

@@ -117,7 +117,6 @@ class Lexicon:
     fix: str = ""
     _indicate: str | None = field(init=False, repr=False, compare=False)
     _rule_out: str | None = field(init=False, repr=False, compare=False)
-    _base: Lexicon | None = field(init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         assert self.name, "lexicon must have a name"
@@ -130,7 +129,6 @@ class Lexicon:
         object.__setattr__(self, "fix", " ".join(self.fix.split()))
         object.__setattr__(self, "_indicate", phrases(self.indicates))
         object.__setattr__(self, "_rule_out", phrases(self.rules_out))
-        object.__setattr__(self, "_base", None)
         assert all(word not in self.rules_out for word in self.indicates), (
             f"{self.name}: a phrase cannot both indicate and rule out the same concept"
         )
@@ -205,39 +203,13 @@ class Lexicon:
         assert len(result) <= count
         return result
 
-    def extend(
-        self,
-        indicates: Collection[str] = (),
-        rules_out: Collection[str] = (),
-        fix: str = "",
-        name: str | None = None,
-    ) -> Lexicon:
-        lexicon = Lexicon(
-            name=name or self.name,
-            indicates=[*self.indicates, *indicates],
-            rules_out=[*self.rules_out, *rules_out],
-            fix=fix or self.fix,
-        )
-        # remember what we grew from so as_code(base=...) can emit the delta, not a flat copy
-        object.__setattr__(lexicon, "_base", self)
-        assert lexicon.name == (name or self.name)
-        assert all(word in lexicon.indicates for word in self.indicates)
-        assert lexicon._base is self
-        return lexicon
-
-    def as_code(self, base: str | None = None) -> str:
+    def as_code(self) -> str:
         """Emit this lexicon as paste-able Python source.
 
         A lexicon is a judgement artifact: it belongs in code, reviewed and diffed, not
         round-tripped through JSON. This returns a `Lexicon(...)` expression (ruff/black
         formatted, terms sorted so re-emitting is byte-identical) ready to paste into a module.
-
-        Pass `base` — the variable name the parent is bound to — to emit a derived lexicon as
-        `<base>.extend(indicates=[...delta])`, keeping provenance and shrinking the diff to only
-        the terms this lexicon added. Requires that it was built with `.extend()`.
         """
-        if base is not None:
-            return self._as_extend(base)
         lines = ["Lexicon(", f"    name={literal(self.name)},", _terms("indicates", self.indicates)]
         if self.rules_out:
             lines.append(_terms("rules_out", self.rules_out))
@@ -246,28 +218,6 @@ class Lexicon:
         lines.append(")")
         result = "\n".join(lines)
         assert result.startswith("Lexicon(\n") and result.endswith("\n)")
-        return result
-
-    def _as_extend(self, base: str) -> str:
-        if self._base is None:
-            raise ValueError(
-                f"{self.name!r} was not built with .extend(); call .as_code() with no base "
-                "for a flat definition"
-            )
-        lines = [f"{base}.extend("]
-        added_indicates = frozenset(self.indicates) - frozenset(self._base.indicates)
-        added_rules_out = frozenset(self.rules_out) - frozenset(self._base.rules_out)
-        if added_indicates:
-            lines.append(_terms("indicates", added_indicates))
-        if added_rules_out:
-            lines.append(_terms("rules_out", added_rules_out))
-        if self.name != self._base.name:
-            lines.append(f"    name={literal(self.name)},")
-        if self.fix != self._base.fix:
-            lines.append(_fix_field(self.fix))
-        # nothing new to say — a no-op extend still parses and round-trips to the base
-        result = f"{base}.extend()" if len(lines) == 1 else "\n".join((*lines, ")"))
-        assert result.startswith(f"{base}.extend(")
         return result
 
     def absent(self, **guards: Any) -> Any:

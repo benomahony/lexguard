@@ -123,53 +123,6 @@ def test_every_shipped_lexicon_round_trips_and_is_stable(lexicon: Lexicon):
     assert all(len(line) <= 100 for line in code.splitlines())
 
 
-def test_extend_can_rename_the_derived_lexicon():
-    from lexguard import Slop
-
-    derived = Slop.extend(indicates=["going forward"], name="house_slop")
-    assert derived.name == "house_slop"
-    assert "going forward" in derived.indicates
-
-
-def test_derived_form_emits_the_delta_against_the_base():
-    from lexguard import Slop
-
-    derived = Slop.extend(indicates=["going forward", "utilise"], name="house_slop")
-    code = derived.as_code(base="Slop")
-    assert code == (
-        "Slop.extend(\n"
-        "    indicates=[\n"
-        '        "going forward",\n'
-        '        "utilise",\n'
-        "    ],\n"
-        '    name="house_slop",\n'
-        ")"
-    )
-    assert eval(code, {"Slop": Slop}) == derived  # noqa: S307
-
-
-def test_derived_form_carries_a_changed_fix_and_new_rules_out():
-    from lexguard import Slop
-
-    derived = Slop.extend(rules_out=["on brand"], fix="prefer the shorter word")
-    code = derived.as_code(base="Slop")
-    assert "rules_out=[" in code
-    assert 'fix="prefer the shorter word"' in code
-    assert "indicates" not in code  # nothing was added on that axis
-    assert eval(code, {"Slop": Slop}) == derived  # noqa: S307
-
-
-def test_derived_form_with_no_delta_is_a_bare_extend():
-    from lexguard import Slop
-
-    assert Slop.extend().as_code(base="Slop") == "Slop.extend()"
-
-
-def test_base_on_a_non_derived_lexicon_is_an_error():
-    with pytest.raises(ValueError, match="not built with .extend"):
-        Lexicon(name="x", indicates=["a"]).as_code(base="X")
-
-
 @given(st.text(max_size=40))
 def test_literal_round_trips_and_prefers_double_quotes(text):
     assert eval(literal(text)) == text  # noqa: S307
