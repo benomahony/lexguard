@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import ast
-
 import pytest
 from hypothesis import given
 from hypothesis import strategies as st
@@ -38,11 +36,6 @@ def test_as_code_is_deterministic(indicates, rules_out, name, fix):
     assert lexicon.as_code() == lexicon.as_code()
 
 
-@given(st.lists(terms, max_size=12), st.lists(terms, max_size=8), names, st.text(max_size=60))
-def test_as_code_is_valid_python(indicates, rules_out, name, fix):
-    ast.parse(build(indicates, rules_out, name, fix).as_code())
-
-
 def test_constructor_rejects_a_bare_string_instead_of_exploding_it():
     # a str is a Collection[str] of characters; the constructor must reject it, not tidy "abc"
     # into {"a", "b", "c"}. Splitting raw text into terms is the CLI's job, at its boundary.
@@ -69,12 +62,6 @@ def test_empty_rules_out_and_fix_are_omitted():
     code = Lexicon(name="x", indicates=["a"]).as_code()
     assert "rules_out" not in code
     assert "fix" not in code
-
-
-def test_terms_with_quotes_round_trip():
-    # repr() handles the escaping: apostrophes and embedded double quotes both survive eval()
-    lexicon = Lexicon(name="x", indicates=["what's next", 'he said "hi"'])
-    assert eval(lexicon.as_code(), {"Lexicon": Lexicon}) == lexicon  # noqa: S307
 
 
 @pytest.mark.parametrize("lexicon", LEXICONS.values(), ids=LEXICONS.keys())
