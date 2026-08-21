@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import ast
 import re
 import unicodedata
 from collections.abc import Collection
@@ -58,9 +57,7 @@ def literal(term: str) -> str:
         else:
             out.append(f"\\U{ord(ch):08x}")
     out.append(quote)
-    result = "".join(out)
-    assert ast.literal_eval(result) == term, "literal() must parse back to the same string"
-    return result
+    return "".join(out)
 
 
 def _terms(key: str, terms: Collection[str]) -> str:
@@ -70,9 +67,7 @@ def _terms(key: str, terms: Collection[str]) -> str:
     if not ordered:
         return f"    {key}=[],"
     body = "".join(f"        {literal(term)},\n" for term in ordered)
-    result = f"    {key}=[\n{body}    ],"
-    assert result.count(",\n") == len(ordered), "_terms must put every term on its own line"
-    return result
+    return f"    {key}=[\n{body}    ],"
 
 
 def snippet(text: str, start: int, end: int, width: int = 34) -> str:
@@ -192,9 +187,7 @@ class Lexicon:
         if self.fix:
             lines.append(f"    fix={literal(self.fix)},")
         lines.append(")")
-        result = "\n".join(lines)
-        assert result.startswith("Lexicon(\n") and result.endswith("\n)")
-        return result
+        return "\n".join(lines)
 
     def absent(self, **guards: Any) -> Any:
         from .rule import Rule

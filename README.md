@@ -135,13 +135,11 @@ append to a module and edit as source — reviewed, diffed, owned:
 $ lexguard slop >> mylexicons.py    # then add or remove terms in code
 ```
 
-With no name it lists every lexicon, one per line. Run interactively with a fuzzy finder on your
-PATH ([fzf](https://github.com/junegunn/fzf) or [skim](https://github.com/skim-rs/skim), or set
-`LEXGUARD_PICKER` to any other), that same bare command opens a picker with a live source preview.
-Piped, it stays a plain list, so you can always compose your own:
+With no name it lists every lexicon, one per line, so it composes. Pipe it into a fuzzy finder for
+a browse-with-preview picker — the preview command is `lexguard` itself:
 
 ```console
-$ lexguard | fzf --preview 'lexguard {}'    # the picker, spelled out
+$ lexguard | fzf --preview 'lexguard {}'
 ```
 
 ## Docs
