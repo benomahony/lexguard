@@ -97,7 +97,7 @@ include = ["src/lexguard"]
 typeCheckingMode = "standard"
 
 [tool.deptry]
-extend_exclude = ["tests", "examples"]
+extend_exclude = ["tests"]
 
 [tool.deptry.per_rule_ignores]
 DEP002 = ["pytest", "pytest-cov", "pytest-examples", "pytest-xdist", "ruff", "basedpyright", "prek", "vulture", "bandit", "deptry", "bump-my-version", "zensical", "pydantic-ai-slim", "hypothesis"]
