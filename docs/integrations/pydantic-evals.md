@@ -31,8 +31,7 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 ```
 
 Pulling values out like that is only to keep this example's output checkable; day to day,
-`report.print(include_reasons=True)` renders the whole `Dataset` as a table (see
-[examples/usage.py](../../examples/usage.py)).
+`report.print(include_reasons=True)` renders the whole `Dataset` as a table.
 
 ## Install
 

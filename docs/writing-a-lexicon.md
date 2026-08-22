@@ -61,26 +61,50 @@ print(SoftDeadline.signal("ideally friday, but it is a hard deadline"))
 #> denied
 ```
 
-## Extending what ships
+## Building on what ships
 
-`extend()` returns a new lexicon and keeps the original intact, so house style sits on top of the
-shared list rather than forking it.
+The built-ins are not a framework to subclass; they are source to copy. `lexguard slop` prints the
+definition — paste it into your module, name it, and edit the list like any other code.
+
+If you are genuinely composing at runtime — folding in an externally derived word list, say — build
+a new lexicon from the parts:
 
 ```py
-from lexguard import Slop
+from lexguard import Lexicon, Slop
 
-HouseStyle = Slop.extend(
-    indicates=["at this moment in time", "going forward", "in order to", "utilise"],
+HouseSlop = Lexicon(
+    name="house_slop",
+    indicates=[*Slop.indicates, "going forward", "utilise"],
+    rules_out=Slop.rules_out,
     fix="house style: prefer the shorter word",
 )
 
-print(len(Slop.indicates), len(HouseStyle.indicates))
-#> 50 54
-print(HouseStyle.signal("going forward we will utilise a new approach"))
+print(len(Slop.indicates), len(HouseSlop.indicates))
+#> 50 52
+print(HouseSlop.signal("going forward we will utilise a new approach"))
 #> present
 print(Slop.signal("going forward we will utilise a new approach"))
 #> absent
 ```
+
+## Promote to code
+
+A lexicon is a judgement artifact. It belongs in a module that is reviewed, diffed, tested, and
+versioned — not round-tripped through JSON. When terms are curated at runtime (an agent proposing
+additions in a self-improvement loop, say), they are transient data until a human commits them.
+`as_code()` is that promotion step: it returns paste-able Python that reconstructs the lexicon.
+
+```py
+from lexguard import Lexicon
+
+vague = Lexicon(name="vague", indicates=["circle back", "at some point"])
+
+print(vague.as_code())
+#> Lexicon(name='vague', indicates=['at some point', 'circle back'])
+```
+
+Terms are sorted, so re-emitting the same lexicon is byte-identical and a diff shows only the terms
+that changed. The output is a compact expression; run it through your formatter to lay it out.
 
 ## Grouping
 

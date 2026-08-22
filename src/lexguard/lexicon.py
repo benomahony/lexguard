@@ -54,6 +54,10 @@ class Lexicon:
 
     def __post_init__(self) -> None:
         assert self.name, "lexicon must have a name"
+        # a bare string is a Collection[str] of characters — reject it loudly rather than tidy it
+        # into single-letter terms; callers with raw text split it into a list themselves
+        assert not isinstance(self.indicates, str), "indicates takes a list of terms, not a string"
+        assert not isinstance(self.rules_out, str), "rules_out takes a list of terms, not a string"
         object.__setattr__(self, "indicates", tidy(self.indicates))
         object.__setattr__(self, "rules_out", tidy(self.rules_out))
         object.__setattr__(self, "fix", " ".join(self.fix.split()))
@@ -133,21 +137,17 @@ class Lexicon:
         assert len(result) <= count
         return result
 
-    def extend(
-        self,
-        indicates: Collection[str] = (),
-        rules_out: Collection[str] = (),
-        fix: str = "",
-    ) -> Lexicon:
-        lexicon = Lexicon(
-            name=self.name,
-            indicates=[*self.indicates, *indicates],
-            rules_out=[*self.rules_out, *rules_out],
-            fix=fix or self.fix,
-        )
-        assert lexicon.name == self.name
-        assert all(word in lexicon.indicates for word in self.indicates)
-        return lexicon
+    def as_code(self) -> str:
+        """A paste-able `Lexicon(...)` expression, terms sorted for byte-identical re-emits.
+
+        Compact — run it through your formatter to lay it out for review.
+        """
+        fields: dict[str, object] = {"name": self.name, "indicates": sorted(self.indicates)}
+        if self.rules_out:
+            fields["rules_out"] = sorted(self.rules_out)
+        if self.fix:
+            fields["fix"] = self.fix
+        return "Lexicon(" + ", ".join(f"{key}={value!r}" for key, value in fields.items()) + ")"
 
     def absent(self, **guards: Any) -> Any:
         from .rule import Rule

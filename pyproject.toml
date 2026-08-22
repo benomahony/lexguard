@@ -16,6 +16,9 @@ inspect-ai = [
     "inspect-ai>=0.3.259",
 ]
 
+[project.scripts]
+lexguard = "lexguard.cli:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -93,7 +96,7 @@ include = ["src/lexguard"]
 typeCheckingMode = "standard"
 
 [tool.deptry]
-extend_exclude = ["tests", "examples"]
+extend_exclude = ["tests"]
 
 [tool.deptry.per_rule_ignores]
 DEP002 = ["pytest", "pytest-cov", "pytest-examples", "pytest-xdist", "ruff", "basedpyright", "prek", "vulture", "bandit", "deptry", "bump-my-version", "zensical", "pydantic-ai-slim", "hypothesis"]

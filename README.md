@@ -125,6 +125,24 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 """
 ```
 
+## From the command line
+
+`lexguard` lists the built-in lexicons, one per line; `lexguard <name>` prints one as `Lexicon(...)`
+source to paste into your code. Drop a shell function in your `~/.zshrc` so `lg` opens a fuzzy picker
+with a syntax-highlighted preview (via [bat](https://github.com/sharkdp/bat)):
+
+```zsh
+lg() {
+  lexguard | fzf --ansi --preview 'lexguard {} | bat -l python --color=always --style=plain'
+}
+```
+
+Or, without bat, the plain one-liner:
+
+```console
+$ lexguard | fzf --preview 'lexguard {}'
+```
+
 ## Docs
 
 - [Lexicons](docs/lexicons/index.md): every lexicon that ships in the box, generated from
@@ -139,6 +157,6 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 
 The slop word lists overlap heavily with
 [slop-forensics](https://github.com/sam-paech/slop-forensics), which derives them statistically
-rather than by hand. Point `Lexicon.extend()` at that list if you want the empirical version.
-The abstain semantics, where a lexicon that does not apply records nothing rather than a free pass,
-is the same idea as a Snorkel labelling function returning `None`.
+rather than by hand. Fold that list into a `Slop` copy in your own module if you want the empirical
+version. The abstain semantics, where a lexicon that does not apply records nothing rather than a
+free pass, is the same idea as a Snorkel labelling function returning `None`.
