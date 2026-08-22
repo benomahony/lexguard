@@ -29,6 +29,13 @@ uv add "lexguard[deepeval]"
 uv add "lexguard[inspect-ai]"
 ```
 
+If you want to use it as a dev tool and not worry about which repo you are in then install it as a tool:
+
+
+```bash
+uv tool install lexguard
+```
+
 ## The idea
 
 A lexicon on its own only observes. Naming a polarity turns it into a verdict.
