@@ -128,10 +128,11 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 ## From the command line
 
 `lexguard` lists the built-in lexicons, one per line; `lexguard <name>` prints one as `Lexicon(...)`
-source to paste into your code. Pipe the list into a fuzzy finder to browse with a preview:
+source to paste into your code. Pipe the list into a fuzzy finder to browse with a syntax-highlighted
+preview (via [bat](https://github.com/sharkdp/bat)):
 
 ```console
-$ lexguard | fzf --preview 'lexguard {}'
+$ lexguard | fzf --ansi --preview 'lexguard {} | bat -l python --color=always'
 ```
 
 ## Docs
