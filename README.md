@@ -136,11 +136,12 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 
 `lexguard` lists the built-in lexicons, one per line; `lexguard <name>` prints one as `Lexicon(...)`
 source to paste into your code. Drop a shell function in your `~/.zshrc` so `lg` opens a fuzzy picker
-with a syntax-highlighted preview (via [bat](https://github.com/sharkdp/bat)):
+with a formatted, syntax-highlighted preview (via [ruff](https://github.com/astral-sh/ruff) and
+[bat](https://github.com/sharkdp/bat)):
 
 ```zsh
 lg() {
-  lexguard | fzf --ansi --preview 'lexguard {} | bat -l python --color=always --style=plain'
+  lexguard | fzf --ansi --preview 'lexguard {} | ruff format - | bat -l python --color=always --style=plain'
 }
 ```
 
