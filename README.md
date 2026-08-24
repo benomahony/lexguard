@@ -4,16 +4,47 @@
 
 # Lexguard
 
-Lexicons that score text for a concept, plus evaluators for
-[pydantic-evals](https://ai.pydantic.dev/evals/), [DeepEval](https://deepeval.com/), and
-[Inspect AI](https://inspect.aisi.org.uk/) built on top.
+## The problem
 
-A lexicon is a named set of words and phrases that signal a concept, plus the words that rule it out.
-Ninety one of them ship in the box, covering what a user asked for and what a model produced.
-`.signal()`, `.fires()` and `.denied()` are plain functions over text: call them directly in a
-guardrail, a test, a CLI, or a log pipeline, no evals framework required. `.spec()` compiles the
-same lexicon into a framework-agnostic `RuleSpec`, which `.absent()` / `.expected()` and the
-[integrations](docs/integrations/index.md) turn into an evaluator for whichever framework you use.
+You're evaluating an AI agent. You want to know whether its reply is polite, or whether it
+overclaimed, leaked something it shouldn't have, or buried the answer under sycophantic preamble.
+The obvious move is to grep the output for a few words, and one list of words breaks fast: an agent
+that writes "could you please fix the fucking bug" used the word "please" and swore in the same
+breath. A single word list can't tell those two apart, so it either misses the problem or, worse,
+scores a bad reply as fine.
+
+Lexguard is still just word matching, it's not doing anything clever with the text. The difference
+is a second list: words that rule the concept back out. Point it at a reply and get back one of
+three answers: the concept is there, it's absent, or the wording rules it out.
+
+```py
+from lexguard import Politeness
+
+print(Politeness.signal("could you send this over when you get a sec?"))
+#> present
+print(Politeness.signal("send me the report"))
+#> absent
+print(Politeness.signal("could you please fix the fucking bug"))
+#> denied
+```
+
+`denied` is not the same as `absent`. A reply with no politeness words at all is merely unasked for.
+This one has a politeness word, but the swearing cancels it out, so it's rated denied, not present.
+
+## How it works
+
+That three-way check is a `Lexicon`: a named set of words and phrases that signal a concept
+(`indicates`), the words that rule it out (`rules_out`), and a plain sentence saying what to do
+about a hit (`fix`). It's matched by plain substring, no model in the loop, so a check is instant
+and gives the same verdict every time. A set of them ship in the box already, tuned for agent
+transcripts: what a user asked for and what a model produced, from slop and sycophancy to leaked
+secrets and overclaimed confidence, alongside politeness; run `lexguard` to list every one.
+Extending a lexicon means editing its list; `lexguard <name>` prints one as source to paste into
+your own module and change. See [Writing a lexicon](docs/writing-a-lexicon.md).
+
+`.signal()`, `.fires()` and `.denied()` are plain functions over text: call them directly on
+whatever an agent returned, in a guardrail before a reply goes out, an `assert` in a unit test, or a
+filter in a log pipeline.
 
 ## Install
 
@@ -21,7 +52,9 @@ same lexicon into a framework-agnostic `RuleSpec`, which `.absent()` / `.expecte
 uv add lexguard
 ```
 
-The core has no dependencies. Each eval framework is its own extra:
+The core has no dependencies. `.spec()` compiles a lexicon into a framework-agnostic `RuleSpec`,
+which `.absent()` / `.expected()` and the [integrations](docs/integrations/index.md) turn into an
+evaluator for whichever eval framework you use; each is its own extra:
 
 ```bash
 uv add "lexguard[pydantic-evals]"
@@ -34,36 +67,6 @@ If you want to use it as a dev tool and not worry about which repo you are in th
 ```bash
 uv tool install lexguard
 ```
-
-## The idea
-
-A lexicon on its own only observes. Naming a polarity turns it into a verdict.
-
-```py
-from lexguard import Slop
-
-print(Slop.signal("let us delve into the intricate tapestry"))
-#> present
-print(Slop.signal("caching skips repeated work"))
-#> absent
-```
-
-Lexicons are three valued, not two. `rules_out` exists so that wording which merely shares
-vocabulary with a concept does not count as the concept.
-
-```py
-from lexguard import HighPriority, Recurrence
-
-print(Recurrence.signal("bin day every tuesday"))
-#> present
-print(Recurrence.signal("i do that every so often"))
-#> denied
-print(HighPriority.signal("sort it whenever, no rush"))
-#> denied
-```
-
-`denied` is not the same as `absent`. An agent setting `priority=high` on "no rush" is wrong,
-where on a sentence with no priority wording at all it is merely unasked for.
 
 ## Using it without an evals framework
 
@@ -131,10 +134,44 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 """
 ```
 
+## Closing the loop
+
+`fix` is not just for a test report. It works standing alone, so a guardrail in the agent loop
+does not just block a bad reply, it can hand the agent something to retry with.
+
+```py
+from lexguard import Slop
+
+
+def guard(reply: str) -> str | None:
+    return Slop.fix if Slop.fires(reply) else None
+
+
+print(guard("let us delve into the intricate tapestry"))
+#> swap for a plain verb or noun, or add these to the sampler ban list
+print(guard("caching skips repeated work"))
+#> None
+```
+
+A non-`None` result is the next prompt: feed it back in and let the agent take another turn,
+instead of failing the whole run.
+
 ## From the command line
 
 `lexguard` lists the built-in lexicons, one per line; `lexguard <name>` prints one as `Lexicon(...)`
-source to paste into your code. Drop a shell function in your `~/.zshrc` so `lg` opens a fuzzy picker
+source to paste into your code.
+
+```bash
+lexguard
+```
+
+You can pipe it to fzf (or another tool if installed) to get a fuzzy picker.
+
+```console
+lexguard | fzf --preview 'lexguard {}'
+```
+
+Or you can drop a shell function in your `~/.zshrc` so `lg` opens a fuzzy picker
 with a formatted, syntax-highlighted preview (via [ruff](https://github.com/astral-sh/ruff) and
 [bat](https://github.com/sharkdp/bat)):
 
@@ -142,12 +179,6 @@ with a formatted, syntax-highlighted preview (via [ruff](https://github.com/astr
 lg() {
   lexguard | fzf --ansi --preview 'lexguard {} | ruff format - | bat -l python --color=always --style=plain'
 }
-```
-
-Or, without bat, the plain one-liner:
-
-```console
-lexguard | fzf --preview 'lexguard {}'
 ```
 
 ## Docs

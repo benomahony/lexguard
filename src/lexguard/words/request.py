@@ -690,6 +690,21 @@ Politeness = Lexicon(
         "when you get a sec",
         "would you",
     ],
+    rules_out=[
+        "asshole",
+        "bullshit",
+        "could you not",
+        "fuck",
+        "fucking",
+        "no thanks to you",
+        "shit",
+        "sorry not sorry",
+        "thanks for nothing",
+    ],
+    fix=(
+        """sarcasm, dismissal, and profanity do not read as politeness.
+        Write the actual request plainly"""
+    ),
 )
 
 
