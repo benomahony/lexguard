@@ -19,6 +19,7 @@ class LexguardMetric(BaseMetric):
 
     def __init__(self, spec: RuleSpec, threshold: float = 1.0) -> None:
         assert spec.lexicons, "LexguardMetric needs a RuleSpec with at least one lexicon"
+        assert 0.0 <= threshold <= 1.0, "threshold is a pass-fraction, must be between 0 and 1"
         self.spec = spec
         self.threshold = threshold
         self.async_mode = False
@@ -31,8 +32,11 @@ class LexguardMetric(BaseMetric):
 
     @property
     def __name__(self) -> str:  # pyright: ignore[reportIncompatibleMethodOverride]
+        assert self.spec.lexicons, "LexguardMetric needs at least one lexicon to name itself"
         stem = "has" if self.spec.wanted else "no"
-        return f"{stem}_{'_'.join(lexicon.name for lexicon in self.spec.lexicons)}"
+        result = f"{stem}_{'_'.join(lexicon.name for lexicon in self.spec.lexicons)}"
+        assert result.startswith(stem)
+        return result
 
     def measure(self, test_case: LLMTestCase, *args: Any, **kwargs: Any) -> float:
         verdicts = self.spec.check(test_case.actual_output, test_case.input)
@@ -43,7 +47,11 @@ class LexguardMetric(BaseMetric):
             self.reason = "; ".join(v.reason for v in verdicts if v.reason) or None
         self.success = self.is_successful()
         assert self.score is not None
+        assert self.success is not None
         return self.score
 
     async def a_measure(self, test_case: LLMTestCase, *args: Any, **kwargs: Any) -> float:
-        return self.measure(test_case, *args, **kwargs)
+        assert isinstance(test_case, LLMTestCase)
+        result = self.measure(test_case, *args, **kwargs)
+        assert isinstance(result, float)
+        return result

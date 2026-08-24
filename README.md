@@ -31,7 +31,6 @@ uv add "lexguard[inspect-ai]"
 
 If you want to use it as a dev tool and not worry about which repo you are in then install it as a tool:
 
-
 ```bash
 uv tool install lexguard
 ```
@@ -148,7 +147,7 @@ lg() {
 Or, without bat, the plain one-liner:
 
 ```console
-$ lexguard | fzf --preview 'lexguard {}'
+lexguard | fzf --preview 'lexguard {}'
 ```
 
 ## Docs

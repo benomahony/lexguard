@@ -82,6 +82,7 @@ class RuleSpec:
         assert not (self.when and self.unless), "a RuleSpec cannot have both when and unless"
 
     def check(self, output: Any, inputs: Any) -> list[Verdict] | None:
+        assert self.lexicons, "RuleSpec.check called without lexicons"
         request = str(inputs)
         if self.when is not None and not self.when.fires(request):
             return None
@@ -106,11 +107,14 @@ class RuleSpec:
         spans = lexicon.spans(body)
         holds = lexicon.fires(body) if self.wanted else not spans
         name = self._name(lexicon)
+        assert name
         if holds:
             return Verdict(name=name, passed=True)
-        return Verdict(
+        result = Verdict(
             name=name, passed=False, reason=self._diagnosis(lexicon, spans, body, request)
         )
+        assert result.reason is not None
+        return result
 
     def _diagnosis(self, lexicon: Lexicon, spans: list, body: str, request: str) -> str:
         where = f" in {self.field}" if self.field else ""
@@ -146,6 +150,7 @@ class ObserveSpec:
 
     def __post_init__(self) -> None:
         assert self.lexicons, "ObserveSpec needs at least one lexicon"
+        assert all(lexicon.name for lexicon in self.lexicons)
 
     def signals(self, output: Any, inputs: Any) -> dict[str, str] | None:
         body = text_at(output if self.of == "output" else inputs, self.field)
@@ -153,4 +158,5 @@ class ObserveSpec:
             return None
         result = {lexicon.name: lexicon.signal(body).value for lexicon in self.lexicons}
         assert set(result) == {lexicon.name for lexicon in self.lexicons}
+        assert all(isinstance(value, str) for value in result.values())
         return result

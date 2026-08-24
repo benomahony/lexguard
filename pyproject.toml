@@ -133,4 +133,3 @@ replace = "__version__ = \"{new_version}\""
 filename = "uv.lock"
 search = "version = \"{current_version}\""
 replace = "version = \"{new_version}\""
-

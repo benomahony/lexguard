@@ -24,11 +24,14 @@ Overreach = Bundle(members=(out.Overclaim, out.UnsourcedAuthority))
 
 
 def _prose() -> list:
-    return [Bloat.absent(), Servility.absent(), Leakage.absent(), Overreach.absent()]
+    result = [Bloat.absent(), Servility.absent(), Leakage.absent(), Overreach.absent()]
+    assert len(result) == 4
+    assert all(rule is not None for rule in result)
+    return result
 
 
 def _adherence() -> list:
-    return [
+    result = [
         out.Disclaimer.absent(unless=ask.AdviceDemand),
         out.Hedging.absent(when=ask.NoCaveats),
         Servility.absent(when=ask.NoPreamble),
@@ -37,10 +40,15 @@ def _adherence() -> list:
         out.CitationMarker.expected(when=ask.CitationDemand),
         out.UncertaintyAdmission.expected(when=ask.FactualDemand),
     ]
+    assert len(result) == 7
+    assert all(rule is not None for rule in result)
+    return result
 
 
 def __getattr__(name: str) -> list:
     # deferred so importing lexguard never requires pydantic-evals until these are touched
+    assert isinstance(name, str)
+    assert name, "attribute name must not be empty"
     if name == "PROSE":
         return _prose()
     if name == "ADHERENCE":

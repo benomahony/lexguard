@@ -44,7 +44,6 @@ repos:
         exclude: ^tests/
 
   - repo: https://github.com/astral-sh/uv-pre-commit
-    # uv version.
     rev: 0.12.5
     hooks:
       - id: uv-lock
@@ -68,7 +67,8 @@ repos:
         entry: uv run basedpyright
         language: system
         types: [python]
-        pass_filenames: true
+        files: ^src/lexguard/
+        pass_filenames: false
         require_serial: true
       - id: vulture
         name: vulture

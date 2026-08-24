@@ -26,12 +26,18 @@ def lexguard_scorer(spec: RuleSpec) -> Scorer:
                 return Score(value=CORRECT, answer=output, explanation="rule did not apply")
             failed = [v for v in verdicts if not v.passed]
             explanation = "\n".join(v.reason for v in failed if v.reason)
-            return Score(
+            result = Score(
                 value=INCORRECT if failed else CORRECT,
                 answer=output,
                 explanation=explanation or "all lexicon checks passed",
             )
+            assert result.value in (CORRECT, INCORRECT)
+            return result
 
+        assert callable(score)
+        assert score.__name__ == "score"
         return score
 
-    return _lexguard_scorer()
+    result = _lexguard_scorer()
+    assert result is not None
+    return result

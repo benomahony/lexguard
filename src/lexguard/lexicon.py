@@ -30,6 +30,7 @@ def phrases(words: Collection[str]) -> str | None:
     pattern = "|".join(rf"\b{re.escape(word)}\b" for word in multiword)
     # a word containing a literal "|" adds its own escaped "\|", so count() can't check the join
     assert pattern.startswith(r"\b")
+    assert pattern.endswith(r"\b")
     return pattern
 
 
@@ -147,7 +148,10 @@ class Lexicon:
             fields["rules_out"] = sorted(self.rules_out)
         if self.fix:
             fields["fix"] = self.fix
-        return "Lexicon(" + ", ".join(f"{key}={value!r}" for key, value in fields.items()) + ")"
+        result = "Lexicon(" + ", ".join(f"{key}={value!r}" for key, value in fields.items()) + ")"
+        assert result.startswith("Lexicon(") and result.endswith(")")
+        assert "name" in fields
+        return result
 
     def absent(self, **guards: Any) -> Any:
         from .rule import Rule
@@ -186,6 +190,7 @@ class Lexicon:
     @staticmethod
     def _fold(text: str) -> str:
         result = unicodedata.normalize("NFKC", text).casefold()
+        assert isinstance(result, str)
         # casefold() can decompose what NFKC just composed (e.g. "ῶ"), so result may not stay NFKC
         assert result == result.casefold()
         return result
