@@ -50,6 +50,7 @@ class Lexicon:
     indicates: Collection[str]
     rules_out: Collection[str] = ()
     fix: str = ""
+    source: str = ""
     _indicate: str | None = field(init=False, repr=False, compare=False)
     _rule_out: str | None = field(init=False, repr=False, compare=False)
 
@@ -62,6 +63,7 @@ class Lexicon:
         object.__setattr__(self, "indicates", tidy(self.indicates))
         object.__setattr__(self, "rules_out", tidy(self.rules_out))
         object.__setattr__(self, "fix", " ".join(self.fix.split()))
+        object.__setattr__(self, "source", " ".join(self.source.split()))
         object.__setattr__(self, "_indicate", phrases(self.indicates))
         object.__setattr__(self, "_rule_out", phrases(self.rules_out))
         assert all(word not in self.rules_out for word in self.indicates), (
@@ -148,6 +150,8 @@ class Lexicon:
             fields["rules_out"] = sorted(self.rules_out)
         if self.fix:
             fields["fix"] = self.fix
+        if self.source:
+            fields["source"] = self.source
         result = "Lexicon(" + ", ".join(f"{key}={value!r}" for key, value in fields.items()) + ")"
         assert result.startswith("Lexicon(") and result.endswith(")")
         assert "name" in fields

@@ -27,6 +27,11 @@ print(Estimate.signal("it depends on how many clients hold session state"))
 #> denied
 ```
 
+A fifth field, `source`, is optional: a short citation for where the terms come from — a paper, a
+finding, or an openly-licensed word list. It renders in the [lexicon tables](lexicons/index.md),
+survives `as_code()`, and is diffed like any other line, so provenance stays next to the words.
+See [Evidence behind the lexicons](evidence.md) for which concepts have one.
+
 ## Write for precision, not recall
 
 A lexicon fires or it does not, so a false positive costs you trust in the whole suite while a miss

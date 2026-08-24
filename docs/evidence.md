@@ -1,18 +1,15 @@
 # Evidence behind the lexicons
 
-The built-in lexicons were written by hand, not derived from a corpus. That is a deliberate
-trade — a hand list is easy to read, diff, and edit — but it raises a fair question: is any of
-this backed by research, or is it all taste?
+Do language studies actually back these concepts — the claim that some words *indicate* a
+concept and others *rule it out*? For a good number of them, yes. This page answers that per
+lexicon, sorting them into three tiers: those that rest on established linguistics (often with an
+openly-licensed word list you can copy), those that rest on a recent ML-era result, and those
+that are craft heuristics with no study behind them.
 
-The honest answer is that it is mixed, and the mix is worth knowing. Many of the *concepts* the
-lexicons encode have a real literature, and a few have published word lists you can fold in with
-the composition pattern in [Writing a lexicon](writing-a-lexicon.md). Others are recent findings
-about model output that name markers but ship no canonical list. And some are craft heuristics
-with no study behind them at all — which is fine, as long as you know that is what they are.
-
-This page sorts the lexicons into those three tiers and names the source for each, so you can
-tell which ones rest on established linguistics, which rest on an ML-era result, and which are
-just a considered guess.
+Where a lexicon draws terms from an outside list, that list is openly licensed — MIT or Apache-2.0
+— and named in the lexicon's `source` field. Proprietary resources such as LIWC are left out on
+purpose. Citing a finding is not the same as copying a list: several Tier-A concepts are grounded
+in a paper or book whose *idea* is cited without any text being lifted.
 
 ## The three tiers
 
@@ -36,7 +33,7 @@ honest.
 | --- | --- | --- |
 | `Politeness` | A | Brown & Levinson politeness theory; the Stanford Politeness Corpus and classifier |
 | `Hedging`, `Hypothetical`, `UncertaintyAdmission` | A | Lakoff's "hedges"; Hyland's hedges taxonomy; CoNLL-2010 uncertainty cues |
-| `Overclaim`, `Confirmation` | A | Hyland's *boosters* — the mirror of hedges; LIWC *certainty* |
+| `Overclaim`, `Confirmation` | A | Hyland's *boosters* — the mirror of hedges |
 | `EmptyIntensifier` | A | Amplifiers / degree adverbs in corpus grammar (Quirk et al., Biber et al.) |
 | `UnsourcedAuthority`, `Vague` | A | Weasel words (Ganter & Strube); bias-language lexicon (Recasens et al.) |
 | `DueDate`, `ClockTime`, `Recurrence`, `Duration` | A | Temporal expression tagging — TimeML/TIMEX3, SUTime, HeidelTime |
@@ -54,9 +51,11 @@ Language Usage* (1987): politeness works through indirection, deference, and sof
 face-threatening act. The computational version is the Stanford Politeness Corpus — about ten
 thousand requests annotated for politeness — and a classifier built on lexical and syntactic
 politeness features (Danescu-Niculescu-Mizil, Sudhof, Jurafsky, Leskovec & Potts, ACL 2013). The
-[paper](https://nlp.stanford.edu/pubs/politeness.pdf) and its
-[feature set](https://github.com/sudhof/politeness) are a ready source of markers to fold into
-`Politeness`. The theory also grounds the `rules_out` side: sarcasm and profanity are
+[paper](https://nlp.stanford.edu/pubs/politeness.pdf) and its Apache-2.0
+[implementation](https://github.com/sudhof/politeness) name the strategies — gratitude,
+deference, greeting, indirection — that the shipped `Politeness` list now draws its generic
+markers from (`appreciate it`, `grateful`, `would you mind`, `sorry to bother`). The theory also
+grounds the `rules_out` side: sarcasm and profanity are
 face-threatening, so a "please" wrapped around an insult is not polite — which is exactly what
 `Politeness.rules_out` encodes.
 
@@ -66,8 +65,7 @@ fuzzier. Hyland's *Metadiscourse* (2005) gives the working taxonomy: **hedges** 
 `of course`, `undoubtedly`) signal conviction. That opposition is the theory behind pairing
 `Hedging` against `Overclaim` and letting each rule the other out. For an annotated resource, the
 CoNLL-2010 Shared Task released uncertainty-cue labels over biomedical text and Wikipedia
-([Farkas et al.](https://aclanthology.org/W10-3001.pdf)). LIWC's *tentativeness* and *certainty*
-categories cover the same ground from the psychometric side (below).
+([Farkas et al.](https://aclanthology.org/W10-3001.pdf)).
 
 **Intensifiers.** `EmptyIntensifier` targets amplifiers — `very`, `really`, `extremely`. Corpus
 grammar treats these as a class of degree adverbs that have been semantically bleached (`very`
@@ -90,14 +88,6 @@ TIMEX3 (Pustejovsky et al., 2003), with mature taggers such as SUTime (Chang & M
 2012) and HeidelTime. If you need these signals for real work rather than a cheap flag, a temporal
 tagger will beat a word list — it normalizes "next Friday" to a date and handles recurrence
 properly. The lexicons are useful as a dependency-free tripwire, not as the parser.
-
-**LIWC as a cross-cutting resource.** Linguistic Inquiry and Word Count (Pennebaker and
-colleagues; see [Tausczik & Pennebaker,
-2010](https://www.cs.cmu.edu/~ylataus/files/TausczikPennebaker2010.pdf)) is a psychometrically
-validated dictionary — 100-plus categories, the basis of tens of thousands of studies. Several
-map onto lexicons here: *tentativeness* onto `Hedging`, *certainty* onto `Overclaim`, *assent*
-onto `Confirmation`, *negations* onto `Negation`. LIWC is licensed, so you cannot vendor its word
-lists, but its category structure is a good template and a validation reference.
 
 ## Tier B, in detail
 
@@ -133,10 +123,11 @@ and strip, not to gate.
 
 ## Tier C, and why it is still fine
 
-The rest are judgements about good agent output with no study to point at: the shape of a reply
-(`Preamble`, `Postamble`, `Padding`), stalling patterns (`EngagementBait`, `ContrastCliche`),
-over-caution (`Disclaimer`, `Refusal`), breaking character (`SelfReference`, `Anthropomorphic`,
-`SystemLeak`). The domain group is topic keyword sets — the relevant field is text classification,
+The rest are judgements about good agent output with no study to point at: padding and filler
+(`Padding`), stalling patterns (`EngagementBait`, `ContrastCliche`), over-caution (`Disclaimer`,
+`Refusal`), breaking character (`SelfReference`, `Anthropomorphic`, `SystemLeak`). (`Preamble` and
+`Postamble` sit a step up — the verbal-tic work names those openers and closers, so they carry a
+`source`.) The domain group is topic keyword sets — the relevant field is text classification,
 where you would train a classifier rather than curate a lexicon, so these are best read as a
 fast, transparent stand-in. The task-capture signals (priority, ownership, due-date *semantics* as
 opposed to date *strings*) are product decisions about what a to-do system should notice, not
@@ -151,11 +142,13 @@ it just matters more when there is no corpus to fall back on.
 
 If you want the evidence to travel with the code:
 
-1. **Record the source where the lexicon lives.** A one-line comment or docstring naming the
-   paper or list is enough. The lexicon is reviewed and diffed like any other module
-   ([Writing a lexicon](writing-a-lexicon.md#promote-to-code)), so provenance belongs next to it.
-2. **Fold in a published list where one exists.** Tier A concepts (politeness, weasel words,
-   uncertainty cues) have released term sets. Compose rather than retype:
+1. **Put the citation in the `source` field.** `Lexicon` takes an optional `source` string; it
+   renders in the docs table, survives `as_code()`, and is diffed like any other line, so the
+   provenance travels with the words. Most of the shipped Tier A and Tier B lexicons already set
+   it.
+2. **Fold in an openly-licensed list where one exists.** Tier A concepts (politeness, weasel
+   words, uncertainty cues) have released term sets under permissive licenses. Compose rather than
+   retype:
 
    ```py
    from lexguard import Lexicon, UnsourcedAuthority

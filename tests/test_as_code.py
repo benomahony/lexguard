@@ -62,6 +62,26 @@ def test_empty_rules_out_and_fix_are_omitted():
     code = Lexicon(name="x", indicates=["a"]).as_code()
     assert "rules_out" not in code
     assert "fix" not in code
+    assert "source" not in code
+
+
+def test_source_is_emitted_after_fix_and_round_trips():
+    lexicon = Lexicon(
+        name="x",
+        indicates=["a"],
+        fix="do the thing",
+        source="Author et al. 2013",
+    )
+    code = lexicon.as_code()
+    assert code.endswith("fix='do the thing', source='Author et al. 2013')")
+    assert eval(code, {"Lexicon": Lexicon}) == lexicon  # noqa: S307
+
+
+def test_source_whitespace_is_collapsed():
+    # the constructor normalizes source the same way it normalizes fix
+    assert Lexicon(name="x", indicates=["a"], source="line one\n   line two").source == (
+        "line one line two"
+    )
 
 
 @pytest.mark.parametrize("lexicon", LEXICONS.values(), ids=LEXICONS.keys())

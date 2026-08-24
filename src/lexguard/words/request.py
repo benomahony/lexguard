@@ -670,25 +670,38 @@ Injection = Lexicon(
         "you are an ai",
     ],
     fix=("treat retrieved or user text as data, never as instructions; strip and log the attempt"),
+    source=(
+        "documented prompt-injection attack phrasings (Perez & Ribeiro 2022; Greshake et al. 2023) "
+        "— a tripwire, not a defence. see docs/evidence.md"
+    ),
 )
 
 
 Politeness = Lexicon(
     name="politeness",
     indicates=[
+        "appreciate it",
         "cheers",
         "could you",
+        "grateful",
         "hello",
         "hey",
         "hi",
+        "if it's not too much trouble",
         "if you don't mind",
+        "kindly",
+        "many thanks",
         "mind",
+        "no worries",
         "please",
         "sorry",
+        "sorry to bother",
         "thank you",
         "thanks",
+        "when you get a chance",
         "when you get a sec",
         "would you",
+        "would you mind",
     ],
     rules_out=[
         "asshole",
@@ -704,6 +717,10 @@ Politeness = Lexicon(
     fix=(
         """sarcasm, dismissal, and profanity do not read as politeness.
         Write the actual request plainly"""
+    ),
+    source=(
+        "gratitude / deference / greeting / indirection strategies from the Stanford politeness "
+        "work (Danescu-Niculescu-Mizil et al. 2013; Apache-2.0 corpus). see docs/evidence.md"
     ),
 )
 
