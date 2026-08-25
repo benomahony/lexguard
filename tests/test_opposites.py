@@ -46,6 +46,17 @@ OPPOSITES: list[tuple[Lexicon, Lexicon]] = [
 
 ids = [f"{a.name}/{b.name}" for a, b in OPPOSITES]
 
+# Pairs promoted to a full mirror: each pole rules out *every* one of the other's indicators, so
+# adding a term to one pole automatically cancels the other and the two can never drift. A pair
+# earns this once its indicators are specific enough that each is a safe blocker for the opposite
+# (see the "priority" note in words/request.py). The rest stay in OPPOSITES with the weaker
+# two-way check until their indicators are tightened.
+MIRRORED: list[tuple[Lexicon, Lexicon]] = [
+    (HighPriority, LowPriority),
+]
+
+mirror_ids = [f"{a.name}/{b.name}" for a, b in MIRRORED]
+
 
 @pytest.mark.parametrize(("a", "b"), OPPOSITES, ids=ids)
 def test_poles_share_no_indicator(a: Lexicon, b: Lexicon):
@@ -70,3 +81,22 @@ def test_mixing_both_poles_is_denied(a: Lexicon, b: Lexicon):
     mixed = f"{a_term} {b_term}"
     assert a.denied(mixed), f"{a.name} not denied by {mixed!r}"
     assert b.denied(mixed), f"{b.name} not denied by {mixed!r}"
+
+
+@pytest.mark.parametrize(("a", "b"), MIRRORED, ids=mirror_ids)
+def test_mirrored_pairs_rule_out_every_opposite_term(a: Lexicon, b: Lexicon):
+    # the strong invariant: a full mirror. add a term to either pole and this fails until it is
+    # also ruled out by the other — the drift guard the curated subsets could not give.
+    missing_from_b = set(a.indicates) - set(b.rules_out)
+    missing_from_a = set(b.indicates) - set(a.rules_out)
+    assert not missing_from_b, f"{b.name} must rule out {sorted(missing_from_b)}"
+    assert not missing_from_a, f"{a.name} must rule out {sorted(missing_from_a)}"
+
+
+def test_low_priority_is_not_denied_by_its_own_phrase():
+    # regression: a bare "priority" indicator (a substring of "low priority") would, once mirrored,
+    # make low_priority deny "low priority" itself. "high priority" carries the signal instead.
+    assert LowPriority.fires("this is low priority")
+    assert HighPriority.denied("this is low priority")
+    assert HighPriority.fires("this is high priority, drop everything")
+    assert LowPriority.denied("this is high priority, drop everything")

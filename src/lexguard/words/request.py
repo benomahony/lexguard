@@ -209,6 +209,11 @@ Duration = Lexicon(
 )
 
 
+# HighPriority and LowPriority are opposite poles of one axis: each rules out every one of the
+# other's indicators (a full mirror), so any mix denies both and the two lists cannot drift.
+# tests/test_opposites.py enforces that. Note "priority" is deliberately NOT a bare indicator:
+# it is a substring of "low priority", so as the opposite's blocker it would deny low priority
+# itself — "high priority" / "top priority" carry the signal instead.
 HighPriority = Lexicon(
     name="high_priority",
     indicates=[
@@ -219,11 +224,11 @@ HighPriority = Lexicon(
         "drop everything",
         "emergency",
         "first thing",
+        "high priority",
         "immediately",
         "important",
         "needs doing now",
         "pressing",
-        "priority",
         "right away",
         "right now",
         "straight away",
@@ -232,11 +237,19 @@ HighPriority = Lexicon(
         "urgently",
     ],
     rules_out=[
+        "at some point",
+        "backlog",
+        "eventually",
+        "if i get a chance",
         "low priority",
+        "maybe later",
         "nice to have",
         "no hurry",
         "no rush",
         "not urgent",
+        "someday",
+        "sometime",
+        "when i get round to it",
         "when you can",
         "whenever",
     ],
@@ -262,12 +275,26 @@ LowPriority = Lexicon(
     ],
     rules_out=[
         "asap",
+        "blocking",
+        "can't wait",
         "critical",
         "deadline",
+        "drop everything",
+        "emergency",
+        "first thing",
+        "high priority",
         "immediately",
+        "important",
+        "needs doing now",
         "now",
+        "pressing",
+        "right away",
+        "right now",
+        "straight away",
         "today",
+        "top priority",
         "urgent",
+        "urgently",
     ],
 )
 
