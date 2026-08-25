@@ -27,9 +27,9 @@ print(Estimate.signal("it depends on how many clients hold session state"))
 #> denied
 ```
 
-A fifth field, `source`, is optional: a short citation for where the terms come from. It renders
+A fifth field, `evidence`, is optional: a short citation for where the terms come from. It renders
 in the lexicon's row on the [lexicon pages](lexicons/index.md), next to the words, so provenance is
-docs-as-code and cannot drift, and it is readable at runtime (`lexicon.source`) if an agent wants
+docs-as-code and cannot drift, and it is readable at runtime (`lexicon.evidence`) if an agent wants
 to cite why a check fired. It is annotation only — ignored by matching, by equality, and by
 `as_code()`.
 

@@ -64,18 +64,18 @@ def test_empty_rules_out_and_fix_are_omitted():
     assert "fix" not in code
 
 
-def test_source_is_annotation_not_identity():
-    # source is documentation: it renders in the docs, but stays out of as_code() and does not
+def test_evidence_is_annotation_not_identity():
+    # evidence is documentation: it renders in the docs, but stays out of as_code() and does not
     # change what a lexicon matches, so it is ignored by equality
-    cited = Lexicon(name="x", indicates=["a"], source="Author 2013")
+    cited = Lexicon(name="x", indicates=["a"], evidence="Author 2013")
     plain = Lexicon(name="x", indicates=["a"])
-    assert "source" not in cited.as_code()
+    assert "evidence" not in cited.as_code()
     assert cited == plain
-    assert cited.source == "Author 2013"
+    assert cited.evidence == "Author 2013"
 
 
-def test_source_whitespace_is_collapsed():
-    assert Lexicon(name="x", indicates=["a"], source="line one\n   line two").source == (
+def test_evidence_whitespace_is_collapsed():
+    assert Lexicon(name="x", indicates=["a"], evidence="line one\n   line two").evidence == (
         "line one line two"
     )
 

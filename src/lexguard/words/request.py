@@ -211,10 +211,9 @@ Duration = Lexicon(
 
 # HighPriority and LowPriority are opposite poles of one axis: each rules out every one of the
 # other's indicators (a full mirror), so any mix denies both and the two lists cannot drift.
-# tests/test_exclusive_families.py enforces that. Note "priority" is deliberately NOT a bare
-# indicator:
-# it is a substring of "low priority", so as the opposite's blocker it would deny low priority
-# itself — "high priority" / "top priority" carry the signal instead.
+# tests/test_exclusive_families.py enforces that. Note bare "priority" is deliberately not an
+# indicator: it is a substring of "low priority", so as the opposite's blocker it would deny
+# "low priority" itself — "high priority" / "top priority" carry the signal instead.
 HighPriority = Lexicon(
     name="high_priority",
     indicates=[

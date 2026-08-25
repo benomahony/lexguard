@@ -50,18 +50,23 @@ class Lexicon:
     indicates: Collection[str]
     rules_out: Collection[str] = ()
     fix: str = ""
+    # a short citation for where the terms come from: rendered next to the lexicon in the docs,
+    # and readable at runtime (e.g. an agent citing why a check fired). annotation only — not part
+    # of matching, kept out of as_code(), and ignored by equality
     evidence: str = field(default="", compare=False)
     _indicate: str | None = field(init=False, repr=False, compare=False)
     _rule_out: str | None = field(init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         assert self.name, "lexicon must have a name"
+        # a bare string is a Collection[str] of characters — reject it loudly rather than tidy it
+        # into single-letter terms; callers with raw text split it into a list themselves
         assert not isinstance(self.indicates, str), "indicates takes a list of terms, not a string"
         assert not isinstance(self.rules_out, str), "rules_out takes a list of terms, not a string"
         object.__setattr__(self, "indicates", tidy(self.indicates))
         object.__setattr__(self, "rules_out", tidy(self.rules_out))
         object.__setattr__(self, "fix", " ".join(self.fix.split()))
-        object.__setattr__(self, "source", " ".join(self.evidence.split()))
+        object.__setattr__(self, "evidence", " ".join(self.evidence.split()))
         object.__setattr__(self, "_indicate", phrases(self.indicates))
         object.__setattr__(self, "_rule_out", phrases(self.rules_out))
         assert all(word not in self.rules_out for word in self.indicates), (
