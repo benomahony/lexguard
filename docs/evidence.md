@@ -11,22 +11,9 @@ Proprietary resources such as LIWC are left out on purpose. Citing a finding is 
 copying a list: several concepts here are grounded in a paper or book whose *idea* is cited without
 any text being lifted.
 
-## What backs each lexicon
-
-| Lexicon | What backs it |
-| --- | --- |
-| `Politeness` | Brown & Levinson politeness theory; the Stanford Politeness Corpus and classifier |
-| `Hedging`, `Hypothetical`, `UncertaintyAdmission` | Lakoff's "hedges"; Hyland's hedges taxonomy; CoNLL-2010 uncertainty cues |
-| `Overclaim`, `Confirmation` | Hyland's *boosters* — the mirror of hedges |
-| `EmptyIntensifier` | Amplifiers / degree adverbs in corpus grammar (Quirk et al., Biber et al.) |
-| `UnsourcedAuthority` | Weasel words (Ganter & Strube); bias-language lexicon (Recasens et al.) |
-| `DueDate`, `ClockTime`, `Recurrence`, `Duration` | Temporal expression tagging — TimeML/TIMEX3, SUTime, HeidelTime |
-| `Slop`, `TransitionSlop` | Excess-vocabulary analysis (Kobak et al.); slop-forensics |
-| `Sycophancy`, `Preamble`, `Postamble` | Sycophancy in RLHF models (Sharma et al.); verbal-tic taxonomy (2026) |
-| `Injection` | Prompt-injection research (Perez & Ribeiro; Greshake et al.) |
-| `Disclaimer`, `Refusal`, `SelfReference`, `Anthropomorphic`, `Apology`, `EngagementBait`, `Padding`, `ContrastCliche`, `CitationMarker`, `SystemLeak` | Craft heuristics for agent-reply quality |
-| Domain group (`Money`, `Travel`, `Household`, …) | Topic keyword sets — closest field is text classification, not a lexicon |
-| Priority / scope / ownership signals (`HighPriority`, `SelfAssigned`, …) | Product decisions for task capture, not linguistic categories |
+The citation lives with the lexicon: a `source` line in its definition, rendered in its row on the
+[lexicon pages](lexicons/index.md), so it cannot drift from the code. This page is the narrative
+behind those one-line citations and the full bibliography.
 
 ## What each concept rests on
 

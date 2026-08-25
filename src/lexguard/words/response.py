@@ -75,6 +75,7 @@ Sycophancy = Lexicon(
         "you're right",
     ],
     fix="delete the compliment; it adds no information and reads as flattery",
+    source="Sharma et al. 2023",
 )
 
 
@@ -126,6 +127,7 @@ Hedging = Lexicon(
         "commit to a claim or say plainly that you do not know; stacked qualifiers are not "
         "calibration"
     ),
+    source="Lakoff 1973; Hyland 2005 (hedges); CoNLL-2010 uncertainty cues",
 )
 
 
@@ -173,6 +175,7 @@ Overclaim = Lexicon(
         "state the condition under which the claim holds, or downgrade it to what the "
         "evidence supports"
     ),
+    source="Hyland 2005 (boosters)",
 )
 
 
@@ -325,6 +328,7 @@ Slop = Lexicon(
         "world-class",
     ],
     fix="swap for a plain verb or noun, or add these to the sampler ban list",
+    source="Kobak et al. 2024 (excess vocabulary); slop-forensics",
 )
 
 
@@ -413,6 +417,7 @@ EmptyIntensifier = Lexicon(
         "wholly",
     ],
     fix="delete the intensifier or replace it with the specific magnitude",
+    source="Quirk et al. 1985; Biber et al. 1999 (amplifiers)",
 )
 
 
@@ -446,6 +451,7 @@ UnsourcedAuthority = Lexicon(
         "widely regarded",
     ],
     fix="name the source or drop the appeal; vague authority is worse than no authority",
+    source="Ganter & Strube 2009; Recasens et al. 2013 (weasel words)",
 )
 
 
@@ -483,6 +489,7 @@ UncertaintyAdmission = Lexicon(
         "worth verifying",
     ],
     fix="say what you are unsure about and what would resolve it",
+    source="CoNLL-2010 uncertainty cues",
 )
 
 

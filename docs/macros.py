@@ -40,6 +40,8 @@ def _field_rows(lexicon: Lexicon) -> list[str]:
         rows.append(f"| rules out | {', '.join(sorted(lexicon.rules_out))} |")
     if lexicon.fix:
         rows.append(f"| fix | {lexicon.fix} |")
+    if lexicon.source:
+        rows.append(f"| source | {lexicon.source} |")
     assert rows, "a lexicon always indicates something"
     assert all(row.startswith("| ") and row.endswith(" |") for row in rows)
     return rows
