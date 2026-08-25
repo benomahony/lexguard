@@ -66,6 +66,49 @@ print(SoftDeadline.signal("ideally friday, but it is a hard deadline"))
 #> denied
 ```
 
+## Mutually-exclusive families
+
+Pairing generalises. When a set of lexicons are **mutually exclusive** — a request has one format,
+one priority, one deadline hardness — the clean design is a *full mirror*: every member rules out
+every other member's indicators. Mixed wording then denies all of them, and a term added to one
+member cancels the rest for free, so the lists cannot drift apart.
+
+```py
+from lexguard import HighPriority, LowPriority
+
+print(HighPriority.signal("this is high priority, drop everything"))
+#> present
+print(LowPriority.signal("this is high priority, drop everything"))
+#> denied
+print(LowPriority.signal("low priority, no rush"))
+#> present
+print(HighPriority.signal("high priority but do it whenever"))
+#> denied
+```
+
+Three things decide whether a family should be mirrored:
+
+**Mutual exclusivity, not exhaustiveness.** You only need that no text is truly two of these at
+once. You do *not* need them to cover the space: a medium-priority task hits no member and is
+correctly `absent` on all of them. Opposites with a neutral middle are still a family.
+
+**Faithful indicators.** A full mirror is only safe if every indicator is specific enough to also
+be a safe *blocker* for its siblings — present only when its concept genuinely holds. A bare word
+that is a genus shared with a sibling breaks this: `priority` is a substring of `low priority`, so
+mirrored into the low-priority blockers it would deny "low priority" itself. The fix is to sharpen
+the indicator (`high priority`), not to special-case the mirror. Mirroring is a forcing function
+for indicator precision — the same lesson as [writing for precision](#write-for-precision-not-recall),
+with teeth.
+
+**Granularity.** Faithfulness has to hold at the granularity the matcher runs on: the whole text.
+Hedging and overclaim are opposite *per claim*, but a paragraph holds many claims, so a hedge
+about one point and a booster about another coexist without contradiction. They are not exclusive
+at text granularity, so they are not a mirror family — they stay a hand-curated pair.
+
+`tests/test_exclusive_families.py` declares the families and enforces the invariants: disjoint
+indicators for every family, plus the full mirror for those marked `mirror=True`. Adding a term to
+a mirrored member fails the suite until every sibling rules it out.
+
 ## Building on what ships
 
 The built-ins are not a framework to subclass; they are source to copy. `lexguard slop` prints the
