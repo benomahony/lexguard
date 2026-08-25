@@ -118,10 +118,15 @@ Hedging = Lexicon(
         "usually",
     ],
     rules_out=[
+        "certainly",
+        "definitely",
+        "guaranteed",
         "i could be wrong",
         "i don't know",
         "i'm not sure",
+        "no doubt",
         "uncertain",
+        "undoubtedly",
     ],
     fix=(
         "commit to a claim or say plainly that you do not know; stacked qualifiers are not "
