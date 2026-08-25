@@ -38,7 +38,7 @@ repos:
         stages: [commit-msg]
 
   - repo: https://github.com/benomahony/nasa-lsp
-    rev: v0.1.11
+    rev: v0.1.12
     hooks:
       - id: nasa-lsp
         exclude: ^tests/
