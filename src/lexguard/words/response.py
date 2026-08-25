@@ -24,7 +24,6 @@ Preamble = Lexicon(
         "to answer your question",
     ],
     fix=("drop the opener and start with the answer; the first sentence should carry information"),
-    source="pseudo-empathetic openers in the verbal-tic taxonomy (2026). see docs/evidence.md",
 )
 
 
@@ -51,7 +50,6 @@ Postamble = Lexicon(
         "end on the last substantive sentence; offers to help further belong in the "
         "interface, not the text"
     ),
-    source="closing filler flagged as a verbal tic (2026). see docs/evidence.md",
 )
 
 
@@ -77,10 +75,6 @@ Sycophancy = Lexicon(
         "you're right",
     ],
     fix="delete the compliment; it adds no information and reads as flattery",
-    source=(
-        "sycophancy in RLHF assistants (Sharma et al. 2023); openers catalogued in the "
-        "verbal-tic taxonomy (2026). see docs/evidence.md"
-    ),
 )
 
 
@@ -132,10 +126,6 @@ Hedging = Lexicon(
         "commit to a claim or say plainly that you do not know; stacked qualifiers are not "
         "calibration"
     ),
-    source=(
-        "hedges as a category (Lakoff 1973; Hyland's hedges/boosters, 2005); uncertainty cues "
-        "from the CoNLL-2010 shared task. see docs/evidence.md"
-    ),
 )
 
 
@@ -182,9 +172,6 @@ Overclaim = Lexicon(
     fix=(
         "state the condition under which the claim holds, or downgrade it to what the "
         "evidence supports"
-    ),
-    source=(
-        "boosters — the mirror of hedges in Hyland's stance taxonomy (2005). see docs/evidence.md"
     ),
 )
 
@@ -338,10 +325,6 @@ Slop = Lexicon(
         "world-class",
     ],
     fix="swap for a plain verb or noun, or add these to the sampler ban list",
-    source=(
-        "excess-vocabulary analysis of post-ChatGPT abstracts (Kobak et al. 2024); statistically "
-        "derived lists in slop-forensics (MIT). see docs/evidence.md"
-    ),
 )
 
 
@@ -372,10 +355,6 @@ TransitionSlop = Lexicon(
         "to conclude",
     ],
     fix=("cut the connective; if the link between paragraphs needs stating, restructure instead"),
-    source=(
-        '"it is important to note" and similar frames flagged as verbal tics (2026). '
-        "see docs/evidence.md"
-    ),
 )
 
 
@@ -434,10 +413,6 @@ EmptyIntensifier = Lexicon(
         "wholly",
     ],
     fix="delete the intensifier or replace it with the specific magnitude",
-    source=(
-        "amplifiers / degree adverbs as a semantically bleached, register-dependent class "
-        "(Quirk et al. 1985; Biber et al. 1999). see docs/evidence.md"
-    ),
 )
 
 
@@ -471,10 +446,6 @@ UnsourcedAuthority = Lexicon(
         "widely regarded",
     ],
     fix="name the source or drop the appeal; vague authority is worse than no authority",
-    source=(
-        "weasel words — Wikipedia-tagged hedges (Ganter & Strube 2009) and the bias-language "
-        "lexicon (Recasens et al. 2013). see docs/evidence.md"
-    ),
 )
 
 
@@ -512,10 +483,6 @@ UncertaintyAdmission = Lexicon(
         "worth verifying",
     ],
     fix="say what you are unsure about and what would resolve it",
-    source=(
-        "epistemic uncertainty cues, as annotated in the CoNLL-2010 shared task. "
-        "see docs/evidence.md"
-    ),
 )
 
 

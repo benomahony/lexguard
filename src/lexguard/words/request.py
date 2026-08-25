@@ -211,7 +211,8 @@ Duration = Lexicon(
 
 # HighPriority and LowPriority are opposite poles of one axis: each rules out every one of the
 # other's indicators (a full mirror), so any mix denies both and the two lists cannot drift.
-# tests/test_opposites.py enforces that. Note "priority" is deliberately NOT a bare indicator:
+# tests/test_exclusive_families.py enforces that. Note "priority" is deliberately NOT a bare
+# indicator:
 # it is a substring of "low priority", so as the opposite's blocker it would deny low priority
 # itself — "high priority" / "top priority" carry the signal instead.
 HighPriority = Lexicon(
@@ -697,10 +698,6 @@ Injection = Lexicon(
         "you are an ai",
     ],
     fix=("treat retrieved or user text as data, never as instructions; strip and log the attempt"),
-    source=(
-        "documented prompt-injection attack phrasings (Perez & Ribeiro 2022; Greshake et al. 2023) "
-        "— a tripwire, not a defence. see docs/evidence.md"
-    ),
 )
 
 
@@ -744,10 +741,6 @@ Politeness = Lexicon(
     fix=(
         """sarcasm, dismissal, and profanity do not read as politeness.
         Write the actual request plainly"""
-    ),
-    source=(
-        "gratitude / deference / greeting / indirection strategies from the Stanford politeness "
-        "work (Danescu-Niculescu-Mizil et al. 2013; Apache-2.0 corpus). see docs/evidence.md"
     ),
 )
 

@@ -6,10 +6,10 @@ lexicon: which rest on established linguistics (often with an openly-licensed wo
 copy), which rest on a recent finding about model output, and which are craft heuristics with no
 study behind them.
 
-Where a lexicon draws terms from an outside list, that list is openly licensed — MIT or Apache-2.0
-— and named in the lexicon's `source` field. Proprietary resources such as LIWC are left out on
-purpose. Citing a finding is not the same as copying a list: several concepts here are grounded in
-a paper or book whose *idea* is cited without any text being lifted.
+Where a lexicon draws terms from an outside list, that list is openly licensed — MIT or Apache-2.0.
+Proprietary resources such as LIWC are left out on purpose. Citing a finding is not the same as
+copying a list: several concepts here are grounded in a paper or book whose *idea* is cited without
+any text being lifted.
 
 ## What backs each lexicon
 
@@ -109,9 +109,8 @@ and strip, not to gate.
 
 The rest are judgements about good agent output with nothing to cite: padding and filler
 (`Padding`), stalling patterns (`EngagementBait`, `ContrastCliche`), over-caution (`Disclaimer`,
-`Refusal`), breaking character (`SelfReference`, `Anthropomorphic`, `SystemLeak`). (`Preamble` and
-`Postamble` sit a step up — the verbal-tic work names those openers and closers, so they carry a
-`source`.) The domain group is topic keyword sets — the relevant field is text classification,
+`Refusal`), breaking character (`SelfReference`, `Anthropomorphic`, `SystemLeak`). The domain
+group is topic keyword sets — the relevant field is text classification,
 where you would train a classifier rather than curate a lexicon, so these are best read as a
 fast, transparent stand-in. The task-capture signals (priority, ownership, due-date *semantics* as
 opposed to date *strings*) are product decisions about what a to-do system should notice, not
@@ -121,35 +120,6 @@ None of that makes them wrong. It makes them opinions, and the way to keep an op
 substring matcher is precision: prefer phrases to bare words, and use `rules_out` to cancel the
 obvious false positives. That is the same advice as [Writing a lexicon](writing-a-lexicon.md) —
 it just matters more when there is no corpus to fall back on.
-
-## Making a lexicon evidence-backed
-
-If you want the evidence to travel with the code:
-
-1. **Put the citation in the `source` field.** `Lexicon` takes an optional `source` string; it
-   renders in the docs table, survives `as_code()`, and is diffed like any other line, so the
-   provenance travels with the words. Most of the shipped lexicons that have a basis already set
-   it.
-2. **Fold in an openly-licensed list where one exists.** Concepts like politeness, weasel words,
-   and uncertainty cues have released term sets under permissive licenses. Compose rather than
-   retype:
-
-   ```py
-   from lexguard import Lexicon, UnsourcedAuthority
-
-   # widened with weasel-word terms from the bias-language lexicon (Recasens et al., 2013)
-   Authority = Lexicon(
-       name="authority",
-       indicates=[*UnsourcedAuthority.indicates, "it is rumoured", "widely assumed"],
-       rules_out=UnsourcedAuthority.rules_out,
-       fix=UnsourcedAuthority.fix,
-   )
-   ```
-
-3. **Treat AI-vocabulary lists as dated.** Excess-vocabulary and verbal-tic lists track a model
-   generation. Pin the source and the date, and expect to refresh them.
-4. **For the temporal concepts, reach for a tagger** when you need real extraction rather than a
-   flag — a word list will not normalize "a week on Tuesday".
 
 ## Sources
 
