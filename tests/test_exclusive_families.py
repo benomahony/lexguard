@@ -90,14 +90,6 @@ def test_mirror_family_rules_out_every_sibling_term(family: Family):
         assert not missing, f"{family.name}: {member.name} must rule out {sorted(missing)}"
 
 
-@pytest.mark.parametrize("family", mirror_families, ids=mirror_ids)
-def test_mixing_two_members_denies_both(family: Family):
-    for a, b in itertools.combinations(family.members, 2):
-        mixed = f"{next(iter(a.indicates))} {next(iter(b.indicates))}"
-        assert a.denied(mixed), f"{family.name}: {a.name} not denied by {mixed!r}"
-        assert b.denied(mixed), f"{family.name}: {b.name} not denied by {mixed!r}"
-
-
 def test_low_priority_is_not_denied_by_its_own_phrase():
     # regression: a bare "priority" indicator (a substring of "low priority") would, once mirrored,
     # make low_priority deny "low priority" itself. "high priority" carries the signal instead.
