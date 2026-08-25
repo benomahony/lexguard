@@ -7,7 +7,7 @@ from .words import LEXICONS
 
 
 def main(argv: list[str] | None = None) -> int:
-    assert argv is None or isinstance(argv, list)
+    assert argv is None or isinstance(argv, list), "argv is a list of args or None"
     parser = argparse.ArgumentParser(
         prog="lexguard",
         description="List the built-in lexicons, or print one as source to paste into your code.",
@@ -18,7 +18,7 @@ def main(argv: list[str] | None = None) -> int:
         help="a lexicon name, e.g. slop; omit to list every lexicon, one per line",
     )
     query = parser.parse_args(argv).name
-    assert query is None or isinstance(query, str)
+    assert query is None or isinstance(query, str), "argparse yields the name string or None"
 
     if query is None:
         print("\n".join(sorted(LEXICONS)))

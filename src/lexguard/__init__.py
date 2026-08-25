@@ -32,7 +32,7 @@ _PYDANTIC_EVALS_SOURCE = {
 
 def __getattr__(name: str) -> object:
     # deferred so importing lexguard never requires pydantic-evals until these are touched
-    assert isinstance(name, str)
+    assert isinstance(name, str), "attribute name must be a string"
     assert name, "attribute name must not be empty"
     source = _PYDANTIC_EVALS_SOURCE.get(name)
     if source is None:

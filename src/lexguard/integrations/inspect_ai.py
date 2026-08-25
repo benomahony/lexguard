@@ -31,13 +31,13 @@ def lexguard_scorer(spec: RuleSpec) -> Scorer:
                 answer=output,
                 explanation=explanation or "all lexicon checks passed",
             )
-            assert result.value in (CORRECT, INCORRECT)
+            assert result.value in (CORRECT, INCORRECT), "score is CORRECT or INCORRECT"
             return result
 
-        assert callable(score)
-        assert score.__name__ == "score"
+        assert callable(score), "the scorer closure must be callable"
+        assert score.__name__ == "score", "Inspect keys the scorer by its function name"
         return score
 
     result = _lexguard_scorer()
-    assert result is not None
+    assert result is not None, "the scorer decorator returns a scorer"
     return result

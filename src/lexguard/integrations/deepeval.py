@@ -35,7 +35,7 @@ class LexguardMetric(BaseMetric):
         assert self.spec.lexicons, "LexguardMetric needs at least one lexicon to name itself"
         stem = "has" if self.spec.wanted else "no"
         result = f"{stem}_{'_'.join(lexicon.name for lexicon in self.spec.lexicons)}"
-        assert result.startswith(stem)
+        assert result.startswith(stem), "metric name is prefixed by has/no"
         return result
 
     def measure(self, test_case: LLMTestCase, *args: Any, **kwargs: Any) -> float:
@@ -46,12 +46,12 @@ class LexguardMetric(BaseMetric):
             self.score = sum(v.passed for v in verdicts) / len(verdicts)
             self.reason = "; ".join(v.reason for v in verdicts if v.reason) or None
         self.success = self.is_successful()
-        assert self.score is not None
-        assert self.success is not None
+        assert self.score is not None, "measure() always sets a score"
+        assert self.success is not None, "measure() always sets success"
         return self.score
 
     async def a_measure(self, test_case: LLMTestCase, *args: Any, **kwargs: Any) -> float:
-        assert isinstance(test_case, LLMTestCase)
+        assert isinstance(test_case, LLMTestCase), "a_measure takes an LLMTestCase"
         result = self.measure(test_case, *args, **kwargs)
-        assert isinstance(result, float)
+        assert isinstance(result, float), "measure() returns a float score"
         return result
