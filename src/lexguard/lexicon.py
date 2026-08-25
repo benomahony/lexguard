@@ -160,9 +160,8 @@ class Lexicon:
         if self.evidence:
             fields["evidence"] = self.evidence
         result = "Lexicon(" + ", ".join(f"{key}={value!r}" for key, value in fields.items()) + ")"
-        assert result.startswith("Lexicon(") and result.endswith(")"), (
-            "as_code emits a Lexicon(...)"
-        )
+        assert result.startswith("Lexicon("), "as_code opens with a Lexicon(...) call"
+        assert result.endswith(")"), "as_code closes the Lexicon(...) call"
         assert "name" in fields, "name is always emitted"
         return result
 
