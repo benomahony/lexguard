@@ -42,5 +42,5 @@ class Observe(Evaluator):
         assert self.lexicons, "Observe needs at least one lexicon"
         spec = ObserveSpec(self.lexicons, self.field, self.of)
         result = spec.signals(ctx.output, ctx.inputs)
-        assert result is None or isinstance(result, dict), "signals() returns a dict or None"
+        assert isinstance(result, dict | None), "signals() returns a dict or None"
         return result if result is not None else SKIP

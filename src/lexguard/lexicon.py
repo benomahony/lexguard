@@ -40,7 +40,8 @@ def snippet(text: str, start: int, end: int, width: int = 34) -> str:
     right = min(len(text), end + width)
     body = " ".join(text[left:right].split())
     result = f"{'…' if left else ''}{body}{'…' if right < len(text) else ''}"
-    assert left == 0 or result.startswith("…"), "a left-trimmed snippet opens with an ellipsis"
+    if left:
+        assert result.startswith("…"), "a left-trimmed snippet opens with an ellipsis"
     return result
 
 
@@ -196,9 +197,10 @@ class Lexicon:
         singles = {word for word in words if " " not in word}
         result = bool({word.casefold() for word in re.findall(WORD_PATTERN, text)} & singles)
         assert singles.issubset(words), "singles are the single-word terms"
-        assert not pattern or pattern in (self._indicate, self._rule_out), (
-            "the phrase pattern belongs to this lexicon"
-        )
+        if pattern:
+            assert pattern in (self._indicate, self._rule_out), (
+                "the phrase pattern belongs to this lexicon"
+            )
         return result
 
     @staticmethod

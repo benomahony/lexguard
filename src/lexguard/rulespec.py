@@ -19,9 +19,8 @@ def _attr(obj: Any, key: str) -> Any:
 
 
 def read(obj: Any, path: str) -> list[Any]:
-    assert not path or all(segment for segment in path.split(".")), (
-        "path must not contain empty segments"
-    )
+    if path:
+        assert all(segment for segment in path.split(".")), "path must not contain empty segments"
     values = [obj] if obj is not None else []
     for head in path.split(".") if path else []:
         many = head.endswith("[]")
@@ -43,7 +42,7 @@ def text_at(obj: Any, path: str) -> str:
     values = read(obj, path)
     result = " ".join(str(value) for value in values)
     assert bool(result) == bool(values), "text is non-empty iff there were values"
-    assert "\n" not in result or any("\n" in str(value) for value in values), (
+    assert ("\n" in result) == any("\n" in str(value) for value in values), (
         "newlines come from the values, never from the join"
     )
     return result
@@ -59,7 +58,8 @@ class Verdict:
 
     def __post_init__(self) -> None:
         assert self.name, "a Verdict needs a name"
-        assert self.passed or self.reason is not None, "a failing Verdict must carry a reason"
+        if not self.passed:
+            assert self.reason is not None, "a failing Verdict must carry a reason"
 
 
 @dataclass(frozen=True)
@@ -81,7 +81,8 @@ class RuleSpec:
 
     def __post_init__(self) -> None:
         assert self.lexicons, "RuleSpec needs at least one lexicon"
-        assert not (self.when and self.unless), "a RuleSpec cannot have both when and unless"
+        if self.when is not None:
+            assert self.unless is None, "a RuleSpec cannot have both when and unless"
 
     def check(self, output: Any, inputs: Any) -> list[Verdict] | None:
         assert self.lexicons, "RuleSpec.check called without lexicons"
@@ -138,7 +139,8 @@ class RuleSpec:
             lines.append(f"fix: {lexicon.fix}")
         result = "\n".join(lines)
         assert result, "_diagnosis always appends at least one line"
-        assert not lexicon.fix or result.endswith(lexicon.fix), "the fix, if any, is the last line"
+        if lexicon.fix:
+            assert result.endswith(lexicon.fix), "the fix, if any, is the last line"
         return result
 
 
