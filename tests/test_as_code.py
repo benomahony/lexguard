@@ -58,18 +58,21 @@ def test_flat_definition_shape():
     )
 
 
-def test_empty_rules_out_and_fix_are_omitted():
+def test_empty_rules_out_fix_and_evidence_are_omitted():
     code = Lexicon(name="x", indicates=["a"]).as_code()
     assert "rules_out" not in code
     assert "fix" not in code
+    assert "evidence" not in code
 
 
-def test_evidence_is_annotation_not_identity():
-    # evidence is documentation: it renders in the docs, but stays out of as_code() and does not
-    # change what a lexicon matches, so it is ignored by equality
+def test_evidence_round_trips_but_is_ignored_by_equality():
+    # as_code() dumps the full source, evidence included, and it round-trips; but evidence does
+    # not change what a lexicon matches, so it is ignored by equality
     cited = Lexicon(name="x", indicates=["a"], evidence="Author 2013")
     plain = Lexicon(name="x", indicates=["a"])
-    assert "evidence" not in cited.as_code()
+    code = cited.as_code()
+    assert "evidence='Author 2013'" in code
+    assert eval(code, {"Lexicon": Lexicon}).evidence == "Author 2013"  # noqa: S307
     assert cited == plain
     assert cited.evidence == "Author 2013"
 

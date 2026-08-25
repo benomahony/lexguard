@@ -50,9 +50,9 @@ class Lexicon:
     indicates: Collection[str]
     rules_out: Collection[str] = ()
     fix: str = ""
-    # a short citation for where the terms come from: rendered next to the lexicon in the docs,
-    # and readable at runtime (e.g. an agent citing why a check fired). annotation only — not part
-    # of matching, kept out of as_code(), and ignored by equality
+    # a short citation for where the terms come from: dumped by as_code(), rendered next to the
+    # lexicon in the docs, and readable at runtime (e.g. an agent citing why a check fired).
+    # ignored by equality — two lexicons that match the same way are equal whatever their evidence
     evidence: str = field(default="", compare=False)
     _indicate: str | None = field(init=False, repr=False, compare=False)
     _rule_out: str | None = field(init=False, repr=False, compare=False)
@@ -157,6 +157,8 @@ class Lexicon:
             fields["rules_out"] = sorted(self.rules_out)
         if self.fix:
             fields["fix"] = self.fix
+        if self.evidence:
+            fields["evidence"] = self.evidence
         result = "Lexicon(" + ", ".join(f"{key}={value!r}" for key, value in fields.items()) + ")"
         assert result.startswith("Lexicon(") and result.endswith(")"), (
             "as_code emits a Lexicon(...)"
