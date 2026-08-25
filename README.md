@@ -185,8 +185,6 @@ lg() {
 
 - [Lexicons](docs/lexicons/index.md): every lexicon that ships in the box, generated from
   source, one page per group
-- [Evidence behind the lexicons](docs/evidence.md): which concepts have a research literature,
-  and where published word lists exist to fold in
 - [Writing a lexicon](docs/writing-a-lexicon.md) for your own domain
 - [Rules](docs/rules.md) and the `when` / `unless` guards
 - [Agents](docs/agents.md) under test with pydantic-ai

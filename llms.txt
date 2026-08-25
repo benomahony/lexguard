@@ -19,10 +19,6 @@ optional extra (`lexguard[pydantic-evals]`, `lexguard[deepeval]`, `lexguard[insp
   [Request](docs/lexicons/request.md), [Instruction](docs/lexicons/instruction.md),
   [Response](docs/lexicons/response.md), [Domain](docs/lexicons/domain.md), and
   [Bundles](docs/lexicons/bundles.md)
-- [Evidence behind the lexicons](docs/evidence.md): which lexicon concepts have a research
-  literature (politeness, hedges/boosters, weasel words, temporal tagging, LIWC), which rest on
-  ML-era findings (slop/excess vocabulary, sycophancy, prompt injection), and which are craft
-  heuristics — plus where published word lists exist to fold in
 - [Writing a lexicon](docs/writing-a-lexicon.md): building your own `Lexicon` for a new domain
 - [Rules](docs/rules.md): `.absent()` / `.expected()`, the `when` / `unless` guards, and `Observe`
 - [Agents](docs/agents.md): checking pydantic-ai agent output, structured or plain text

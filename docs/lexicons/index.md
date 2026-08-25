@@ -13,6 +13,3 @@ Import any of these by their class name, e.g. `from lexguard import DueDate`.
   refusals
 - [Domain](domain.md): what the request is about — money, travel, household, people
 - [Bundles](bundles.md): prebuilt groupings of the lexicons above
-
-For which of these concepts have a research literature behind them, and where published word lists
-exist to fold in, see [Evidence behind the lexicons](../evidence.md).

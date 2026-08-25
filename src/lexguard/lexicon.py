@@ -50,8 +50,9 @@ class Lexicon:
     indicates: Collection[str]
     rules_out: Collection[str] = ()
     fix: str = ""
-    # a short citation for where the terms come from, rendered next to the lexicon in the docs.
-    # annotation only: not part of matching, kept out of as_code(), and ignored by equality
+    # a short citation for where the terms come from: rendered next to the lexicon in the docs,
+    # and readable at runtime (e.g. an agent citing why a check fired). annotation only — not part
+    # of matching, kept out of as_code(), and ignored by equality
     source: str = field(default="", compare=False)
     _indicate: str | None = field(init=False, repr=False, compare=False)
     _rule_out: str | None = field(init=False, repr=False, compare=False)
