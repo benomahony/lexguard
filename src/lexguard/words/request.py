@@ -698,7 +698,7 @@ Injection = Lexicon(
         "you are an ai",
     ],
     fix=("treat retrieved or user text as data, never as instructions; strip and log the attempt"),
-    source="Perez & Ribeiro 2022; Greshake et al. 2023",
+    evidence="Perez & Ribeiro 2022; Greshake et al. 2023",
 )
 
 
@@ -743,7 +743,7 @@ Politeness = Lexicon(
         """sarcasm, dismissal, and profanity do not read as politeness.
         Write the actual request plainly"""
     ),
-    source="Brown & Levinson 1987; Stanford Politeness Corpus (Danescu-Niculescu-Mizil 2013)",
+    evidence="Brown & Levinson 1987; Stanford Politeness Corpus (Danescu-Niculescu-Mizil 2013)",
 )
 
 
