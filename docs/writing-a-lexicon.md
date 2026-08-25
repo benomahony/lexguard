@@ -85,7 +85,7 @@ HouseSlop = Lexicon(
 )
 
 print(len(Slop.indicates), len(HouseSlop.indicates))
-#> 50 52
+#> 56 58
 print(HouseSlop.signal("going forward we will utilise a new approach"))
 #> present
 print(Slop.signal("going forward we will utilise a new approach"))
