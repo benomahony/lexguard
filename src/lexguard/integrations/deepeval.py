@@ -51,7 +51,7 @@ class LexguardMetric(BaseMetric):
         return self.score
 
     async def a_measure(self, test_case: LLMTestCase, *args: Any, **kwargs: Any) -> float:
-        assert isinstance(test_case, LLMTestCase), "a_measure takes an LLMTestCase"
+        assert self.spec.lexicons, "a_measure needs a spec with at least one lexicon"
         result = self.measure(test_case, *args, **kwargs)
-        assert isinstance(result, float), "measure() returns a float score"
+        assert 0.0 <= result <= 1.0, "the score is a pass-fraction in [0, 1]"
         return result

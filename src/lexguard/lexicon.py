@@ -61,9 +61,10 @@ class Lexicon:
     def __post_init__(self) -> None:
         assert self.name, "lexicon must have a name"
         # a bare string is a Collection[str] of characters — reject it loudly rather than tidy it
-        # into single-letter terms; callers with raw text split it into a list themselves
-        assert not isinstance(self.indicates, str), "indicates takes a list of terms, not a string"
-        assert not isinstance(self.rules_out, str), "rules_out takes a list of terms, not a string"
+        # into single-letter terms; callers with raw text split it into a list themselves. this is
+        # input validation, so it raises (survives -O) rather than asserting
+        if isinstance(self.indicates, str) or isinstance(self.rules_out, str):
+            raise TypeError("indicates and rules_out take a list of terms, not a string")
         object.__setattr__(self, "indicates", tidy(self.indicates))
         object.__setattr__(self, "rules_out", tidy(self.rules_out))
         object.__setattr__(self, "fix", " ".join(self.fix.split()))
@@ -205,8 +206,8 @@ class Lexicon:
 
     @staticmethod
     def _fold(text: str) -> str:
+        assert text is not None, "fold needs text to normalize"
         result = unicodedata.normalize("NFKC", text).casefold()
-        assert isinstance(result, str), "fold returns text"
         # casefold() can decompose what NFKC just composed (e.g. "ῶ"), so result may not stay NFKC
         assert result == result.casefold(), "folded text is stable under a second casefold"
         return result

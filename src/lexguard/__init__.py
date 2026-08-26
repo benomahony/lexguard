@@ -32,7 +32,6 @@ _PYDANTIC_EVALS_SOURCE = {
 
 def __getattr__(name: str) -> object:
     # deferred so importing lexguard never requires pydantic-evals until these are touched
-    assert isinstance(name, str), "attribute name must be a string"
     assert name, "attribute name must not be empty"
     source = _PYDANTIC_EVALS_SOURCE.get(name)
     if source is None:
@@ -41,7 +40,9 @@ def __getattr__(name: str) -> object:
         module = import_module(f".{source}", __name__)
         namespace = vars(module)
         # some sources (e.g. suites) resolve their own attrs lazily via module __getattr__
-        return namespace[name] if name in namespace else namespace["__getattr__"](name)
+        result = namespace[name] if name in namespace else namespace["__getattr__"](name)
+        assert result is not None, "a resolved lazy export is never None"
+        return result
     except ImportError as err:
         raise ImportError(
             f"lexguard.{name} needs pydantic-evals: pip install 'lexguard[pydantic-evals]'"

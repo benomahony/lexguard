@@ -47,12 +47,13 @@ def _adherence() -> list:
 
 def __getattr__(name: str) -> list:
     # deferred so importing lexguard never requires pydantic-evals until these are touched
-    assert isinstance(name, str), "attribute name must be a string"
     assert name, "attribute name must not be empty"
     if name == "PROSE":
         return _prose()
     if name == "ADHERENCE":
         return _adherence()
     if name == "GENERIC":
-        return [*_prose(), *_adherence()]
+        result = [*_prose(), *_adherence()]
+        assert result, "GENERIC combines the prose and adherence suites into a non-empty list"
+        return result
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

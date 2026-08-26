@@ -157,10 +157,10 @@ class ObserveSpec:
         assert all(lexicon.name for lexicon in self.lexicons), "every lexicon has a name"
 
     def signals(self, output: Any, inputs: Any) -> dict[str, str] | None:
+        assert self.lexicons, "signals needs at least one lexicon to label with"
         body = text_at(output if self.of == "output" else inputs, self.field)
         if not body.strip():
             return None
         result = {lexicon.name: lexicon.signal(body).value for lexicon in self.lexicons}
         assert set(result) == {lexicon.name for lexicon in self.lexicons}, "one signal per lexicon"
-        assert all(isinstance(value, str) for value in result.values()), "signals are string values"
         return result

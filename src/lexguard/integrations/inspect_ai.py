@@ -19,7 +19,7 @@ def lexguard_scorer(spec: RuleSpec) -> Scorer:
     @scorer(metrics=[accuracy()])
     def _lexguard_scorer() -> Scorer:
         async def score(state: TaskState, target: Target) -> Score:
-            assert isinstance(target, Target), "lexguard scores the output text, not a target"
+            assert spec.lexicons, "the scorer needs a spec with at least one lexicon"
             output = state.output.completion
             verdicts = spec.check(output, state.input_text)
             if verdicts is None:

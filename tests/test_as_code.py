@@ -39,9 +39,9 @@ def test_as_code_is_deterministic(indicates, rules_out, name, fix):
 def test_constructor_rejects_a_bare_string_instead_of_exploding_it():
     # a str is a Collection[str] of characters; the constructor must reject it, not tidy "abc"
     # into {"a", "b", "c"}. Splitting raw text into terms is the CLI's job, at its boundary.
-    with pytest.raises(AssertionError, match="list of terms"):
+    with pytest.raises(TypeError, match="list of terms"):
         Lexicon(name="x", indicates="circle back")
-    with pytest.raises(AssertionError, match="list of terms"):
+    with pytest.raises(TypeError, match="list of terms"):
         Lexicon(name="x", indicates=["a"], rules_out="b")
 
 
