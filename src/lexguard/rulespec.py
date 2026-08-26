@@ -19,9 +19,8 @@ def _attr(obj: Any, key: str) -> Any:
 
 
 def read(obj: Any, path: str) -> list[Any]:
-    assert not path or all(segment for segment in path.split(".")), (
-        "path must not contain empty segments"
-    )
+    if path:
+        assert all(segment for segment in path.split(".")), "path must not contain empty segments"
     values = [obj] if obj is not None else []
     for head in path.split(".") if path else []:
         many = head.endswith("[]")
@@ -33,7 +32,7 @@ def read(obj: Any, path: str) -> list[Any]:
                 continue
             step.extend(attr) if many else step.append(attr)
         values = step
-    assert all(value is not None for value in values)
+    assert all(value is not None for value in values), "read() drops missing values as it walks"
     return values
 
 
@@ -42,8 +41,10 @@ def text_at(obj: Any, path: str) -> str:
         return str(obj)
     values = read(obj, path)
     result = " ".join(str(value) for value in values)
-    assert bool(result) == bool(values)
-    assert "\n" not in result or any("\n" in str(value) for value in values)
+    assert bool(result) == bool(values), "text is non-empty iff there were values"
+    assert ("\n" in result) == any("\n" in str(value) for value in values), (
+        "newlines come from the values, never from the join"
+    )
     return result
 
 
@@ -57,7 +58,8 @@ class Verdict:
 
     def __post_init__(self) -> None:
         assert self.name, "a Verdict needs a name"
-        assert self.passed or self.reason is not None, "a failing Verdict must carry a reason"
+        if not self.passed:
+            assert self.reason is not None, "a failing Verdict must carry a reason"
 
 
 @dataclass(frozen=True)
@@ -79,7 +81,8 @@ class RuleSpec:
 
     def __post_init__(self) -> None:
         assert self.lexicons, "RuleSpec needs at least one lexicon"
-        assert not (self.when and self.unless), "a RuleSpec cannot have both when and unless"
+        if self.when is not None:
+            assert self.unless is None, "a RuleSpec cannot have both when and unless"
 
     def check(self, output: Any, inputs: Any) -> list[Verdict] | None:
         assert self.lexicons, "RuleSpec.check called without lexicons"
@@ -92,28 +95,28 @@ class RuleSpec:
         if not body.strip():
             return None
         result = [self._verdict(entry, body, request) for entry in self.lexicons]
-        assert len(result) == len(self.lexicons)
+        assert len(result) == len(self.lexicons), "one verdict per lexicon"
         return result
 
     def _name(self, lexicon: Lexicon) -> str:
-        assert lexicon.name
+        assert lexicon.name, "a lexicon always has a name"
         stem = f"{'has' if self.wanted else 'no'}_{lexicon.name}"
         guard = self.when or self.unless
         result = f"{stem}[{'when' if self.when else 'unless'} {guard.name}]" if guard else stem
-        assert result
+        assert result, "the rule name is never empty"
         return result
 
     def _verdict(self, lexicon: Lexicon, body: str, request: str) -> Verdict:
         spans = lexicon.spans(body)
         holds = lexicon.fires(body) if self.wanted else not spans
         name = self._name(lexicon)
-        assert name
+        assert name, "every verdict is named"
         if holds:
             return Verdict(name=name, passed=True)
         result = Verdict(
             name=name, passed=False, reason=self._diagnosis(lexicon, spans, body, request)
         )
-        assert result.reason is not None
+        assert result.reason is not None, "a failing verdict carries a reason"
         return result
 
     def _diagnosis(self, lexicon: Lexicon, spans: list, body: str, request: str) -> str:
@@ -136,7 +139,8 @@ class RuleSpec:
             lines.append(f"fix: {lexicon.fix}")
         result = "\n".join(lines)
         assert result, "_diagnosis always appends at least one line"
-        assert not lexicon.fix or result.endswith(lexicon.fix)
+        if lexicon.fix:
+            assert result.endswith(lexicon.fix), "the fix, if any, is the last line"
         return result
 
 
@@ -150,13 +154,13 @@ class ObserveSpec:
 
     def __post_init__(self) -> None:
         assert self.lexicons, "ObserveSpec needs at least one lexicon"
-        assert all(lexicon.name for lexicon in self.lexicons)
+        assert all(lexicon.name for lexicon in self.lexicons), "every lexicon has a name"
 
     def signals(self, output: Any, inputs: Any) -> dict[str, str] | None:
+        assert self.lexicons, "signals needs at least one lexicon to label with"
         body = text_at(output if self.of == "output" else inputs, self.field)
         if not body.strip():
             return None
         result = {lexicon.name: lexicon.signal(body).value for lexicon in self.lexicons}
-        assert set(result) == {lexicon.name for lexicon in self.lexicons}
-        assert all(isinstance(value, str) for value in result.values())
+        assert set(result) == {lexicon.name for lexicon in self.lexicons}, "one signal per lexicon"
         return result

@@ -75,26 +75,37 @@ Sycophancy = Lexicon(
         "you're right",
     ],
     fix="delete the compliment; it adds no information and reads as flattery",
+    evidence="Sharma et al. 2023",
 )
 
 
 Hedging = Lexicon(
     name="hedging",
     indicates=[
+        "apparently",
+        "appears to",
         "arguably",
         "broadly speaking",
+        "conceivably",
         "could potentially",
+        "for the most part",
         "generally",
+        "in general",
         "in many ways",
         "in some cases",
         "it depends",
+        "likely",
         "may",
         "might",
         "more or less",
         "often",
         "perhaps",
+        "plausibly",
         "possibly",
+        "presumably",
+        "probably",
         "relatively",
+        "seems",
         "somewhat",
         "tends to",
         "to some extent",
@@ -102,15 +113,21 @@ Hedging = Lexicon(
         "usually",
     ],
     rules_out=[
+        "certainly",
+        "definitely",
+        "guaranteed",
         "i could be wrong",
         "i don't know",
         "i'm not sure",
+        "no doubt",
         "uncertain",
+        "undoubtedly",
     ],
     fix=(
         "commit to a claim or say plainly that you do not know; stacked qualifiers are not "
         "calibration"
     ),
+    evidence="Lakoff 1973; Hyland 2005 (hedges); CoNLL-2010 uncertainty cues",
 )
 
 
@@ -119,22 +136,33 @@ Overclaim = Lexicon(
     indicates=[
         "100%",
         "always",
+        "beyond doubt",
         "bulletproof",
         "cannot fail",
+        "certainly",
         "certainly will",
+        "clearly",
         "completely safe",
+        "definitely",
         "definitely will",
         "foolproof",
         "guaranteed",
         "guarantees",
+        "indisputably",
         "never fails",
+        "no doubt",
         "no risk",
+        "obviously",
         "perfect solution",
         "proven to",
         "the best",
         "the only",
+        "undeniably",
         "undoubtedly",
+        "unequivocally",
+        "unquestionably",
         "without a doubt",
+        "without question",
     ],
     rules_out=[
         "depends",
@@ -147,6 +175,7 @@ Overclaim = Lexicon(
         "state the condition under which the claim holds, or downgrade it to what the "
         "evidence supports"
     ),
+    evidence="Hyland 2005 (boosters)",
 )
 
 
@@ -269,8 +298,10 @@ Slop = Lexicon(
         "leveraging",
         "meticulous",
         "meticulously",
+        "multifaceted",
         "myriad",
         "navigate the complexities",
+        "nuanced",
         "paradigm",
         "pivotal",
         "plethora",
@@ -279,11 +310,15 @@ Slop = Lexicon(
         "robust",
         "seamless",
         "seamlessly",
+        "showcase",
+        "showcasing",
         "state-of-the-art",
         "synergy",
         "tapestry",
         "testament",
         "transformative",
+        "underpin",
+        "underpins",
         "underscore",
         "underscores",
         "unlock",
@@ -293,6 +328,7 @@ Slop = Lexicon(
         "world-class",
     ],
     fix="swap for a plain verb or noun, or add these to the sampler ban list",
+    evidence="Kobak et al. 2024 (excess vocabulary); slop-forensics",
 )
 
 
@@ -352,25 +388,36 @@ EmptyIntensifier = Lexicon(
     name="empty_intensifier",
     indicates=[
         "absolutely",
+        "completely",
         "deeply",
+        "enormously",
+        "entirely",
+        "exceptionally",
         "extremely",
         "genuinely",
         "highly",
+        "hugely",
         "immensely",
         "incredibly",
+        "massively",
         "profoundly",
         "quite",
         "quite literally",
         "really",
         "remarkably",
         "simply put",
+        "terribly",
+        "thoroughly",
+        "totally",
         "tremendously",
         "truly",
         "utterly",
         "vastly",
         "very",
+        "wholly",
     ],
     fix="delete the intensifier or replace it with the specific magnitude",
+    evidence="Quirk et al. 1985; Biber et al. 1999 (amplifiers)",
 )
 
 
@@ -378,22 +425,33 @@ UnsourcedAuthority = Lexicon(
     name="unsourced_authority",
     indicates=[
         "common knowledge",
+        "critics say",
         "data suggests",
         "evidence shows",
         "experts agree",
         "experts say",
+        "it has been claimed",
+        "it is believed",
+        "it is said",
+        "it is thought",
         "it is widely",
         "it's well established",
+        "many argue",
         "many believe",
+        "reportedly",
         "research indicates",
         "research shows",
         "science says",
+        "some argue",
+        "some say",
+        "sources say",
         "studies have shown",
         "studies show",
         "widely known",
         "widely regarded",
     ],
     fix="name the source or drop the appeal; vague authority is worse than no authority",
+    evidence="Ganter & Strube 2009; Recasens et al. 2013 (weasel words)",
 )
 
 
@@ -431,6 +489,7 @@ UncertaintyAdmission = Lexicon(
         "worth verifying",
     ],
     fix="say what you are unsure about and what would resolve it",
+    evidence="CoNLL-2010 uncertainty cues",
 )
 
 

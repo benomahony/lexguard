@@ -209,6 +209,11 @@ Duration = Lexicon(
 )
 
 
+# HighPriority and LowPriority are opposite poles of one axis: each rules out every one of the
+# other's indicators (a full mirror), so any mix denies both and the two lists cannot drift.
+# tests/test_exclusive_families.py enforces that. Note bare "priority" is deliberately not an
+# indicator: it is a substring of "low priority", so as the opposite's blocker it would deny
+# "low priority" itself — "high priority" / "top priority" carry the signal instead.
 HighPriority = Lexicon(
     name="high_priority",
     indicates=[
@@ -219,11 +224,11 @@ HighPriority = Lexicon(
         "drop everything",
         "emergency",
         "first thing",
+        "high priority",
         "immediately",
         "important",
         "needs doing now",
         "pressing",
-        "priority",
         "right away",
         "right now",
         "straight away",
@@ -232,11 +237,19 @@ HighPriority = Lexicon(
         "urgently",
     ],
     rules_out=[
+        "at some point",
+        "backlog",
+        "eventually",
+        "if i get a chance",
         "low priority",
+        "maybe later",
         "nice to have",
         "no hurry",
         "no rush",
         "not urgent",
+        "someday",
+        "sometime",
+        "when i get round to it",
         "when you can",
         "whenever",
     ],
@@ -262,12 +275,26 @@ LowPriority = Lexicon(
     ],
     rules_out=[
         "asap",
+        "blocking",
+        "can't wait",
         "critical",
         "deadline",
+        "drop everything",
+        "emergency",
+        "first thing",
+        "high priority",
         "immediately",
+        "important",
+        "needs doing now",
         "now",
+        "pressing",
+        "right away",
+        "right now",
+        "straight away",
         "today",
+        "top priority",
         "urgent",
+        "urgently",
     ],
 )
 
@@ -670,25 +697,35 @@ Injection = Lexicon(
         "you are an ai",
     ],
     fix=("treat retrieved or user text as data, never as instructions; strip and log the attempt"),
+    evidence="Perez & Ribeiro 2022; Greshake et al. 2023",
 )
 
 
 Politeness = Lexicon(
     name="politeness",
     indicates=[
+        "appreciate it",
         "cheers",
         "could you",
+        "grateful",
         "hello",
         "hey",
         "hi",
+        "if it's not too much trouble",
         "if you don't mind",
+        "kindly",
+        "many thanks",
         "mind",
+        "no worries",
         "please",
         "sorry",
+        "sorry to bother",
         "thank you",
         "thanks",
+        "when you get a chance",
         "when you get a sec",
         "would you",
+        "would you mind",
     ],
     rules_out=[
         "asshole",
@@ -705,6 +742,7 @@ Politeness = Lexicon(
         """sarcasm, dismissal, and profanity do not read as politeness.
         Write the actual request plainly"""
     ),
+    evidence="Brown & Levinson 1987; Stanford Politeness Corpus (Danescu-Niculescu-Mizil 2013)",
 )
 
 

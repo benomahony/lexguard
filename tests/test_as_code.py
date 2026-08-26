@@ -39,9 +39,9 @@ def test_as_code_is_deterministic(indicates, rules_out, name, fix):
 def test_constructor_rejects_a_bare_string_instead_of_exploding_it():
     # a str is a Collection[str] of characters; the constructor must reject it, not tidy "abc"
     # into {"a", "b", "c"}. Splitting raw text into terms is the CLI's job, at its boundary.
-    with pytest.raises(AssertionError, match="list of terms"):
+    with pytest.raises(TypeError, match="list of terms"):
         Lexicon(name="x", indicates="circle back")
-    with pytest.raises(AssertionError, match="list of terms"):
+    with pytest.raises(TypeError, match="list of terms"):
         Lexicon(name="x", indicates=["a"], rules_out="b")
 
 
@@ -58,10 +58,29 @@ def test_flat_definition_shape():
     )
 
 
-def test_empty_rules_out_and_fix_are_omitted():
+def test_empty_rules_out_fix_and_evidence_are_omitted():
     code = Lexicon(name="x", indicates=["a"]).as_code()
     assert "rules_out" not in code
     assert "fix" not in code
+    assert "evidence" not in code
+
+
+def test_evidence_round_trips_but_is_ignored_by_equality():
+    # as_code() dumps the full source, evidence included, and it round-trips; but evidence does
+    # not change what a lexicon matches, so it is ignored by equality
+    cited = Lexicon(name="x", indicates=["a"], evidence="Author 2013")
+    plain = Lexicon(name="x", indicates=["a"])
+    code = cited.as_code()
+    assert "evidence='Author 2013'" in code
+    assert eval(code, {"Lexicon": Lexicon}).evidence == "Author 2013"  # noqa: S307
+    assert cited == plain
+    assert cited.evidence == "Author 2013"
+
+
+def test_evidence_whitespace_is_collapsed():
+    assert Lexicon(name="x", indicates=["a"], evidence="line one\n   line two").evidence == (
+        "line one line two"
+    )
 
 
 @pytest.mark.parametrize("lexicon", LEXICONS.values(), ids=LEXICONS.keys())

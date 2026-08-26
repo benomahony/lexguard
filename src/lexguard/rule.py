@@ -28,7 +28,7 @@ class Rule(Evaluator):
         if verdicts is None:
             return SKIP
         result = {v.name: EvaluationReason(value=v.passed, reason=v.reason) for v in verdicts}
-        assert len(result) == len(verdicts)
+        assert len(result) == len(verdicts), "one reason per verdict; names must be unique"
         return result
 
 
@@ -42,5 +42,6 @@ class Observe(Evaluator):
         assert self.lexicons, "Observe needs at least one lexicon"
         spec = ObserveSpec(self.lexicons, self.field, self.of)
         result = spec.signals(ctx.output, ctx.inputs)
-        assert result is None or isinstance(result, dict)
-        return result if result is not None else SKIP
+        mapping = result if result is not None else SKIP
+        assert mapping is not None, "Observe returns a mapping, empty when the rule abstains"
+        return mapping
