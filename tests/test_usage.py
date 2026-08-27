@@ -8,7 +8,6 @@ from lexguard import (
     CitationDemand,
     CitationMarker,
     Disclaimer,
-    HighPriority,
     NoCaveats,
     Observe,
     Politeness,
@@ -146,15 +145,6 @@ def test_failure_names_the_matches_and_shows_them_in_context():
 def test_failure_carries_the_fix():
     reason = failures([Slop.absent()], "explain", "let us delve in")["no_slop"]
     assert reason.endswith(Slop.fix)
-
-
-def test_guidance_is_the_self_contained_fix():
-    # handed back on its own, the message names the concept that fired, then the remedy
-    assert Slop.guidance() == f"slop: {Slop.fix}"
-    assert Slop.guidance().endswith(Slop.fix)
-    # a multi-word name reads as human text, not the snake_case identifier
-    assert HighPriority.guidance() == f"high priority: {HighPriority.fix}"
-    assert "high_priority" not in HighPriority.guidance()
 
 
 def test_failure_quotes_the_request_words_that_triggered_the_rule():

@@ -151,17 +151,6 @@ class Lexicon:
         assert len(result) <= count, "at most count examples"
         return result
 
-    def guidance(self) -> str:
-        """The fix as a standalone message: the readable label, then the remedy.
-
-        For handing back on its own — from a guardrail, a log, an agent retry — where the fix needs
-        to name what fired.
-        """
-        label = self.name.replace("_", " ")
-        result = f"{label}: {self.fix}"
-        assert label in result, "guidance names the concept that fired"
-        return result
-
     def as_code(self) -> str:
         """A paste-able `Lexicon(...)` expression, terms sorted for byte-identical re-emits.
 
