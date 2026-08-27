@@ -36,7 +36,7 @@ def test_hits_works_for_a_lexicon_with_no_multiword_indicators():
 
 
 def test_a_casefold_expanding_hit_has_no_span_in_the_original_text():
-    lexicon = Lexicon(name="t", indicates=["strasse report"])
+    lexicon = Lexicon(name="t", indicates=["strasse report"], fix="x")
     text = "the straße report is ready"
     assert lexicon.hits(text) == {"strasse report"}
     assert lexicon.spans(text) == []

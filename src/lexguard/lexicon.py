@@ -49,8 +49,11 @@ def snippet(text: str, start: int, end: int, width: int = 34) -> str:
 class Lexicon:
     name: str
     indicates: Collection[str]
+    # a one-sentence remedy for a hit: what to do when this lexicon fires. required — every lexicon
+    # carries its own fix so a verdict is actionable standing alone (a guardrail returning it, a
+    # test report, an agent citing it), never just a label. dumped by as_code(), rendered in docs.
+    fix: str
     rules_out: Collection[str] = ()
-    fix: str = ""
     # a short citation for where the terms come from: dumped by as_code(), rendered next to the
     # lexicon in the docs, and readable at runtime (e.g. an agent citing why a check fired).
     # ignored by equality — two lexicons that match the same way are equal whatever their evidence
@@ -68,6 +71,7 @@ class Lexicon:
         object.__setattr__(self, "indicates", tidy(self.indicates))
         object.__setattr__(self, "rules_out", tidy(self.rules_out))
         object.__setattr__(self, "fix", " ".join(self.fix.split()))
+        assert self.fix, f"{self.name}: lexicon must have a fix"
         object.__setattr__(self, "evidence", " ".join(self.evidence.split()))
         object.__setattr__(self, "_indicate", phrases(self.indicates))
         object.__setattr__(self, "_rule_out", phrases(self.rules_out))
@@ -157,8 +161,7 @@ class Lexicon:
         fields: dict[str, object] = {"name": self.name, "indicates": sorted(self.indicates)}
         if self.rules_out:
             fields["rules_out"] = sorted(self.rules_out)
-        if self.fix:
-            fields["fix"] = self.fix
+        fields["fix"] = self.fix
         if self.evidence:
             fields["evidence"] = self.evidence
         result = "Lexicon(" + ", ".join(f"{key}={value!r}" for key, value in fields.items()) + ")"

@@ -25,6 +25,7 @@ FormatList = Lexicon(
         "paragraphs",
         "prose",
     ],
+    fix="format the answer as a list",
 )
 
 
@@ -41,6 +42,7 @@ FormatTable = Lexicon(
         "table",
         "tabular",
     ],
+    fix="lay the answer out as a table with the relevant columns",
 )
 
 
@@ -70,6 +72,7 @@ FormatCode = Lexicon(
         "no code",
         "without code",
     ],
+    fix="give the answer as code, not just a description of it",
 )
 
 
@@ -94,6 +97,7 @@ FormatProse = Lexicon(
         "numbered",
         "table",
     ],
+    fix="write the answer as flowing prose, not bullets or a table",
 )
 
 
@@ -129,6 +133,7 @@ LengthShort = Lexicon(
         "in depth",
         "thorough",
     ],
+    fix="keep the answer short; lead with the point and stop",
 )
 
 
@@ -158,6 +163,7 @@ LengthLong = Lexicon(
         "short",
         "tldr",
     ],
+    fix="give a thorough, detailed answer that covers the ground",
 )
 
 
@@ -178,6 +184,7 @@ NoPreamble = Lexicon(
         "skip the",
         "straight to",
     ],
+    fix="skip the preamble and open with the answer",
 )
 
 
@@ -197,6 +204,7 @@ NoCaveats = Lexicon(
         "spare me",
         "without the caveats",
     ],
+    fix="drop the caveats and disclaimers; the user has accepted the risk",
 )
 
 
@@ -221,6 +229,7 @@ CitationDemand = Lexicon(
         "no sources needed",
         "off the top of your head",
     ],
+    fix="attach a source to each claim the user could act on",
 )
 
 
@@ -239,6 +248,7 @@ StepByStep = Lexicon(
         "tutorial",
         "walk me through",
     ],
+    fix="give numbered steps in the order they should be done",
 )
 
 
@@ -264,6 +274,7 @@ OpinionDemand = Lexicon(
         "no opinions",
         "objectively",
     ],
+    fix="give a clear recommendation, not just the options",
 )
 
 
@@ -283,6 +294,7 @@ ComparisonDemand = Lexicon(
         "vs",
         "which is",
     ],
+    fix="compare the items directly, drawing out the differences that matter",
 )
 
 
@@ -310,6 +322,7 @@ CreativeDemand = Lexicon(
         "factual",
         "real",
     ],
+    fix="answer creatively; invention is wanted here, not literal fact",
 )
 
 
@@ -339,6 +352,7 @@ FactualDemand = Lexicon(
         "made up",
         "story",
     ],
+    fix="stick to verified fact and flag anything you are unsure of",
 )
 
 
@@ -356,6 +370,7 @@ RolePlay = Lexicon(
         "take on the role",
         "you are a",
     ],
+    fix="take on the requested role and stay in character",
 )
 
 
@@ -378,6 +393,7 @@ Revision = Lexicon(
         "try again",
         "tweak",
     ],
+    fix="revise the previous output as asked rather than starting over",
 )
 
 
@@ -400,6 +416,7 @@ AdviceDemand = Lexicon(
         "what should",
         "worth doing",
     ],
+    fix="give the advice asked for, with the reasoning and any real risks named",
 )
 
 
@@ -423,6 +440,7 @@ ToneFormal = Lexicon(
         "informal",
         "relaxed",
     ],
+    fix="write in a formal, polished register",
 )
 
 
@@ -447,6 +465,7 @@ ToneCasual = Lexicon(
         "official",
         "professional",
     ],
+    fix="write in a casual, conversational register",
 )
 
 

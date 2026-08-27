@@ -21,6 +21,7 @@ Shopping = Lexicon(
         "shopping",
         "top up",
     ],
+    fix="add the item to the shopping list and note the quantity if one is given",
 )
 
 
@@ -43,6 +44,7 @@ Communication = Lexicon(
         "text",
         "whatsapp",
     ],
+    fix="capture who to contact and on which channel, then draft or schedule the message",
 )
 
 
@@ -68,6 +70,7 @@ Money = Lexicon(
         "top up",
         "transfer",
     ],
+    fix="log the amount, payee, and due date, and set a reminder before it falls due",
 )
 
 
@@ -91,6 +94,7 @@ HealthAppointment = Lexicon(
         "surgery",
         "vaccination",
     ],
+    fix="record the date, time, and location, and set a reminder to leave in good time",
 )
 
 
@@ -116,6 +120,7 @@ Travel = Lexicon(
         "train",
         "visa",
     ],
+    fix="capture the dates, booking reference, and departure time, and add reminders around them",
 )
 
 
@@ -143,6 +148,7 @@ Work = Lexicon(
         "ticket",
         "timesheet",
     ],
+    fix="file the item under the right project and track its owner and deadline",
 )
 
 
@@ -165,6 +171,7 @@ Household = Lexicon(
         "vacuum",
         "washing",
     ],
+    fix="add the chore to the home list and set it to recur if it is routine",
 )
 
 
@@ -186,6 +193,7 @@ Pets = Lexicon(
         "walk the",
         "worming",
     ],
+    fix="schedule the pet task and set a recurring reminder for routine care",
 )
 
 
@@ -205,6 +213,7 @@ Children = Lexicon(
         "term starts",
         "uniform",
     ],
+    fix="add the school or childcare item to the family calendar with its date and any prep",
 )
 
 
@@ -225,6 +234,7 @@ Garden = Lexicon(
         "weeding",
         "weeds",
     ],
+    fix="add the garden task and set it to recur with the season where relevant",
 )
 
 
@@ -245,6 +255,7 @@ Maintenance = Lexicon(
         "tyres",
         "warranty",
     ],
+    fix="record the renewal or service date and set a reminder well before it expires",
 )
 
 
@@ -266,6 +277,7 @@ Media = Lexicon(
         "video",
         "watch",
     ],
+    fix="save the title to the watch or read list rather than treating it as a task",
 )
 
 
@@ -289,6 +301,7 @@ Occasion = Lexicon(
         "wedding",
         "xmas",
     ],
+    fix="note the date, remind ahead of it, and capture any gift or booking to arrange",
 )
 
 
@@ -316,6 +329,7 @@ Location = Lexicon(
         "while i'm",
         "work",
     ],
+    fix="attach the place to the task so it can surface when nearby or en route",
 )
 
 
@@ -348,6 +362,7 @@ People = Lexicon(
         "wife",
         "with",
     ],
+    fix="link the task to the named person so related items group together",
 )
 
 
