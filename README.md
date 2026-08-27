@@ -137,18 +137,19 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 ## Closing the loop
 
 `fix` is not just for a test report. It works standing alone, so a guardrail in the agent loop
-does not just block a bad reply, it can hand the agent something to retry with.
+does not just block a bad reply, it can hand the agent something to retry with. `guidance()` is
+that message: the lexicon name, then the fix, so it names what fired when handed back on its own.
 
 ```py
 from lexguard import Slop
 
 
 def guard(reply: str) -> str | None:
-    return Slop.fix if Slop.fires(reply) else None
+    return Slop.guidance() if Slop.fires(reply) else None
 
 
 print(guard("let us delve into the intricate tapestry"))
-#> swap for a plain verb or noun, or add these to the sampler ban list
+#> slop: swap for a plain verb or noun, or add these to the sampler ban list
 print(guard("caching skips repeated work"))
 #> None
 ```

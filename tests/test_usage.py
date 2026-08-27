@@ -147,6 +147,13 @@ def test_failure_carries_the_fix():
     assert reason.endswith(Slop.fix)
 
 
+def test_guidance_is_the_self_contained_fix():
+    # handed back on its own, the message names the lexicon that fired, then the remedy
+    assert Slop.guidance() == f"{Slop.name}: {Slop.fix}"
+    assert Slop.name in Slop.guidance()
+    assert Slop.guidance().endswith(Slop.fix)
+
+
 def test_failure_quotes_the_request_words_that_triggered_the_rule():
     reason = failures(
         [Disclaimer.absent(when=NoCaveats)],
