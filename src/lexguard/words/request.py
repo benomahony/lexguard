@@ -95,7 +95,7 @@ DueDate = Lexicon(
         "when i get round to it",
         "whenever",
     ],
-    fix="a due date is present: put it on the task and remind ahead of it",
+    fix="treat the date as the deadline, not incidental text",
 )
 
 
@@ -128,7 +128,7 @@ ClockTime = Lexicon(
         "some time",
         "whenever",
     ],
-    fix="a time of day is present: set it on the task and remind at it",
+    fix="treat the time of day as when it should happen",
 )
 
 
@@ -168,7 +168,7 @@ Recurrence = Lexicon(
         "single",
         "this once",
     ],
-    fix="a recurring task: make it repeat on that cadence, not a one-off",
+    fix="treat this as recurring, not a one-off",
 )
 
 
@@ -187,7 +187,7 @@ Past = Lexicon(
         "was supposed",
         "yesterday",
     ],
-    fix="this refers to a missed task: log it as overdue, don't schedule it as new",
+    fix="this already happened; treat it as missed, not upcoming",
 )
 
 
@@ -210,7 +210,7 @@ Duration = Lexicon(
         "quick",
         "takes",
     ],
-    fix="a duration is given: record it so the task fits a matching free block",
+    fix="account for how long this takes",
 )
 
 
@@ -258,7 +258,7 @@ HighPriority = Lexicon(
         "when you can",
         "whenever",
     ],
-    fix="marked urgent: surface it ahead of everything else, not the normal queue",
+    fix="treat this as urgent; act on it before other work",
 )
 
 
@@ -302,7 +302,7 @@ LowPriority = Lexicon(
         "urgent",
         "urgently",
     ],
-    fix="marked low priority: send it to the backlog, don't rank it above real work",
+    fix="treat this as low priority; let real work go first",
 )
 
 
@@ -383,7 +383,7 @@ Actionable = Lexicon(
         "no action",
         "no need",
     ],
-    fix="this is an instruction to act: create a task, don't just file a note",
+    fix="this asks you to act, so act, don't just acknowledge it",
 )
 
 
@@ -426,7 +426,7 @@ Question = Lexicon(
         "make a note",
         "remind me",
     ],
-    fix="this is a question: answer it from what you hold, don't create a task",
+    fix="answer the question; don't turn it into a task",
 )
 
 
@@ -449,7 +449,7 @@ Cancellation = Lexicon(
         "take it off",
         "undo",
     ],
-    fix="this cancels something: remove the referenced task, don't add a new one",
+    fix="this cancels something; undo it, don't add",
 )
 
 
@@ -476,7 +476,7 @@ Completion = Lexicon(
         "still need",
         "unfinished",
     ],
-    fix="this reports a task done: mark it complete, don't create a duplicate",
+    fix="this is already done; record that, don't repeat it",
 )
 
 
@@ -511,7 +511,7 @@ Hypothetical = Lexicon(
         "for sure",
         "go ahead",
     ],
-    fix="this is only tentative: hold it and confirm before acting, don't book it",
+    fix="this is tentative; confirm before acting on it",
 )
 
 
@@ -539,7 +539,7 @@ Negation = Lexicon(
         "without",
         "won't",
     ],
-    fix="this excludes something: respect it, don't add the negated item",
+    fix="honour what is ruled out; don't include it",
 )
 
 
@@ -561,7 +561,7 @@ Delegation = Lexicon(
         "sort it with",
         "tell",
     ],
-    fix="this delegates the task: assign it to the named person, not the user",
+    fix="this is for someone else to do, not you",
 )
 
 
@@ -632,7 +632,7 @@ Subtasks = Lexicon(
         "steps",
         "then",
     ],
-    fix="several steps are listed: break it into ordered subtasks, not one task",
+    fix="break this into its separate steps",
 )
 
 
@@ -669,7 +669,7 @@ Quantity = Lexicon(
         "three",
         "two",
     ],
-    fix="a quantity is named: capture the amount so the right number is acted on",
+    fix="keep the amount attached to what it counts",
 )
 
 
@@ -786,7 +786,7 @@ Confirmation = Lexicon(
         "tentatively",
         "we'll see",
     ],
-    fix="this confirms a tentative item: commit it, the user has approved it",
+    fix="this is confirmed; proceed, don't ask again",
 )
 
 
@@ -807,7 +807,7 @@ Correction = Lexicon(
         "scratch that",
         "sorry",
     ],
-    fix="this corrects an earlier item: amend that item, don't add a new one",
+    fix="this corrects an earlier point; use the new version",
 )
 
 
@@ -825,7 +825,7 @@ Continuation = Lexicon(
         "too",
         "while you're at it",
     ],
-    fix="this adds to an earlier item: append to it, don't start a separate task",
+    fix="this extends the earlier request; add to it",
 )
 
 
@@ -846,7 +846,7 @@ PriorReference = Lexicon(
         "we discussed",
         "you added",
     ],
-    fix="this points to an earlier item: resolve the reference, don't treat as new",
+    fix="this refers back; resolve it against what came before",
 )
 
 
@@ -865,7 +865,7 @@ ConditionalTrigger = Lexicon(
         "whenever i",
         "while i'm",
     ],
-    fix="this is conditional: hold the task until the condition fires, not now",
+    fix="act only once the stated condition holds",
 )
 
 
@@ -884,7 +884,7 @@ Dependency = Lexicon(
         "waiting for",
         "waiting on",
     ],
-    fix="this depends on something: block the task until the prerequisite clears",
+    fix="this can't proceed until its prerequisite is done",
 )
 
 
@@ -906,7 +906,7 @@ Effort = Lexicon(
         "two minutes",
         "will take a while",
     ],
-    fix="an effort estimate is given: record it so the task matches the time free",
+    fix="account for the effort this takes",
 )
 
 
@@ -925,7 +925,7 @@ EnergyContext = Lexicon(
         "mindless",
         "when i'm fresh",
     ],
-    fix="a focus level is named: tag it so the task surfaces at the right time",
+    fix="match this to the kind of focus it needs",
 )
 
 
@@ -943,7 +943,7 @@ Exception = Lexicon(
         "skip",
         "unless",
     ],
-    fix="an exception is stated: apply it and leave the exempted case out",
+    fix="apply the exclusion; leave the exempted case out",
 )
 
 
@@ -963,7 +963,7 @@ Attachment = Lexicon(
         "the thread",
         "url",
     ],
-    fix="an attachment is referenced: keep the file or link with the task",
+    fix="the referenced file or link is part of this; keep it",
 )
 
 
@@ -981,7 +981,7 @@ EventRelative = Lexicon(
         "on the day",
         "prior to",
     ],
-    fix="this is timed around an event: anchor the task to it, not a fixed date",
+    fix="time this relative to the event it names",
 )
 
 
@@ -1006,7 +1006,7 @@ SelfAssigned = Lexicon(
         "on behalf of",
         "tell them",
     ],
-    fix="this is the user's own to-do: assign the task to them",
+    fix="this is the user's own to do",
 )
 
 
@@ -1025,7 +1025,7 @@ Shared = Lexicon(
         "us",
         "we",
     ],
-    fix="this is shared: mark it so everyone named can see and act on it",
+    fix="this concerns more than one person; treat it as shared",
 )
 
 
@@ -1051,7 +1051,7 @@ Approximation = Lexicon(
         "precisely",
         "sharp",
     ],
-    fix="the timing is approximate: keep it rough, don't commit to a false exact",
+    fix="the figure is approximate; don't treat it as exact",
 )
 
 
@@ -1077,7 +1077,7 @@ HardDeadline = Lexicon(
         "roughly",
         "would be nice",
     ],
-    fix="a hard deadline is set: treat it as fixed, leave lead time to hit it",
+    fix="the deadline is firm; treat it as fixed",
 )
 
 
@@ -1102,7 +1102,7 @@ SoftDeadline = Lexicon(
         "must",
         "no later than",
     ],
-    fix="a soft target is set: treat it as a preference, not a cut-off",
+    fix="the target is a preference, not a firm cut-off",
 )
 
 

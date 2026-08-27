@@ -25,7 +25,7 @@ FormatList = Lexicon(
         "paragraphs",
         "prose",
     ],
-    fix="a list was asked for: answer in bullet points, not reflowed prose",
+    fix="answer as a list, not reflowed prose",
 )
 
 
@@ -42,7 +42,7 @@ FormatTable = Lexicon(
         "table",
         "tabular",
     ],
-    fix="a table was asked for: lay the answer out in columns, not prose",
+    fix="lay the answer out as a table, not prose",
 )
 
 
@@ -72,7 +72,7 @@ FormatCode = Lexicon(
         "no code",
         "without code",
     ],
-    fix="code was asked for: answer with the actual code, not a description of it",
+    fix="answer with the actual code, not a description of it",
 )
 
 
@@ -97,7 +97,7 @@ FormatProse = Lexicon(
         "numbered",
         "table",
     ],
-    fix="prose was asked for: write flowing paragraphs, not bullets or a table",
+    fix="answer in prose, not bullets or a table",
 )
 
 
@@ -133,7 +133,7 @@ LengthShort = Lexicon(
         "in depth",
         "thorough",
     ],
-    fix="brevity was asked for: cut to the answer and stop, don't chase completeness",
+    fix="keep it short: give the answer and stop",
 )
 
 
@@ -163,7 +163,7 @@ LengthLong = Lexicon(
         "short",
         "tldr",
     ],
-    fix="depth was asked for: cover the ground fully; a terse answer underserves it",
+    fix="go deep; a terse answer underserves this",
 )
 
 
@@ -184,7 +184,7 @@ NoPreamble = Lexicon(
         "skip the",
         "straight to",
     ],
-    fix="no preamble was asked for: open on the answer itself",
+    fix="open on the answer, with no preamble",
 )
 
 
@@ -204,7 +204,7 @@ NoCaveats = Lexicon(
         "spare me",
         "without the caveats",
     ],
-    fix="caveats were waved off: drop the disclaimers, the risk is already accepted",
+    fix="drop the caveats; the risk is already accepted",
 )
 
 
@@ -229,7 +229,7 @@ CitationDemand = Lexicon(
         "no sources needed",
         "off the top of your head",
     ],
-    fix="sources were asked for: attach a citation to each actionable claim",
+    fix="cite a source for each claim",
 )
 
 
@@ -248,7 +248,7 @@ StepByStep = Lexicon(
         "tutorial",
         "walk me through",
     ],
-    fix="a walkthrough was asked for: give numbered steps in order",
+    fix="answer as ordered steps",
 )
 
 
@@ -274,7 +274,7 @@ OpinionDemand = Lexicon(
         "no opinions",
         "objectively",
     ],
-    fix="a recommendation was asked for: commit to a call, not a list of options",
+    fix="commit to a recommendation, not just options",
 )
 
 
@@ -294,7 +294,7 @@ ComparisonDemand = Lexicon(
         "vs",
         "which is",
     ],
-    fix="a comparison was asked for: weigh them head to head on the axes that matter",
+    fix="compare them directly on the points that matter",
 )
 
 
@@ -322,7 +322,7 @@ CreativeDemand = Lexicon(
         "factual",
         "real",
     ],
-    fix="creative work was asked for: invent freely, this is not a request for fact",
+    fix="answer creatively; invention is wanted, not literal fact",
 )
 
 
@@ -352,7 +352,7 @@ FactualDemand = Lexicon(
         "made up",
         "story",
     ],
-    fix="accuracy was asked for: stick to what you can verify and flag uncertainty",
+    fix="stick to what you can verify; flag any uncertainty",
 )
 
 
@@ -370,7 +370,7 @@ RolePlay = Lexicon(
         "take on the role",
         "you are a",
     ],
-    fix="a role was asked for: stay in character, don't answer as the assistant",
+    fix="stay in the requested role and voice",
 )
 
 
@@ -393,7 +393,7 @@ Revision = Lexicon(
         "try again",
         "tweak",
     ],
-    fix="a revision was asked for: rework the previous answer, don't start over",
+    fix="revise the previous answer, don't start over",
 )
 
 
@@ -416,7 +416,7 @@ AdviceDemand = Lexicon(
         "what should",
         "worth doing",
     ],
-    fix="advice was asked for: give a clear recommendation with reasoning and risks",
+    fix="give a clear recommendation, with the reasoning and risks",
 )
 
 
@@ -440,7 +440,7 @@ ToneFormal = Lexicon(
         "informal",
         "relaxed",
     ],
-    fix="a formal tone was asked for: write in a polished, professional register",
+    fix="answer in a formal register",
 )
 
 
@@ -465,7 +465,7 @@ ToneCasual = Lexicon(
         "official",
         "professional",
     ],
-    fix="a casual tone was asked for: write plainly, drop the corporate register",
+    fix="answer in a casual register",
 )
 
 
