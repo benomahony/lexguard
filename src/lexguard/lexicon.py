@@ -154,14 +154,16 @@ class Lexicon:
         return result
 
     def guidance(self) -> str:
-        """The fix as a self-contained message: the lexicon name, then the remedy.
+        """The fix as a self-contained message: a human-readable label, then the remedy.
 
         `fix` alone is natural-language advice; handed back on its own — returned from a guardrail,
         logged, fed to an agent to retry with — it needs to name what fired. This prepends the name
-        so the message stands apart from the lexicon that produced it.
+        in readable form (underscores as spaces, not the snake_case identifier) so the message
+        stands apart from the lexicon that produced it.
         """
-        result = f"{self.name}: {self.fix}"
-        assert self.name in result, "guidance names the lexicon that fired"
+        label = self.name.replace("_", " ")
+        result = f"{label}: {self.fix}"
+        assert label in result, "guidance names the concept that fired"
         assert result.endswith(self.fix), "guidance keeps the fix as its remedy"
         return result
 
