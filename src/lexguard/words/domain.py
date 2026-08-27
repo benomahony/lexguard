@@ -21,7 +21,7 @@ Shopping = Lexicon(
         "shopping",
         "top up",
     ],
-    fix="treat this as something to buy",
+    fix="add it to what needs buying",
 )
 
 
@@ -44,7 +44,7 @@ Communication = Lexicon(
         "text",
         "whatsapp",
     ],
-    fix="treat this as a message to send someone",
+    fix="reach out to the person named",
 )
 
 
@@ -70,7 +70,7 @@ Money = Lexicon(
         "top up",
         "transfer",
     ],
-    fix="treat this as a payment or money matter",
+    fix="handle the payment or amount owed",
 )
 
 
@@ -94,7 +94,7 @@ HealthAppointment = Lexicon(
         "surgery",
         "vaccination",
     ],
-    fix="treat this as a medical appointment to keep",
+    fix="keep the appointment; mind when and where",
 )
 
 
@@ -120,7 +120,7 @@ Travel = Lexicon(
         "train",
         "visa",
     ],
-    fix="treat this as a trip to arrange or catch",
+    fix="arrange or catch the trip on time",
 )
 
 
@@ -148,7 +148,7 @@ Work = Lexicon(
         "ticket",
         "timesheet",
     ],
-    fix="treat this as work, tracked with the rest of it",
+    fix="handle it as part of your work",
 )
 
 
@@ -171,7 +171,7 @@ Household = Lexicon(
         "vacuum",
         "washing",
     ],
-    fix="treat this as a household chore",
+    fix="get the chore done",
 )
 
 
@@ -193,7 +193,7 @@ Pets = Lexicon(
         "walk the",
         "worming",
     ],
-    fix="treat this as pet care",
+    fix="see to the pet's care",
 )
 
 
@@ -213,7 +213,7 @@ Children = Lexicon(
         "term starts",
         "uniform",
     ],
-    fix="treat this as a childcare or school matter",
+    fix="see to the child's school or care need",
 )
 
 
@@ -234,7 +234,7 @@ Garden = Lexicon(
         "weeding",
         "weeds",
     ],
-    fix="treat this as a gardening task",
+    fix="get the gardening done",
 )
 
 
@@ -255,7 +255,7 @@ Maintenance = Lexicon(
         "tyres",
         "warranty",
     ],
-    fix="treat this as upkeep with a renewal or service date",
+    fix="renew or service it before it lapses",
 )
 
 
@@ -277,7 +277,7 @@ Media = Lexicon(
         "video",
         "watch",
     ],
-    fix="this is something to read or watch, not a task to do",
+    fix="keep it to read or watch, don't act on it as a task",
 )
 
 
@@ -301,7 +301,7 @@ Occasion = Lexicon(
         "wedding",
         "xmas",
     ],
-    fix="treat this as an event with a date to prepare for",
+    fix="prepare for it ahead of the date",
 )
 
 
@@ -329,7 +329,7 @@ Location = Lexicon(
         "while i'm",
         "work",
     ],
-    fix="this is tied to a place; use where it happens",
+    fix="act on it where it happens",
 )
 
 
@@ -362,7 +362,7 @@ People = Lexicon(
         "wife",
         "with",
     ],
-    fix="this involves a specific person; keep them attached",
+    fix="involve the person named",
 )
 
 

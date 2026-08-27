@@ -168,7 +168,7 @@ Recurrence = Lexicon(
         "single",
         "this once",
     ],
-    fix="treat this as recurring, not a one-off",
+    fix="apply it every time, not just once",
 )
 
 
@@ -187,7 +187,7 @@ Past = Lexicon(
         "was supposed",
         "yesterday",
     ],
-    fix="this already happened; treat it as missed, not upcoming",
+    fix="treat it as already missed, not upcoming",
 )
 
 
@@ -258,7 +258,7 @@ HighPriority = Lexicon(
         "when you can",
         "whenever",
     ],
-    fix="treat this as urgent; act on it before other work",
+    fix="act on it before less urgent work",
 )
 
 
@@ -302,7 +302,7 @@ LowPriority = Lexicon(
         "urgent",
         "urgently",
     ],
-    fix="treat this as low priority; let real work go first",
+    fix="let more urgent work go first",
 )
 
 
@@ -383,7 +383,7 @@ Actionable = Lexicon(
         "no action",
         "no need",
     ],
-    fix="this asks you to act, so act, don't just acknowledge it",
+    fix="act on it, don't just acknowledge it",
 )
 
 
@@ -449,7 +449,7 @@ Cancellation = Lexicon(
         "take it off",
         "undo",
     ],
-    fix="this cancels something; undo it, don't add",
+    fix="undo the referenced item, don't add a new one",
 )
 
 
@@ -476,7 +476,7 @@ Completion = Lexicon(
         "still need",
         "unfinished",
     ],
-    fix="this is already done; record that, don't repeat it",
+    fix="record it as done, don't repeat it",
 )
 
 
@@ -511,7 +511,7 @@ Hypothetical = Lexicon(
         "for sure",
         "go ahead",
     ],
-    fix="this is tentative; confirm before acting on it",
+    fix="hold off until it's confirmed",
 )
 
 
@@ -561,7 +561,7 @@ Delegation = Lexicon(
         "sort it with",
         "tell",
     ],
-    fix="this is for someone else to do, not you",
+    fix="hand it to the person named, not yourself",
 )
 
 
@@ -786,7 +786,7 @@ Confirmation = Lexicon(
         "tentatively",
         "we'll see",
     ],
-    fix="this is confirmed; proceed, don't ask again",
+    fix="go ahead; don't ask again",
 )
 
 
@@ -807,7 +807,7 @@ Correction = Lexicon(
         "scratch that",
         "sorry",
     ],
-    fix="this corrects an earlier point; use the new version",
+    fix="use the corrected version, not the earlier one",
 )
 
 
@@ -825,7 +825,7 @@ Continuation = Lexicon(
         "too",
         "while you're at it",
     ],
-    fix="this extends the earlier request; add to it",
+    fix="add it to the earlier request",
 )
 
 
@@ -846,7 +846,7 @@ PriorReference = Lexicon(
         "we discussed",
         "you added",
     ],
-    fix="this refers back; resolve it against what came before",
+    fix="resolve it against what came before",
 )
 
 
@@ -884,7 +884,7 @@ Dependency = Lexicon(
         "waiting for",
         "waiting on",
     ],
-    fix="this can't proceed until its prerequisite is done",
+    fix="wait for its prerequisite before starting",
 )
 
 
@@ -963,7 +963,7 @@ Attachment = Lexicon(
         "the thread",
         "url",
     ],
-    fix="the referenced file or link is part of this; keep it",
+    fix="keep the referenced file or link with it",
 )
 
 
@@ -1006,7 +1006,7 @@ SelfAssigned = Lexicon(
         "on behalf of",
         "tell them",
     ],
-    fix="this is the user's own to do",
+    fix="keep it as the user's own to do",
 )
 
 
@@ -1025,7 +1025,7 @@ Shared = Lexicon(
         "us",
         "we",
     ],
-    fix="this concerns more than one person; treat it as shared",
+    fix="keep it visible to everyone it involves",
 )
 
 
@@ -1051,7 +1051,7 @@ Approximation = Lexicon(
         "precisely",
         "sharp",
     ],
-    fix="the figure is approximate; don't treat it as exact",
+    fix="don't treat the figure as exact",
 )
 
 
@@ -1077,7 +1077,7 @@ HardDeadline = Lexicon(
         "roughly",
         "would be nice",
     ],
-    fix="the deadline is firm; treat it as fixed",
+    fix="treat the deadline as fixed",
 )
 
 
@@ -1102,7 +1102,7 @@ SoftDeadline = Lexicon(
         "must",
         "no later than",
     ],
-    fix="the target is a preference, not a firm cut-off",
+    fix="treat the target as a preference, not a firm cut-off",
 )
 
 

@@ -19,6 +19,4 @@ def test_all_lexicons_are_exported(module) -> None:
 
 @pytest.mark.parametrize("lexicon", LEXICONS.values(), ids=LEXICONS.keys())
 def test_every_shipped_lexicon_carries_a_fix(lexicon: Lexicon) -> None:
-    # fix is a required field: every shipped lexicon must offer a non-empty remedy so a verdict
-    # is actionable standing alone, not just a label.
     assert lexicon.fix, f"{lexicon.name} is missing a fix"

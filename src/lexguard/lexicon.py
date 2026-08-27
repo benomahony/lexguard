@@ -49,9 +49,7 @@ def snippet(text: str, start: int, end: int, width: int = 34) -> str:
 class Lexicon:
     name: str
     indicates: Collection[str]
-    # a one-sentence remedy for a hit: what to do when this lexicon fires. required — every lexicon
-    # carries its own fix so a verdict is actionable standing alone (a guardrail returning it, a
-    # test report, an agent citing it), never just a label. dumped by as_code(), rendered in docs.
+    # a one-sentence remedy: what to do when this fires. required, so a verdict is always actionable
     fix: str
     rules_out: Collection[str] = ()
     # a short citation for where the terms come from: dumped by as_code(), rendered next to the
@@ -154,17 +152,14 @@ class Lexicon:
         return result
 
     def guidance(self) -> str:
-        """The fix as a self-contained message: a human-readable label, then the remedy.
+        """The fix as a standalone message: the readable label, then the remedy.
 
-        `fix` alone is natural-language advice; handed back on its own — returned from a guardrail,
-        logged, fed to an agent to retry with — it needs to name what fired. This prepends the name
-        in readable form (underscores as spaces, not the snake_case identifier) so the message
-        stands apart from the lexicon that produced it.
+        For handing back on its own — from a guardrail, a log, an agent retry — where the fix needs
+        to name what fired.
         """
         label = self.name.replace("_", " ")
         result = f"{label}: {self.fix}"
         assert label in result, "guidance names the concept that fired"
-        assert result.endswith(self.fix), "guidance keeps the fix as its remedy"
         return result
 
     def as_code(self) -> str:
