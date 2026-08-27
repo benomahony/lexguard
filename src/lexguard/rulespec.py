@@ -135,12 +135,10 @@ class RuleSpec:
             matched = ", ".join(f'"{term}"' for term in sorted(guard.hits(request))[:2])
             verb = "the request asked" if self.when else "the request never asked"
             lines.append(f"{verb} for {guard.name}: {matched or 'no match'}")
-        if lexicon.fix:
-            lines.append(f"fix: {lexicon.fix}")
+        lines.append(f"fix: {lexicon.fix}")
         result = "\n".join(lines)
         assert result, "_diagnosis always appends at least one line"
-        if lexicon.fix:
-            assert result.endswith(lexicon.fix), "the fix, if any, is the last line"
+        assert result.endswith(lexicon.fix), "the fix is always the last line"
         return result
 
 
