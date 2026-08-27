@@ -184,12 +184,12 @@ class Lexicon:
         assert self in rule.lexicons, "the rule targets this lexicon"
         return rule
 
-    def spec(self, wanted: bool = False, **guards: Any) -> Any:
-        from .rulespec import RuleSpec
+    def check(self, wanted: bool = False, **guards: Any) -> Any:
+        from .rulespec import Check
 
-        result = RuleSpec(lexicons=[self], wanted=wanted, **guards)
-        assert result.wanted is wanted, "the spec keeps the wanted flag"
-        assert self in result.lexicons, "the spec targets this lexicon"
+        result = Check(lexicons=[self], wanted=wanted, **guards)
+        assert result.wanted is wanted, "the check keeps the wanted flag"
+        assert self in result.lexicons, "the check targets this lexicon"
         return result
 
     def _any(self, text: str, words: Collection[str], pattern: str | None) -> bool:
@@ -241,12 +241,12 @@ class Bundle:
         assert set(rule.lexicons) == set(self.members), "the rule spans the bundle's members"
         return rule
 
-    def spec(self, wanted: bool = False, **guards: Any) -> Any:
-        from .rulespec import RuleSpec
+    def check(self, wanted: bool = False, **guards: Any) -> Any:
+        from .rulespec import Check
 
-        result = RuleSpec(lexicons=list(self.members), wanted=wanted, **guards)
-        assert result.wanted is wanted, "the spec keeps the wanted flag"
-        assert set(result.lexicons) == set(self.members), "the spec spans the bundle's members"
+        result = Check(lexicons=list(self.members), wanted=wanted, **guards)
+        assert result.wanted is wanted, "the check keeps the wanted flag"
+        assert set(result.lexicons) == set(self.members), "the check spans the bundle's members"
         return result
 
     def signals(self, text: str) -> dict[str, Signal]:

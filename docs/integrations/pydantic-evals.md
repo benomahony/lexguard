@@ -1,6 +1,6 @@
 # pydantic-evals
 
-`.absent()` and `.expected()` build a `RuleSpec` and wrap it in a pydantic-evals `Rule` in one
+`.absent()` and `.expected()` build a `Check` and wrap it in a pydantic-evals `Rule` in one
 step, for use as an `Evaluator` in a `Dataset`. See [Rules](../rules.md) and
 [Agents](../agents.md) for the guards and structured-output scoping this gives you.
 

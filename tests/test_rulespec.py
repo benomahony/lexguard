@@ -13,17 +13,17 @@ class Notes:
 
 
 def test_field_reads_from_a_mapping_output():
-    verdicts = Slop.spec(field="notes").check({"notes": "let us delve in"}, "explain")
+    verdicts = Slop.check(field="notes").run({"notes": "let us delve in"}, "explain")
     assert verdicts[0].passed is False
 
 
 def test_field_path_through_a_leaf_value_resolves_to_nothing():
-    verdicts = Slop.spec(field="notes.length").check(Notes(notes="clean text"), "explain")
+    verdicts = Slop.check(field="notes.length").run(Notes(notes="clean text"), "explain")
     assert verdicts is None
 
 
-def test_spec_returns_none_for_a_blank_output():
-    assert Slop.spec().check("   ", "explain") is None
+def test_check_returns_none_for_a_blank_output():
+    assert Slop.check().run("   ", "explain") is None
 
 
 def test_observe_spec_returns_none_for_a_blank_output():

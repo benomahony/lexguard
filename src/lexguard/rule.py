@@ -7,7 +7,7 @@ from typing import Literal
 from pydantic_evals.evaluators import EvaluationReason, Evaluator, EvaluatorContext
 
 from .lexicon import Lexicon
-from .rulespec import ObserveSpec, RuleSpec
+from .rulespec import Check, ObserveSpec
 
 SKIP: dict = {}
 
@@ -23,8 +23,8 @@ class Rule(Evaluator):
 
     def evaluate(self, ctx: EvaluatorContext) -> dict[str, EvaluationReason]:
         assert self.lexicons, "Rule needs at least one lexicon"
-        spec = RuleSpec(self.lexicons, self.wanted, self.when, self.unless, self.field, self.of)
-        verdicts = spec.check(ctx.output, ctx.inputs)
+        check = Check(self.lexicons, self.wanted, self.when, self.unless, self.field, self.of)
+        verdicts = check.run(ctx.output, ctx.inputs)
         if verdicts is None:
             return SKIP
         result = {v.name: EvaluationReason(value=v.passed, reason=v.reason) for v in verdicts}

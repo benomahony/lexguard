@@ -52,7 +52,7 @@ filter in a log pipeline.
 uv add lexguard
 ```
 
-The core has no dependencies. `.spec()` compiles a lexicon into a framework-agnostic `RuleSpec`,
+The core has no dependencies. `.check()` compiles a lexicon into a framework-agnostic `Check`,
 which `.absent()` / `.expected()` and the [integrations](docs/integrations/index.md) turn into an
 evaluator for whichever eval framework you use; each is its own extra:
 
@@ -190,7 +190,7 @@ lg() {
 - [Rules](docs/rules.md) and the `when` / `unless` guards
 - [Agents](docs/agents.md) under test with pydantic-ai
 - [Integrations](docs/integrations/index.md): pydantic-evals, DeepEval, Inspect AI, and the
-  framework-agnostic `RuleSpec`, each with its own page
+  framework-agnostic `Check`, each with its own page
 
 ## Prior art
 

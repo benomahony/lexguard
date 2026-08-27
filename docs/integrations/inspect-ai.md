@@ -1,6 +1,6 @@
 # Inspect AI
 
-`lexguard_scorer` wraps a `RuleSpec` as an Inspect AI `Scorer`, scoring `CORRECT` when every
+`lexguard_scorer` wraps a `Check` as an Inspect AI `Scorer`, scoring `CORRECT` when every
 lexicon in the spec holds and `INCORRECT` otherwise, with the usual diagnosis as the explanation.
 
 ```py
@@ -23,7 +23,7 @@ state = TaskState(
         model="mockllm", content="Let us delve into the intricate tapestry of caching."
     ),
 )
-score = lexguard_scorer(Slop.spec())
+score = lexguard_scorer(Slop.check())
 result = asyncio.run(score(state, Target("")))
 print(result.value)
 #> I
@@ -37,7 +37,7 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 ```
 
 That direct call is only to show what the scorer returns; day to day it goes straight into a
-`Task`: `Task(dataset=..., solver=..., scorer=lexguard_scorer(Slop.spec()))`.
+`Task`: `Task(dataset=..., solver=..., scorer=lexguard_scorer(Slop.check()))`.
 
 ## Install
 

@@ -63,11 +63,11 @@ class Verdict:
 
 
 @dataclass(frozen=True)
-class RuleSpec:
-    """The framework-agnostic core behind `Lexicon.spec()` / `Bundle.spec()`.
+class Check:
+    """The framework-agnostic core behind `Lexicon.check()` / `Bundle.check()`.
 
-    `check()` is the whole surface: hand it an output and the originating input, get back the
-    per-lexicon verdicts, or `None` when a guard or empty field means the rule did not apply.
+    `run()` is the whole surface: hand it an output and the originating input, get back the
+    per-lexicon verdicts, or `None` when a guard or empty field means the check did not apply.
     Every eval-framework adapter (pydantic-evals, DeepEval, Inspect AI, ...) is a thin wrapper
     around this.
     """
@@ -80,12 +80,12 @@ class RuleSpec:
     of: Literal["output", "inputs"] = "output"
 
     def __post_init__(self) -> None:
-        assert self.lexicons, "RuleSpec needs at least one lexicon"
+        assert self.lexicons, "Check needs at least one lexicon"
         if self.when is not None:
-            assert self.unless is None, "a RuleSpec cannot have both when and unless"
+            assert self.unless is None, "a Check cannot have both when and unless"
 
-    def check(self, output: Any, inputs: Any) -> list[Verdict] | None:
-        assert self.lexicons, "RuleSpec.check called without lexicons"
+    def run(self, output: Any, inputs: Any) -> list[Verdict] | None:
+        assert self.lexicons, "Check.run called without lexicons"
         request = str(inputs)
         if self.when is not None and not self.when.fires(request):
             return None

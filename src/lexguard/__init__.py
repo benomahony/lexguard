@@ -5,8 +5,8 @@ from importlib import import_module
 from .lexicon import Bundle as Bundle
 from .lexicon import Lexicon as Lexicon
 from .lexicon import Signal as Signal
+from .rulespec import Check as Check
 from .rulespec import ObserveSpec as ObserveSpec
-from .rulespec import RuleSpec as RuleSpec
 from .rulespec import Verdict as Verdict
 from .suites import Bloat as Bloat
 from .suites import Leakage as Leakage
