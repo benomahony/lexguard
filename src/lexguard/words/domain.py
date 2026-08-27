@@ -21,7 +21,7 @@ Shopping = Lexicon(
         "shopping",
         "top up",
     ],
-    fix="add the item to the shopping list and note the quantity if one is given",
+    fix="add the item to the shopping list with its quantity; don't lose it in a note",
 )
 
 
@@ -44,7 +44,7 @@ Communication = Lexicon(
         "text",
         "whatsapp",
     ],
-    fix="capture who to contact and on which channel, then draft or schedule the message",
+    fix="capture who to contact and on which channel, then draft or schedule it",
 )
 
 
@@ -70,7 +70,7 @@ Money = Lexicon(
         "top up",
         "transfer",
     ],
-    fix="log the amount, payee, and due date, and set a reminder before it falls due",
+    fix="capture the amount, payee, and due date and remind before it's due",
 )
 
 
@@ -94,7 +94,7 @@ HealthAppointment = Lexicon(
         "surgery",
         "vaccination",
     ],
-    fix="record the date, time, and location, and set a reminder to leave in good time",
+    fix="capture the date, time, and place, and remind in time to leave",
 )
 
 
@@ -120,7 +120,7 @@ Travel = Lexicon(
         "train",
         "visa",
     ],
-    fix="capture the dates, booking reference, and departure time, and add reminders around them",
+    fix="capture the dates, reference, and departure time, and remind around them",
 )
 
 
@@ -148,7 +148,7 @@ Work = Lexicon(
         "ticket",
         "timesheet",
     ],
-    fix="file the item under the right project and track its owner and deadline",
+    fix="file this under its project with an owner and a deadline",
 )
 
 
@@ -171,7 +171,7 @@ Household = Lexicon(
         "vacuum",
         "washing",
     ],
-    fix="add the chore to the home list and set it to recur if it is routine",
+    fix="add the chore to the home list and make it recur if it's routine",
 )
 
 
@@ -193,7 +193,7 @@ Pets = Lexicon(
         "walk the",
         "worming",
     ],
-    fix="schedule the pet task and set a recurring reminder for routine care",
+    fix="schedule the pet task and make routine care recur",
 )
 
 
@@ -213,7 +213,7 @@ Children = Lexicon(
         "term starts",
         "uniform",
     ],
-    fix="add the school or childcare item to the family calendar with its date and any prep",
+    fix="put it on the family calendar with its date and any prep needed",
 )
 
 
@@ -234,7 +234,7 @@ Garden = Lexicon(
         "weeding",
         "weeds",
     ],
-    fix="add the garden task and set it to recur with the season where relevant",
+    fix="add the garden task and make it recur with the season where it applies",
 )
 
 
@@ -255,7 +255,7 @@ Maintenance = Lexicon(
         "tyres",
         "warranty",
     ],
-    fix="record the renewal or service date and set a reminder well before it expires",
+    fix="capture the renewal or service date and remind well before it expires",
 )
 
 
@@ -277,7 +277,7 @@ Media = Lexicon(
         "video",
         "watch",
     ],
-    fix="save the title to the watch or read list rather than treating it as a task",
+    fix="save the title to a watch or read list; don't action it as a task",
 )
 
 
@@ -329,7 +329,7 @@ Location = Lexicon(
         "while i'm",
         "work",
     ],
-    fix="attach the place to the task so it can surface when nearby or en route",
+    fix="attach the place so the task surfaces when nearby or en route",
 )
 
 
