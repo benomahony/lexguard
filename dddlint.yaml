@@ -1,0 +1,30 @@
+# https://benomahony.github.io/dddlint/reference/config/
+# Ubiquitous-language guard for lexguard. Kept to the deterministic `forbidden` check: it needs no
+# embeddings (fast, reproducible in CI) and locks in the vocabulary decisions the API settled on.
+#
+# The embedding checks are off on purpose:
+#   - name_uniqueness flags `evaluate` on both pydantic Evaluator subclasses (the framework mandates
+#     that method name) and `signals` used as the same domain verb on Bundle and Observation.
+#   - enforce_canonical flags public/private pairs like Verdict/_verdict that share a word by design.
+# Turn them back on if you want to audit vocabulary drift with `dddlint map`.
+enforce_canonical: false
+name_uniqueness: false
+
+# terms that must never appear in a definition name
+#   spec — retired: the assertion core is `Check`, the observe core is `Observation` (never *Spec)
+#   util / helper / manager — classic grab-bag names that hide a missing concept
+forbidden:
+  - spec
+  - util
+  - helper
+  - manager
+
+# paths to skip, gitignore syntax, relative to this file.
+# integrations/ is adapter code: it mirrors each framework's own vocabulary (pydantic-evals'
+# `evaluate`, inspect's `scorer` factory), which is not lexguard's ubiquitous language to police.
+exclude:
+  - src/lexguard/integrations
+
+synonyms: []
+
+contexts: []

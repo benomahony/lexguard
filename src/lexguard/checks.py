@@ -94,7 +94,7 @@ class Check:
         body = text_at(output if self.of == "output" else inputs, self.field)
         if not body.strip():
             return None
-        result = [self._verdict(entry, body, request) for entry in self.lexicons]
+        result = [self._judge(entry, body, request) for entry in self.lexicons]
         assert len(result) == len(self.lexicons), "one verdict per lexicon"
         return result
 
@@ -106,7 +106,7 @@ class Check:
         assert result, "the rule name is never empty"
         return result
 
-    def _verdict(self, lexicon: Lexicon, body: str, request: str) -> Verdict:
+    def _judge(self, lexicon: Lexicon, body: str, request: str) -> Verdict:
         spans = lexicon.spans(body)
         holds = lexicon.fires(body) if self.wanted else not spans
         name = self._name(lexicon)
