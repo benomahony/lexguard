@@ -5,7 +5,6 @@ import unicodedata
 from collections.abc import Collection
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Any
 
 WORD_PATTERN = r"[\w']+"
 
@@ -168,30 +167,6 @@ class Lexicon:
         assert "name" in fields, "name is always emitted"
         return result
 
-    def absent(self, **guards: Any) -> Any:
-        from .rule import Rule
-
-        rule = Rule(lexicons=[self], wanted=False, **guards)
-        assert rule.wanted is False, "absent() builds a not-wanted rule"
-        assert self in rule.lexicons, "the rule targets this lexicon"
-        return rule
-
-    def expected(self, **guards: Any) -> Any:
-        from .rule import Rule
-
-        rule = Rule(lexicons=[self], wanted=True, **guards)
-        assert rule.wanted is True, "expected() builds a wanted rule"
-        assert self in rule.lexicons, "the rule targets this lexicon"
-        return rule
-
-    def check(self, wanted: bool = False, **guards: Any) -> Any:
-        from .rulespec import Check
-
-        result = Check(lexicons=[self], wanted=wanted, **guards)
-        assert result.wanted is wanted, "the check keeps the wanted flag"
-        assert self in result.lexicons, "the check targets this lexicon"
-        return result
-
     def _any(self, text: str, words: Collection[str], pattern: str | None) -> bool:
         folded = self._fold(text)
         if pattern and re.search(pattern, folded):
@@ -224,30 +199,6 @@ class Bundle:
         assert set(self.members).issubset(bundle.members), "the merge keeps our members"
         assert len(bundle.members) == len(self.members) + len(extra), "the merge adds the extras"
         return bundle
-
-    def absent(self, **guards: Any) -> Any:
-        from .rule import Rule
-
-        rule = Rule(lexicons=list(self.members), wanted=False, **guards)
-        assert rule.wanted is False, "absent() builds a not-wanted rule"
-        assert set(rule.lexicons) == set(self.members), "the rule spans the bundle's members"
-        return rule
-
-    def expected(self, **guards: Any) -> Any:
-        from .rule import Rule
-
-        rule = Rule(lexicons=list(self.members), wanted=True, **guards)
-        assert rule.wanted is True, "expected() builds a wanted rule"
-        assert set(rule.lexicons) == set(self.members), "the rule spans the bundle's members"
-        return rule
-
-    def check(self, wanted: bool = False, **guards: Any) -> Any:
-        from .rulespec import Check
-
-        result = Check(lexicons=list(self.members), wanted=wanted, **guards)
-        assert result.wanted is wanted, "the check keeps the wanted flag"
-        assert set(result.lexicons) == set(self.members), "the check spans the bundle's members"
-        return result
 
     def signals(self, text: str) -> dict[str, Signal]:
         result = {member.name: member.signal(text) for member in self.members}

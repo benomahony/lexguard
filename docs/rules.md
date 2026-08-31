@@ -4,8 +4,11 @@ A lexicon observes. A rule commits to a verdict. There are two, and two guards.
 
 | rule | assertion | passes when |
 | --- | --- | --- |
-| `Lexicon.absent()` | `no_<name>` | nothing in the output matches |
-| `Lexicon.expected()` | `has_<name>` | the output signal is `present` |
+| `absent(lexicon)` | `no_<name>` | nothing in the output matches |
+| `expected(lexicon)` | `has_<name>` | the output signal is `present` |
+
+`absent()` and `expected()` are pydantic-evals evaluators, imported from
+`lexguard.integrations.pydantic_evals`. Both take a `Lexicon` or a `Bundle`.
 
 ## Guards
 
@@ -16,6 +19,7 @@ lexicon fires. `unless` runs it only if it does not.
 from pydantic_evals import Case, Dataset
 
 from lexguard import AdviceDemand, Disclaimer, NoCaveats
+from lexguard.integrations.pydantic_evals import absent
 
 
 async def agent(prompt: str) -> str:
@@ -31,7 +35,7 @@ report = Dataset(
         Case(name="definition", inputs="what is a tort"),
         Case(name="advice", inputs="should i sue my landlord over this clause"),
     ],
-    evaluators=[Disclaimer.absent(when=NoCaveats), Disclaimer.absent(unless=AdviceDemand)],
+    evaluators=[absent(Disclaimer, when=NoCaveats), absent(Disclaimer, unless=AdviceDemand)],
 ).evaluate_sync(agent)
 
 print({case.name: sorted(case.assertions) for case in report.cases})
@@ -59,13 +63,14 @@ otherwise fill a dashboard with green from rules that never ran.
 from pydantic_evals import Case, Dataset
 
 from lexguard import CitationDemand, CitationMarker
+from lexguard.integrations.pydantic_evals import expected
 
 
 async def agent(prompt: str) -> str:
     return "Subprime lending and securitisation both played a part."
 
 
-evaluators = [CitationMarker.expected(when=CitationDemand)]
+evaluators = [expected(CitationMarker, when=CitationDemand)]
 asked = Dataset(
     name="asked",
     cases=[Case(inputs="what caused the 2008 crash, with sources")],
@@ -90,6 +95,7 @@ from pydantic import BaseModel
 from pydantic_evals import Case, Dataset
 
 from lexguard import Confidential, Overclaim
+from lexguard.integrations.pydantic_evals import absent
 
 
 class Ticket(BaseModel):
@@ -110,9 +116,9 @@ report = Dataset(
     name="triage",
     cases=[Case(inputs="customer cannot log in")],
     evaluators=[
-        Confidential.absent(field="internal_notes"),
-        Confidential.absent(field="summary"),
-        Overclaim.absent(field="next_steps[]"),
+        absent(Confidential, field="internal_notes"),
+        absent(Confidential, field="summary"),
+        absent(Overclaim, field="next_steps[]"),
     ],
 ).evaluate_sync(agent)
 print({name: result.value for name, result in report.cases[0].assertions.items()})
@@ -130,7 +136,8 @@ anyone decides it should fail a build.
 ```py
 from pydantic_evals import Case, Dataset
 
-from lexguard import Disclaimer, Hedging, Observe
+from lexguard import Disclaimer, Hedging
+from lexguard.integrations.pydantic_evals import Observe
 
 
 async def agent(prompt: str) -> str:

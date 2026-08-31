@@ -21,28 +21,18 @@ from .words.response import *
 
 __version__ = "0.1.12"
 
-_PYDANTIC_EVALS_SOURCE = {
-    "Rule": "rule",
-    "Observe": "rule",
-    "PROSE": "suites",
-    "ADHERENCE": "suites",
-    "GENERIC": "suites",
-}
+# the shipped suites are pydantic-evals evaluator lists; deferred so importing lexguard never
+# requires pydantic-evals until one is touched. the evaluators themselves live in
+# lexguard.integrations.pydantic_evals, not at the top level.
+_SUITES = ("PROSE", "ADHERENCE", "GENERIC")
 
 
 def __getattr__(name: str) -> object:
-    # deferred so importing lexguard never requires pydantic-evals until these are touched
     assert name, "attribute name must not be empty"
-    source = _PYDANTIC_EVALS_SOURCE.get(name)
-    if source is None:
+    if name not in _SUITES:
         raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
     try:
-        module = import_module(f".{source}", __name__)
-        namespace = vars(module)
-        # some sources (e.g. suites) resolve their own attrs lazily via module __getattr__
-        result = namespace[name] if name in namespace else namespace["__getattr__"](name)
-        assert result is not None, "a resolved lazy export is never None"
-        return result
+        return vars(import_module(".suites", __name__))["__getattr__"](name)
     except ImportError as err:
         raise ImportError(
             f"lexguard.{name} needs pydantic-evals: pip install 'lexguard[pydantic-evals]'"

@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 from pydantic_evals import Case, Dataset
 
+from lexguard.integrations.pydantic_evals import absent, expected
 from lexguard.suites import GENERIC
 from lexguard.words import instruction, response
 
@@ -21,7 +22,7 @@ def verdicts(evaluators: list, prompt: str, reply: str) -> dict[str, bool]:
 
 def test_slop_is_caught_in_plain_output():
     result = verdicts(
-        [response.Slop.absent()],
+        [absent(response.Slop)],
         "explain caching",
         "Let us delve into the intricate tapestry of caching.",
     )
@@ -42,7 +43,7 @@ def test_clean_prose_passes_the_whole_generic_suite():
 
 
 def test_no_caveats_suppresses_disclaimers():
-    check = [response.Disclaimer.absent(when=instruction.NoCaveats)]
+    check = [absent(response.Disclaimer, when=instruction.NoCaveats)]
     result = verdicts(
         check,
         "no disclaimers please, is this contract enforceable",
@@ -52,7 +53,7 @@ def test_no_caveats_suppresses_disclaimers():
 
 
 def test_disclaimer_is_fine_when_no_suppression_asked():
-    check = [response.Disclaimer.absent(when=instruction.NoCaveats)]
+    check = [absent(response.Disclaimer, when=instruction.NoCaveats)]
     result = verdicts(
         check,
         "is this contract enforceable",
@@ -62,7 +63,7 @@ def test_disclaimer_is_fine_when_no_suppression_asked():
 
 
 def test_disclaimer_gated_on_advice_being_sought():
-    check = [response.Disclaimer.absent(unless=instruction.AdviceDemand)]
+    check = [absent(response.Disclaimer, unless=instruction.AdviceDemand)]
     assert (
         verdicts(
             check,
@@ -75,7 +76,7 @@ def test_disclaimer_gated_on_advice_being_sought():
 
 
 def test_citations_required_only_when_asked():
-    check = [response.CitationMarker.expected(when=instruction.CitationDemand)]
+    check = [expected(response.CitationMarker, when=instruction.CitationDemand)]
     assert (
         verdicts(check, "explain it with sources", "Caching is useful.")[
             "has_citation_marker[when citation_demand]"
@@ -86,7 +87,7 @@ def test_citations_required_only_when_asked():
 
 
 def test_no_preamble_suppresses_openers():
-    check = [response.Preamble.absent(when=instruction.NoPreamble)]
+    check = [absent(response.Preamble, when=instruction.NoPreamble)]
     result = verdicts(
         check,
         "just give me the answer, no preamble",

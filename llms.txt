@@ -5,10 +5,11 @@
 
 lexguard is not only an evals add-on. The core API — `Lexicon.signal()`, `.fires()`, `.denied()`
 — is plain functions over a string with no evals framework involved, useful as a guardrail, a
-unit-test assertion, or a log filter. `.spec()` compiles a lexicon into a framework-agnostic
-`RuleSpec`; `.absent()` / `.expected()` and the integration modules turn that into an evaluator
-for whichever eval framework a project uses. The core has no dependencies — each framework is an
-optional extra (`lexguard[pydantic-evals]`, `lexguard[deepeval]`, `lexguard[inspect-ai]`).
+unit-test assertion, or a log filter. `Check([lexicon, ...])` compiles a lexicon into a
+framework-agnostic check; the integration modules turn that into an evaluator for whichever eval
+framework a project uses (pydantic-evals' `absent()` / `expected()`, DeepEval's `LexguardMetric`,
+Inspect AI's `lexguard_scorer`). The core has no dependencies — each framework is an optional
+extra (`lexguard[pydantic-evals]`, `lexguard[deepeval]`, `lexguard[inspect-ai]`).
 
 ## Documentation
 
@@ -20,9 +21,9 @@ optional extra (`lexguard[pydantic-evals]`, `lexguard[deepeval]`, `lexguard[insp
   [Response](docs/lexicons/response.md), [Domain](docs/lexicons/domain.md), and
   [Bundles](docs/lexicons/bundles.md)
 - [Writing a lexicon](docs/writing-a-lexicon.md): building your own `Lexicon` for a new domain
-- [Rules](docs/rules.md): `.absent()` / `.expected()`, the `when` / `unless` guards, and `Observe`
+- [Rules](docs/rules.md): `absent()` / `expected()`, the `when` / `unless` guards, and `Observe`
 - [Agents](docs/agents.md): checking pydantic-ai agent output, structured or plain text
-- [Integrations](docs/integrations/index.md): the framework-agnostic `RuleSpec`, with its own
+- [Integrations](docs/integrations/index.md): the framework-agnostic `Check`, with its own
   page per framework — [pydantic-evals](docs/integrations/pydantic-evals.md),
   [DeepEval](docs/integrations/deepeval.md), [Inspect AI](docs/integrations/inspect-ai.md)
 

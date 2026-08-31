@@ -9,12 +9,12 @@ from lexguard import (
     CitationMarker,
     Disclaimer,
     NoCaveats,
-    Observe,
     Politeness,
     Preamble,
     Servility,
     Sycophancy,
 )
+from lexguard.integrations.pydantic_evals import Observe, absent, expected
 from lexguard.words.response import Slop
 
 pytestmark = pytest.mark.unit
@@ -36,19 +36,17 @@ def assertions(evaluators: list, prompt: str, reply: str) -> dict[str, bool]:
 
 
 def test_absent_reads_off_the_cue():
-    assert assertions([Slop.absent()], "explain", "let us delve in") == {"no_slop": False}
-    assert assertions([Slop.absent()], "explain", "caching skips repeated work") == {
-        "no_slop": True
-    }
+    assert assertions([absent(Slop)], "explain", "let us delve in") == {"no_slop": False}
+    assert assertions([absent(Slop)], "explain", "caching skips repeated work") == {"no_slop": True}
 
 
 def test_expected_is_the_other_direction():
-    assert assertions([Politeness.expected()], "hi", "4") == {"has_politeness": False}
+    assert assertions([expected(Politeness)], "hi", "4") == {"has_politeness": False}
 
 
 def test_or_builds_a_set_that_keeps_its_members():
     result = assertions(
-        [(Slop | Sycophancy | Preamble).absent()],
+        [absent(Slop | Sycophancy | Preamble)],
         "explain",
         "Great question! Certainly, let us delve in.",
     )
@@ -56,13 +54,13 @@ def test_or_builds_a_set_that_keeps_its_members():
 
 
 def test_bundle_expected_checks_every_member():
-    result = assertions([(Politeness | CitationMarker).expected()], "hi", "4")
+    result = assertions([expected(Politeness | CitationMarker)], "hi", "4")
     assert result == {"has_politeness": False, "has_citation_marker": False}
 
 
 def test_named_bundles_are_cue_sets():
     result = assertions(
-        [Servility.absent()], "explain", "Certainly! Great question, hope this helps."
+        [absent(Servility)], "explain", "Certainly! Great question, hope this helps."
     )
     assert result["no_preamble"] is False
     assert result["no_sycophancy"] is False
@@ -71,7 +69,7 @@ def test_named_bundles_are_cue_sets():
 
 
 def test_guards_are_keywords_on_the_verb():
-    check = [Disclaimer.absent(when=NoCaveats)]
+    check = [absent(Disclaimer, when=NoCaveats)]
     assert assertions(
         check,
         "no disclaimers please, is it enforceable",
@@ -81,7 +79,7 @@ def test_guards_are_keywords_on_the_verb():
 
 
 def test_unless_is_the_mirror():
-    check = [Disclaimer.absent(unless=AdviceDemand)]
+    check = [absent(Disclaimer, unless=AdviceDemand)]
     assert assertions(check, "what is a tort", "A civil wrong. Not legal advice.") == {
         "no_disclaimer[unless advice_demand]": False
     }
@@ -89,7 +87,7 @@ def test_unless_is_the_mirror():
 
 
 def test_presence_can_be_guarded_too():
-    check = [CitationMarker.expected(when=CitationDemand)]
+    check = [expected(CitationMarker, when=CitationDemand)]
     assert assertions(check, "explain it with sources", "Caching is useful.") == {
         "has_citation_marker[when citation_demand]": False
     }
@@ -103,7 +101,7 @@ def test_field_scopes_the_check():
         title: str
         notes: str
 
-    dataset = Dataset(name="d", cases=[Case(inputs="x")], evaluators=[Slop.absent(field="notes")])
+    dataset = Dataset(name="d", cases=[Case(inputs="x")], evaluators=[absent(Slop, field="notes")])
 
     async def task(text: str) -> Out:
         return Out(title="let us delve in", notes="clean")
@@ -134,7 +132,7 @@ def failures(evaluators: list, prompt: str, reply: str) -> dict[str, str]:
 
 
 def test_failure_names_the_matches_and_shows_them_in_context():
-    reason = failures([Slop.absent()], "explain", "Let us delve into the intricate tapestry.")[
+    reason = failures([absent(Slop)], "explain", "Let us delve into the intricate tapestry.")[
         "no_slop"
     ]
     assert "3 slop matches" in reason
@@ -143,13 +141,13 @@ def test_failure_names_the_matches_and_shows_them_in_context():
 
 
 def test_failure_carries_the_fix():
-    reason = failures([Slop.absent()], "explain", "let us delve in")["no_slop"]
+    reason = failures([absent(Slop)], "explain", "let us delve in")["no_slop"]
     assert reason.endswith(Slop.fix)
 
 
 def test_failure_quotes_the_request_words_that_triggered_the_rule():
     reason = failures(
-        [Disclaimer.absent(when=NoCaveats)],
+        [absent(Disclaimer, when=NoCaveats)],
         "no disclaimers please",
         "Consult a professional.",
     )["no_disclaimer[when no_caveats]"]
@@ -158,7 +156,7 @@ def test_failure_quotes_the_request_words_that_triggered_the_rule():
 
 def test_missing_presence_lists_what_would_satisfy_it():
     reason = failures(
-        [CitationMarker.expected(when=CitationDemand)],
+        [expected(CitationMarker, when=CitationDemand)],
         "explain with sources",
         "Caching is useful.",
     )["has_citation_marker[when citation_demand]"]
@@ -171,7 +169,7 @@ def test_field_is_named_in_the_failure():
     class Out(BaseModel):
         notes: str
 
-    dataset = Dataset(name="d", cases=[Case(inputs="x")], evaluators=[Slop.absent(field="notes")])
+    dataset = Dataset(name="d", cases=[Case(inputs="x")], evaluators=[absent(Slop, field="notes")])
 
     async def task(text: str) -> Out:
         return Out(notes="a rich tapestry")
@@ -183,5 +181,5 @@ def test_field_is_named_in_the_failure():
 
 
 def test_passing_assertions_carry_no_noise():
-    case = run([Slop.absent()], "explain", "caching skips repeated work")
+    case = run([absent(Slop)], "explain", "caching skips repeated work")
     assert case.assertions["no_slop"].reason is None

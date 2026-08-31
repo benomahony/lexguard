@@ -52,9 +52,9 @@ filter in a log pipeline.
 uv add lexguard
 ```
 
-The core has no dependencies. `.check()` compiles a lexicon into a framework-agnostic `Check`,
-which `.absent()` / `.expected()` and the [integrations](docs/integrations/index.md) turn into an
-evaluator for whichever eval framework you use; each is its own extra:
+The core has no dependencies. `Check(...)` compiles a lexicon into a framework-agnostic check,
+which the [integrations](docs/integrations/index.md) turn into an evaluator for whichever eval
+framework you use; each is its own extra:
 
 ```bash
 uv add "lexguard[pydantic-evals]"
@@ -87,13 +87,14 @@ def guard(reply: str) -> str:
 
 ## Running it inside pydantic-evals
 
-`.absent()` and `.expected()` turn a lexicon into an evaluator, for when you want the same check
-running as part of a `Dataset` alongside everything else.
+`absent()` and `expected()`, from `lexguard.integrations.pydantic_evals`, turn a lexicon into an
+evaluator, for when you want the same check running as part of a `Dataset` alongside everything else.
 
 ```py
 from pydantic_evals import Case, Dataset
 
 from lexguard import Servility, Slop
+from lexguard.integrations.pydantic_evals import absent
 
 
 async def agent(prompt: str) -> str:
@@ -103,7 +104,7 @@ async def agent(prompt: str) -> str:
 dataset = Dataset(
     name="prose",
     cases=[Case(name="explainer", inputs="explain database indexing")],
-    evaluators=[Slop.absent(), Servility.absent()],
+    evaluators=[absent(Slop), absent(Servility)],
 )
 report = dataset.evaluate_sync(agent)
 print(sorted(name for name, result in report.cases[0].assertions.items() if not result.value))
@@ -116,6 +117,7 @@ print(sorted(name for name, result in report.cases[0].assertions.items() if not 
 from pydantic_evals import Case, Dataset
 
 from lexguard import Slop
+from lexguard.integrations.pydantic_evals import absent
 
 
 async def agent(prompt: str) -> str:
@@ -123,7 +125,7 @@ async def agent(prompt: str) -> str:
 
 
 report = Dataset(
-    name="prose", cases=[Case(inputs="explain indexing")], evaluators=[Slop.absent()]
+    name="prose", cases=[Case(inputs="explain indexing")], evaluators=[absent(Slop)]
 ).evaluate_sync(agent)
 print(report.cases[0].assertions["no_slop"].reason)
 """

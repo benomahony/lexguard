@@ -64,7 +64,7 @@ class Verdict:
 
 @dataclass(frozen=True)
 class Check:
-    """The framework-agnostic core behind `Lexicon.check()` / `Bundle.check()`.
+    """The framework-agnostic core, built with `Check([lexicon, ...], ...)`.
 
     `run()` is the whole surface: hand it an output and the originating input, get back the
     per-lexicon verdicts, or `None` when a guard or empty field means the check did not apply.

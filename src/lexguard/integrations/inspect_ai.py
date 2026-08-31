@@ -7,7 +7,7 @@ from ..rulespec import Check
 
 
 def lexguard_scorer(check: Check) -> Scorer:
-    """Build an Inspect AI `Scorer` from a `Check` (from `Lexicon.check()` / `Bundle.check()`).
+    """Build an Inspect AI `Scorer` from a `Check` (built with `Check([lexicon, ...], ...)`).
 
     Scores `CORRECT` when every lexicon in the check holds, `INCORRECT` otherwise, with the usual
     lexguard diagnosis as the explanation. A check whose guard did not fire, or whose field was

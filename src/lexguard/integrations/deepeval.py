@@ -9,10 +9,10 @@ from ..rulespec import Check
 
 
 class LexguardMetric(BaseMetric):
-    """Wrap a `Check` (from `Lexicon.check()` / `Bundle.check()`) as a DeepEval metric.
+    """Wrap a `Check` (built with `Check([lexicon, ...], ...)`) as a DeepEval metric.
 
     `score` is the fraction of lexicons in the check that passed; the default `threshold=1.0`
-    means every lexicon must hold, mirroring `.absent()` / `.expected()` semantics. A check whose
+    means every lexicon must hold, the same all-or-nothing semantics a bundle gives. A check whose
     guard did not fire, or whose field was empty, scores 1.0 rather than failing the test case:
     silence is not a failure any more than it is a pass elsewhere in lexguard.
     """
