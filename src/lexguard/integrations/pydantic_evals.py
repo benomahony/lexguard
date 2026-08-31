@@ -6,8 +6,8 @@ from typing import Any, Literal
 
 from pydantic_evals.evaluators import EvaluationReason, Evaluator, EvaluatorContext
 
+from ..checks import Check, Observation
 from ..lexicon import Bundle, Lexicon
-from ..rulespec import Check, ObserveSpec
 
 SKIP: dict = {}
 
@@ -60,8 +60,8 @@ class Observe(Evaluator):
 
     def evaluate(self, ctx: EvaluatorContext) -> dict[str, str]:
         assert self.lexicons, "Observe needs at least one lexicon"
-        spec = ObserveSpec(self.lexicons, self.field, self.of)
-        result = spec.signals(ctx.output, ctx.inputs)
+        observation = Observation(self.lexicons, self.field, self.of)
+        result = observation.signals(ctx.output, ctx.inputs)
         mapping = result if result is not None else SKIP
         assert mapping is not None, "Observe returns a mapping, empty when the rule abstains"
         return mapping

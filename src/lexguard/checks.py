@@ -143,7 +143,7 @@ class Check:
 
 
 @dataclass(frozen=True)
-class ObserveSpec:
+class Observation:
     """The framework-agnostic core behind pydantic-evals `Observe`: labels, not assertions."""
 
     lexicons: Sequence[Lexicon]
@@ -151,7 +151,7 @@ class ObserveSpec:
     of: Literal["output", "inputs"] = "output"
 
     def __post_init__(self) -> None:
-        assert self.lexicons, "ObserveSpec needs at least one lexicon"
+        assert self.lexicons, "Observation needs at least one lexicon"
         assert all(lexicon.name for lexicon in self.lexicons), "every lexicon has a name"
 
     def signals(self, output: Any, inputs: Any) -> dict[str, str] | None:

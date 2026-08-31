@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from lexguard import Check, Lexicon, ObserveSpec, Quantity, Slop
+from lexguard import Check, Lexicon, Observation, Quantity, Slop
 
 pytestmark = pytest.mark.unit
 
@@ -26,8 +26,8 @@ def test_check_returns_none_for_a_blank_output():
     assert Check([Slop]).run("   ", "explain") is None
 
 
-def test_observe_spec_returns_none_for_a_blank_output():
-    assert ObserveSpec([Slop]).signals("   ", "explain") is None
+def test_observation_returns_none_for_a_blank_output():
+    assert Observation([Slop]).signals("   ", "explain") is None
 
 
 def test_hits_works_for_a_lexicon_with_no_multiword_indicators():

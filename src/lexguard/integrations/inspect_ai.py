@@ -3,7 +3,7 @@ from __future__ import annotations
 from inspect_ai.scorer import CORRECT, INCORRECT, Score, Scorer, Target, accuracy, scorer
 from inspect_ai.solver import TaskState
 
-from ..rulespec import Check
+from ..checks import Check
 
 
 def lexguard_scorer(check: Check) -> Scorer:

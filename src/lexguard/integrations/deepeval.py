@@ -5,7 +5,7 @@ from typing import Any
 from deepeval.metrics import BaseMetric
 from deepeval.test_case import LLMTestCase
 
-from ..rulespec import Check
+from ..checks import Check
 
 
 class LexguardMetric(BaseMetric):

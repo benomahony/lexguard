@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from importlib import import_module
 
+from .checks import Check as Check
+from .checks import Observation as Observation
+from .checks import Verdict as Verdict
 from .lexicon import Bundle as Bundle
 from .lexicon import Lexicon as Lexicon
 from .lexicon import Signal as Signal
-from .rulespec import Check as Check
-from .rulespec import ObserveSpec as ObserveSpec
-from .rulespec import Verdict as Verdict
 from .suites import Bloat as Bloat
 from .suites import Leakage as Leakage
 from .suites import Overreach as Overreach
