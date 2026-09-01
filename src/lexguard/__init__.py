@@ -19,7 +19,7 @@ from .words.instruction import *
 from .words.request import *
 from .words.response import *
 
-__version__ = "0.1.12"
+__version__ = "0.1.13"
 
 # the shipped suites are pydantic-evals evaluator lists; deferred so importing lexguard never
 # requires pydantic-evals until one is touched. the evaluators themselves live in
