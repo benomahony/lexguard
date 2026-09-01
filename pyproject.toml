@@ -45,6 +45,7 @@ dev = [
     "deepeval>=4.1.8",
     "inspect-ai>=0.3.259",
     "hypothesis>=6.165.10",
+    "dddlint>=0.1.10",
 ]
 
 [tool.ruff]

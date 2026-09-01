@@ -30,9 +30,8 @@ jobs:
       - name: Type check with basedpyright
         run: uv run basedpyright
 
-      # isolated via uvx: dddlint needs rich>=15, deepeval (a dev dep) caps rich<15
       - name: Ubiquitous-language check with dddlint
-        run: uvx --from dddlint==0.1.9 dddlint lint src
+        run: uv run dddlint lint src
 
       - name: Run unit tests (parallel)
         run: uv run pytest -m unit -n auto --cov=src/lexguard --cov-report=term-missing

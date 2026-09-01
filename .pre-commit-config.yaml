@@ -91,10 +91,9 @@ repos:
         language: system
         pass_filenames: false
         require_serial: true
-      # run isolated via uvx: dddlint needs rich>=15, deepeval (a dev dep) caps rich<15
       - id: dddlint
         name: dddlint
-        entry: uvx --from dddlint==0.1.9 dddlint lint src
+        entry: uv run dddlint lint src
         language: system
         types: [python]
         files: ^src/lexguard/
