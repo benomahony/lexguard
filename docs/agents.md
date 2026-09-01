@@ -9,6 +9,7 @@ from pydantic_ai.models.test import TestModel
 from pydantic_evals import Case, Dataset
 
 from lexguard import Bloat, Servility
+from lexguard.integrations.pydantic_evals import absent
 
 agent = Agent(TestModel(custom_output_text="Great question! Let us delve in. Hope this helps!"))
 
@@ -20,7 +21,7 @@ async def task(prompt: str) -> str:
 report = Dataset(
     name="prose",
     cases=[Case(name="explainer", inputs="explain database indexing")],
-    evaluators=[Bloat.absent(), Servility.absent()],
+    evaluators=[absent(Bloat), absent(Servility)],
 ).evaluate_sync(task)
 print(sorted(name for name, result in report.cases[0].assertions.items() if not result.value))
 #> ['no_postamble', 'no_slop', 'no_sycophancy']
@@ -42,6 +43,7 @@ from pydantic_ai.models.test import TestModel
 from pydantic_evals import Case, Dataset
 
 from lexguard import Confidential
+from lexguard.integrations.pydantic_evals import absent
 
 
 class Ticket(BaseModel):
@@ -67,7 +69,7 @@ async def task(prompt: str) -> Ticket:
 report = Dataset(
     name="triage",
     cases=[Case(inputs="customer cannot log in")],
-    evaluators=[Confidential.absent(field="internal_notes")],
+    evaluators=[absent(Confidential, field="internal_notes")],
 ).evaluate_sync(task)
 print(report.cases[0].assertions["no_confidential"].reason)
 """
@@ -88,6 +90,7 @@ from pydantic_ai.models.test import TestModel
 from pydantic_evals import Case, Dataset
 
 from lexguard import Overclaim, UncertaintyAdmission
+from lexguard.integrations.pydantic_evals import absent, expected
 
 agent = Agent(TestModel(custom_output_text="This is guaranteed to work, it never fails."))
 
@@ -99,7 +102,7 @@ async def task(prompt: str) -> str:
 report = Dataset(
     name="scoping",
     cases=[Case(inputs="will this migration work?")],
-    evaluators=[Overclaim.absent(), UncertaintyAdmission.expected()],
+    evaluators=[absent(Overclaim), expected(UncertaintyAdmission)],
 ).evaluate_sync(task)
 print({name: result.value for name, result in report.cases[0].assertions.items()})
 #> {'no_overclaim': False, 'has_uncertainty_admission': False}

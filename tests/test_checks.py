@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from lexguard import Lexicon, ObserveSpec, Quantity, Slop
+from lexguard import Check, Lexicon, Observation, Quantity, Slop
 
 pytestmark = pytest.mark.unit
 
@@ -13,21 +13,21 @@ class Notes:
 
 
 def test_field_reads_from_a_mapping_output():
-    verdicts = Slop.spec(field="notes").check({"notes": "let us delve in"}, "explain")
+    verdicts = Check([Slop], field="notes").run({"notes": "let us delve in"}, "explain")
     assert verdicts[0].passed is False
 
 
 def test_field_path_through_a_leaf_value_resolves_to_nothing():
-    verdicts = Slop.spec(field="notes.length").check(Notes(notes="clean text"), "explain")
+    verdicts = Check([Slop], field="notes.length").run(Notes(notes="clean text"), "explain")
     assert verdicts is None
 
 
-def test_spec_returns_none_for_a_blank_output():
-    assert Slop.spec().check("   ", "explain") is None
+def test_check_returns_none_for_a_blank_output():
+    assert Check([Slop]).run("   ", "explain") is None
 
 
-def test_observe_spec_returns_none_for_a_blank_output():
-    assert ObserveSpec([Slop]).signals("   ", "explain") is None
+def test_observation_returns_none_for_a_blank_output():
+    assert Observation([Slop]).signals("   ", "explain") is None
 
 
 def test_hits_works_for_a_lexicon_with_no_multiword_indicators():
@@ -36,7 +36,7 @@ def test_hits_works_for_a_lexicon_with_no_multiword_indicators():
 
 
 def test_a_casefold_expanding_hit_has_no_span_in_the_original_text():
-    lexicon = Lexicon(name="t", indicates=["strasse report"])
+    lexicon = Lexicon(name="t", indicates=["strasse report"], fix="x")
     text = "the straße report is ready"
     assert lexicon.hits(text) == {"strasse report"}
     assert lexicon.spans(text) == []

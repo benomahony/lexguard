@@ -95,6 +95,7 @@ DueDate = Lexicon(
         "when i get round to it",
         "whenever",
     ],
+    fix="treat the date as the deadline, not incidental text",
 )
 
 
@@ -127,6 +128,7 @@ ClockTime = Lexicon(
         "some time",
         "whenever",
     ],
+    fix="treat the time of day as when it should happen",
 )
 
 
@@ -166,6 +168,7 @@ Recurrence = Lexicon(
         "single",
         "this once",
     ],
+    fix="apply it every time, not just once",
 )
 
 
@@ -184,6 +187,7 @@ Past = Lexicon(
         "was supposed",
         "yesterday",
     ],
+    fix="treat it as already missed, not upcoming",
 )
 
 
@@ -206,6 +210,7 @@ Duration = Lexicon(
         "quick",
         "takes",
     ],
+    fix="account for how long this takes",
 )
 
 
@@ -253,6 +258,7 @@ HighPriority = Lexicon(
         "when you can",
         "whenever",
     ],
+    fix="act on it before less urgent work",
 )
 
 
@@ -296,6 +302,7 @@ LowPriority = Lexicon(
         "urgent",
         "urgently",
     ],
+    fix="let more urgent work go first",
 )
 
 
@@ -376,6 +383,7 @@ Actionable = Lexicon(
         "no action",
         "no need",
     ],
+    fix="act on it, don't just acknowledge it",
 )
 
 
@@ -418,6 +426,7 @@ Question = Lexicon(
         "make a note",
         "remind me",
     ],
+    fix="answer the question; don't turn it into a task",
 )
 
 
@@ -440,6 +449,7 @@ Cancellation = Lexicon(
         "take it off",
         "undo",
     ],
+    fix="undo the referenced item, don't add a new one",
 )
 
 
@@ -466,6 +476,7 @@ Completion = Lexicon(
         "still need",
         "unfinished",
     ],
+    fix="record it as done, don't repeat it",
 )
 
 
@@ -500,6 +511,7 @@ Hypothetical = Lexicon(
         "for sure",
         "go ahead",
     ],
+    fix="hold off until it's confirmed",
 )
 
 
@@ -527,6 +539,7 @@ Negation = Lexicon(
         "without",
         "won't",
     ],
+    fix="honour what is ruled out; don't include it",
 )
 
 
@@ -548,6 +561,7 @@ Delegation = Lexicon(
         "sort it with",
         "tell",
     ],
+    fix="hand it to the person named, not yourself",
 )
 
 
@@ -618,6 +632,7 @@ Subtasks = Lexicon(
         "steps",
         "then",
     ],
+    fix="break this into its separate steps",
 )
 
 
@@ -654,6 +669,7 @@ Quantity = Lexicon(
         "three",
         "two",
     ],
+    fix="keep the amount attached to what it counts",
 )
 
 
@@ -770,6 +786,7 @@ Confirmation = Lexicon(
         "tentatively",
         "we'll see",
     ],
+    fix="go ahead; don't ask again",
 )
 
 
@@ -790,6 +807,7 @@ Correction = Lexicon(
         "scratch that",
         "sorry",
     ],
+    fix="use the corrected version, not the earlier one",
 )
 
 
@@ -807,6 +825,7 @@ Continuation = Lexicon(
         "too",
         "while you're at it",
     ],
+    fix="add it to the earlier request",
 )
 
 
@@ -827,6 +846,7 @@ PriorReference = Lexicon(
         "we discussed",
         "you added",
     ],
+    fix="resolve it against what came before",
 )
 
 
@@ -845,6 +865,7 @@ ConditionalTrigger = Lexicon(
         "whenever i",
         "while i'm",
     ],
+    fix="act only once the stated condition holds",
 )
 
 
@@ -863,6 +884,7 @@ Dependency = Lexicon(
         "waiting for",
         "waiting on",
     ],
+    fix="wait for its prerequisite before starting",
 )
 
 
@@ -884,6 +906,7 @@ Effort = Lexicon(
         "two minutes",
         "will take a while",
     ],
+    fix="account for the effort this takes",
 )
 
 
@@ -902,6 +925,7 @@ EnergyContext = Lexicon(
         "mindless",
         "when i'm fresh",
     ],
+    fix="match this to the kind of focus it needs",
 )
 
 
@@ -919,6 +943,7 @@ Exception = Lexicon(
         "skip",
         "unless",
     ],
+    fix="apply the exclusion; leave the exempted case out",
 )
 
 
@@ -938,6 +963,7 @@ Attachment = Lexicon(
         "the thread",
         "url",
     ],
+    fix="keep the referenced file or link with it",
 )
 
 
@@ -955,6 +981,7 @@ EventRelative = Lexicon(
         "on the day",
         "prior to",
     ],
+    fix="time this relative to the event it names",
 )
 
 
@@ -979,6 +1006,7 @@ SelfAssigned = Lexicon(
         "on behalf of",
         "tell them",
     ],
+    fix="keep it as the user's own to do",
 )
 
 
@@ -997,6 +1025,7 @@ Shared = Lexicon(
         "us",
         "we",
     ],
+    fix="keep it visible to everyone it involves",
 )
 
 
@@ -1022,6 +1051,7 @@ Approximation = Lexicon(
         "precisely",
         "sharp",
     ],
+    fix="don't treat the figure as exact",
 )
 
 
@@ -1047,6 +1077,7 @@ HardDeadline = Lexicon(
         "roughly",
         "would be nice",
     ],
+    fix="treat the deadline as fixed",
 )
 
 
@@ -1071,6 +1102,7 @@ SoftDeadline = Lexicon(
         "must",
         "no later than",
     ],
+    fix="treat the target as a preference, not a firm cut-off",
 )
 
 

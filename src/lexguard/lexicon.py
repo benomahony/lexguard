@@ -5,7 +5,6 @@ import unicodedata
 from collections.abc import Collection
 from dataclasses import dataclass, field
 from enum import StrEnum
-from typing import Any
 
 WORD_PATTERN = r"[\w']+"
 
@@ -49,8 +48,9 @@ def snippet(text: str, start: int, end: int, width: int = 34) -> str:
 class Lexicon:
     name: str
     indicates: Collection[str]
+    # a one-sentence remedy: what to do when this fires. required, so a verdict is always actionable
+    fix: str
     rules_out: Collection[str] = ()
-    fix: str = ""
     # a short citation for where the terms come from: dumped by as_code(), rendered next to the
     # lexicon in the docs, and readable at runtime (e.g. an agent citing why a check fired).
     # ignored by equality — two lexicons that match the same way are equal whatever their evidence
@@ -68,6 +68,7 @@ class Lexicon:
         object.__setattr__(self, "indicates", tidy(self.indicates))
         object.__setattr__(self, "rules_out", tidy(self.rules_out))
         object.__setattr__(self, "fix", " ".join(self.fix.split()))
+        assert self.fix, f"{self.name}: lexicon must have a fix"
         object.__setattr__(self, "evidence", " ".join(self.evidence.split()))
         object.__setattr__(self, "_indicate", phrases(self.indicates))
         object.__setattr__(self, "_rule_out", phrases(self.rules_out))
@@ -157,38 +158,13 @@ class Lexicon:
         fields: dict[str, object] = {"name": self.name, "indicates": sorted(self.indicates)}
         if self.rules_out:
             fields["rules_out"] = sorted(self.rules_out)
-        if self.fix:
-            fields["fix"] = self.fix
+        fields["fix"] = self.fix
         if self.evidence:
             fields["evidence"] = self.evidence
         result = "Lexicon(" + ", ".join(f"{key}={value!r}" for key, value in fields.items()) + ")"
         assert result.startswith("Lexicon("), "as_code opens with a Lexicon(...) call"
         assert result.endswith(")"), "as_code closes the Lexicon(...) call"
         assert "name" in fields, "name is always emitted"
-        return result
-
-    def absent(self, **guards: Any) -> Any:
-        from .rule import Rule
-
-        rule = Rule(lexicons=[self], wanted=False, **guards)
-        assert rule.wanted is False, "absent() builds a not-wanted rule"
-        assert self in rule.lexicons, "the rule targets this lexicon"
-        return rule
-
-    def expected(self, **guards: Any) -> Any:
-        from .rule import Rule
-
-        rule = Rule(lexicons=[self], wanted=True, **guards)
-        assert rule.wanted is True, "expected() builds a wanted rule"
-        assert self in rule.lexicons, "the rule targets this lexicon"
-        return rule
-
-    def spec(self, wanted: bool = False, **guards: Any) -> Any:
-        from .rulespec import RuleSpec
-
-        result = RuleSpec(lexicons=[self], wanted=wanted, **guards)
-        assert result.wanted is wanted, "the spec keeps the wanted flag"
-        assert self in result.lexicons, "the spec targets this lexicon"
         return result
 
     def _any(self, text: str, words: Collection[str], pattern: str | None) -> bool:
@@ -223,30 +199,6 @@ class Bundle:
         assert set(self.members).issubset(bundle.members), "the merge keeps our members"
         assert len(bundle.members) == len(self.members) + len(extra), "the merge adds the extras"
         return bundle
-
-    def absent(self, **guards: Any) -> Any:
-        from .rule import Rule
-
-        rule = Rule(lexicons=list(self.members), wanted=False, **guards)
-        assert rule.wanted is False, "absent() builds a not-wanted rule"
-        assert set(rule.lexicons) == set(self.members), "the rule spans the bundle's members"
-        return rule
-
-    def expected(self, **guards: Any) -> Any:
-        from .rule import Rule
-
-        rule = Rule(lexicons=list(self.members), wanted=True, **guards)
-        assert rule.wanted is True, "expected() builds a wanted rule"
-        assert set(rule.lexicons) == set(self.members), "the rule spans the bundle's members"
-        return rule
-
-    def spec(self, wanted: bool = False, **guards: Any) -> Any:
-        from .rulespec import RuleSpec
-
-        result = RuleSpec(lexicons=list(self.members), wanted=wanted, **guards)
-        assert result.wanted is wanted, "the spec keeps the wanted flag"
-        assert set(result.lexicons) == set(self.members), "the spec spans the bundle's members"
-        return result
 
     def signals(self, text: str) -> dict[str, Signal]:
         result = {member.name: member.signal(text) for member in self.members}

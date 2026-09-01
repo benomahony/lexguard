@@ -91,3 +91,11 @@ repos:
         language: system
         pass_filenames: false
         require_serial: true
+      - id: dddlint
+        name: dddlint
+        entry: uv run dddlint lint src
+        language: system
+        types: [python]
+        files: ^src/lexguard/
+        pass_filenames: false
+        require_serial: true

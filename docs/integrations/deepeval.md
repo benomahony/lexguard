@@ -1,16 +1,16 @@
 # DeepEval
 
-`LexguardMetric` wraps a `RuleSpec` as a DeepEval `BaseMetric`. Its score is the fraction of
-lexicons in the spec that passed; the default `threshold=1.0` means every one of them must, the
-same all-or-nothing semantics `.absent()` gives a `Bundle`.
+`LexguardMetric` wraps a `Check` as a DeepEval `BaseMetric`. Its score is the fraction of
+lexicons in the check that passed; the default `threshold=1.0` means every one of them must, the
+same all-or-nothing semantics a bundle gives.
 
 ```py
 from deepeval.test_case import LLMTestCase
 
-from lexguard import Slop
+from lexguard import Check, Slop
 from lexguard.integrations.deepeval import LexguardMetric
 
-metric = LexguardMetric(Slop.spec())
+metric = LexguardMetric(Check([Slop]))
 test_case = LLMTestCase(
     input="explain caching",
     actual_output="Let us delve into the intricate tapestry of caching.",

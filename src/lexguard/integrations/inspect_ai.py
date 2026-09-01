@@ -3,25 +3,25 @@ from __future__ import annotations
 from inspect_ai.scorer import CORRECT, INCORRECT, Score, Scorer, Target, accuracy, scorer
 from inspect_ai.solver import TaskState
 
-from ..rulespec import RuleSpec
+from ..checks import Check
 
 
-def lexguard_scorer(spec: RuleSpec) -> Scorer:
-    """Build an Inspect AI `Scorer` from a `RuleSpec` (from `Lexicon.spec()` / `Bundle.spec()`).
+def lexguard_scorer(check: Check) -> Scorer:
+    """Build an Inspect AI `Scorer` from a `Check` (built with `Check([lexicon, ...], ...)`).
 
-    Scores `CORRECT` when every lexicon in the spec holds, `INCORRECT` otherwise, with the usual
-    lexguard diagnosis as the explanation. A spec whose guard did not fire, or whose field was
+    Scores `CORRECT` when every lexicon in the check holds, `INCORRECT` otherwise, with the usual
+    lexguard diagnosis as the explanation. A check whose guard did not fire, or whose field was
     empty, scores `CORRECT`: silence is not a failure any more than it is a pass elsewhere in
     lexguard.
     """
-    assert spec.lexicons, "lexguard_scorer needs a RuleSpec with at least one lexicon"
+    assert check.lexicons, "lexguard_scorer needs a Check with at least one lexicon"
 
     @scorer(metrics=[accuracy()])
     def _lexguard_scorer() -> Scorer:
         async def score(state: TaskState, target: Target) -> Score:
-            assert spec.lexicons, "the scorer needs a spec with at least one lexicon"
+            assert check.lexicons, "the scorer needs a check with at least one lexicon"
             output = state.output.completion
-            verdicts = spec.check(output, state.input_text)
+            verdicts = check.run(output, state.input_text)
             if verdicts is None:
                 return Score(value=CORRECT, answer=output, explanation="rule did not apply")
             failed = [v for v in verdicts if not v.passed]

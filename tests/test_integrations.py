@@ -2,42 +2,39 @@ from __future__ import annotations
 
 import pytest
 
-from lexguard import Disclaimer, NoCaveats, Politeness, RuleSpec, Slop, Verdict
+from lexguard import Check, Disclaimer, NoCaveats, Politeness, Slop, Verdict
 from lexguard.words.response import Slop as SlopLexicon
 
 pytestmark = pytest.mark.unit
 
 
-def test_spec_runs_with_no_framework_at_all():
-    verdicts = Slop.spec().check("let us delve in", "explain")
+def test_check_runs_with_no_framework_at_all():
+    verdicts = Check([Slop]).run("let us delve in", "explain")
     assert verdicts == [Verdict(name="no_slop", passed=False, reason=verdicts[0].reason)]
     assert "delve" in verdicts[0].reason
 
 
-def test_spec_passes_on_clean_text():
-    verdicts = Slop.spec().check("caching skips repeated work", "explain")
+def test_check_passes_on_clean_text():
+    verdicts = Check([Slop]).run("caching skips repeated work", "explain")
     assert verdicts == [Verdict(name="no_slop", passed=True)]
 
 
-def test_spec_wanted_true_is_expected():
-    verdicts = Politeness.spec(wanted=True).check("4", "hi")
+def test_check_wanted_true_is_expected():
+    verdicts = Check([Politeness], wanted=True).run("4", "hi")
     assert verdicts is not None
     assert verdicts[0].passed is False
 
 
-def test_spec_guard_skips_return_none():
-    spec = Disclaimer.spec(when=NoCaveats)
-    assert spec.check("Yes, but consult a professional.", "is it enforceable") is None
+def test_check_guard_skips_return_none():
+    check = Check([Disclaimer], when=NoCaveats)
+    assert check.run("Yes, but consult a professional.", "is it enforceable") is None
 
 
-def test_spec_bundle_reports_each_member():
+def test_check_bundle_reports_each_member():
     from lexguard import Preamble, Sycophancy
 
-    verdicts = (
-        (Slop | Sycophancy | Preamble)
-        .spec()
-        .check("Great question! Certainly, let us delve in.", "explain")
-    )
+    bundle = Check([Slop, Sycophancy, Preamble])
+    verdicts = bundle.run("Great question! Certainly, let us delve in.", "explain")
     assert {v.name: v.passed for v in verdicts} == {
         "no_slop": False,
         "no_sycophancy": False,
@@ -45,14 +42,14 @@ def test_spec_bundle_reports_each_member():
     }
 
 
-def test_rulespec_needs_at_least_one_lexicon():
+def test_check_needs_at_least_one_lexicon():
     with pytest.raises(AssertionError):
-        RuleSpec(lexicons=[])
+        Check(lexicons=[])
 
 
-def test_rulespec_rejects_both_guards():
+def test_check_rejects_both_guards():
     with pytest.raises(AssertionError):
-        RuleSpec(lexicons=[SlopLexicon], when=NoCaveats, unless=NoCaveats)
+        Check(lexicons=[SlopLexicon], when=NoCaveats, unless=NoCaveats)
 
 
 def test_verdict_failing_needs_a_reason():
@@ -68,7 +65,7 @@ class TestDeepEval:
         from lexguard.integrations.deepeval import LexguardMetric
 
         assert deepeval
-        metric = LexguardMetric(Slop.spec())
+        metric = LexguardMetric(Check([Slop]))
         test_case = LLMTestCase(input="explain caching", actual_output="let us delve in")
         score = metric.measure(test_case)
         assert score == 0.0
@@ -81,7 +78,7 @@ class TestDeepEval:
 
         from lexguard.integrations.deepeval import LexguardMetric
 
-        metric = LexguardMetric(Slop.spec())
+        metric = LexguardMetric(Check([Slop]))
         test_case = LLMTestCase(
             input="explain caching", actual_output="caching skips repeated work"
         )
@@ -96,7 +93,7 @@ class TestDeepEval:
 
         from lexguard.integrations.deepeval import LexguardMetric
 
-        metric = LexguardMetric(Disclaimer.spec(when=NoCaveats))
+        metric = LexguardMetric(Check([Disclaimer], when=NoCaveats))
         test_case = LLMTestCase(input="is it enforceable", actual_output="Consult a professional.")
         score = metric.measure(test_case)
         assert score == 1.0
@@ -106,8 +103,8 @@ class TestDeepEval:
         pytest.importorskip("deepeval")
         from lexguard.integrations.deepeval import LexguardMetric
 
-        assert LexguardMetric(Slop.spec()).__name__ == "no_slop"
-        assert LexguardMetric(Politeness.spec(wanted=True)).__name__ == "has_politeness"
+        assert LexguardMetric(Check([Slop])).__name__ == "no_slop"
+        assert LexguardMetric(Check([Politeness], wanted=True)).__name__ == "has_politeness"
 
     def test_a_measure_delegates_to_measure(self):
         pytest.importorskip("deepeval")
@@ -117,7 +114,7 @@ class TestDeepEval:
 
         from lexguard.integrations.deepeval import LexguardMetric
 
-        metric = LexguardMetric(Slop.spec())
+        metric = LexguardMetric(Check([Slop]))
         test_case = LLMTestCase(input="explain caching", actual_output="let us delve in")
         score = asyncio.run(metric.a_measure(test_case))
         assert score == 0.0
@@ -147,12 +144,12 @@ class TestInspectAI:
 
         assert inspect_ai
         state = self._state("let us delve in", "explain caching")
-        result = asyncio.run(lexguard_scorer(Slop.spec())(state, Target("")))
+        result = asyncio.run(lexguard_scorer(Check([Slop]))(state, Target("")))
         assert result.value == INCORRECT
         assert "delve" in result.explanation
 
         clean_state = self._state("caching skips repeated work", "explain caching")
-        clean_result = asyncio.run(lexguard_scorer(Slop.spec())(clean_state, Target("")))
+        clean_result = asyncio.run(lexguard_scorer(Check([Slop]))(clean_state, Target("")))
         assert clean_result.value == CORRECT
 
     def test_scorer_skips_when_guard_does_not_fire(self):
@@ -164,6 +161,8 @@ class TestInspectAI:
         from lexguard.integrations.inspect_ai import lexguard_scorer
 
         state = self._state("Consult a professional.", "is it enforceable")
-        result = asyncio.run(lexguard_scorer(Disclaimer.spec(when=NoCaveats))(state, Target("")))
+        result = asyncio.run(
+            lexguard_scorer(Check([Disclaimer], when=NoCaveats))(state, Target(""))
+        )
         assert result.value == CORRECT
         assert result.explanation == "rule did not apply"

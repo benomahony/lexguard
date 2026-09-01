@@ -1,0 +1,15 @@
+# https://benomahony.github.io/dddlint/reference/config/
+# Guards the ubiquitous language the API settled on. Deterministic `forbidden` only — no embeddings,
+# so it is fast and reproducible in CI. The embedding checks (name_uniqueness, enforce_canonical)
+# are off: they flag framework-mandated names (`evaluate` on both Evaluator subclasses, `signals` on
+# Bundle and Observation) and public/private pairs that share a word by design.
+enforce_canonical: false
+name_uniqueness: false
+
+# `spec` is retired: the assertion core is Check, the observe core is Observation (never *Spec).
+forbidden:
+  - spec
+
+# integrations/ is adapter code that mirrors each framework's own vocabulary, not lexguard's.
+exclude:
+  - src/lexguard/integrations

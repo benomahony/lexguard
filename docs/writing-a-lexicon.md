@@ -43,8 +43,12 @@ costs you one caught case. Prefer phrases over bare words when the bare word is 
 ```py
 from lexguard import Lexicon
 
-Loose = Lexicon(name="loose", indicates=["just", "simple"])
-Tight = Lexicon(name="tight", indicates=["plug and play", "out of the box", "drop in"])
+Loose = Lexicon(name="loose", indicates=["just", "simple"], fix="name the concrete work")
+Tight = Lexicon(
+    name="tight",
+    indicates=["plug and play", "out of the box", "drop in"],
+    fix="name the concrete work",
+)
 
 print(Loose.signal("just checking you got my last message"))
 #> present
@@ -147,10 +151,10 @@ additions in a self-improvement loop, say), they are transient data until a huma
 ```py
 from lexguard import Lexicon
 
-vague = Lexicon(name="vague", indicates=["circle back", "at some point"])
+vague = Lexicon(name="vague", indicates=["circle back", "at some point"], fix="ask for a date")
 
 print(vague.as_code())
-#> Lexicon(name='vague', indicates=['at some point', 'circle back'])
+#> Lexicon(name='vague', indicates=['at some point', 'circle back'], fix='ask for a date')
 ```
 
 Terms are sorted, so re-emitting the same lexicon is byte-identical and a diff shows only the terms

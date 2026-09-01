@@ -63,11 +63,11 @@ class Verdict:
 
 
 @dataclass(frozen=True)
-class RuleSpec:
-    """The framework-agnostic core behind `Lexicon.spec()` / `Bundle.spec()`.
+class Check:
+    """The framework-agnostic core, built with `Check([lexicon, ...], ...)`.
 
-    `check()` is the whole surface: hand it an output and the originating input, get back the
-    per-lexicon verdicts, or `None` when a guard or empty field means the rule did not apply.
+    `run()` is the whole surface: hand it an output and the originating input, get back the
+    per-lexicon verdicts, or `None` when a guard or empty field means the check did not apply.
     Every eval-framework adapter (pydantic-evals, DeepEval, Inspect AI, ...) is a thin wrapper
     around this.
     """
@@ -80,12 +80,12 @@ class RuleSpec:
     of: Literal["output", "inputs"] = "output"
 
     def __post_init__(self) -> None:
-        assert self.lexicons, "RuleSpec needs at least one lexicon"
+        assert self.lexicons, "Check needs at least one lexicon"
         if self.when is not None:
-            assert self.unless is None, "a RuleSpec cannot have both when and unless"
+            assert self.unless is None, "a Check cannot have both when and unless"
 
-    def check(self, output: Any, inputs: Any) -> list[Verdict] | None:
-        assert self.lexicons, "RuleSpec.check called without lexicons"
+    def run(self, output: Any, inputs: Any) -> list[Verdict] | None:
+        assert self.lexicons, "Check.run called without lexicons"
         request = str(inputs)
         if self.when is not None and not self.when.fires(request):
             return None
@@ -94,7 +94,7 @@ class RuleSpec:
         body = text_at(output if self.of == "output" else inputs, self.field)
         if not body.strip():
             return None
-        result = [self._verdict(entry, body, request) for entry in self.lexicons]
+        result = [self._judge(entry, body, request) for entry in self.lexicons]
         assert len(result) == len(self.lexicons), "one verdict per lexicon"
         return result
 
@@ -106,7 +106,7 @@ class RuleSpec:
         assert result, "the rule name is never empty"
         return result
 
-    def _verdict(self, lexicon: Lexicon, body: str, request: str) -> Verdict:
+    def _judge(self, lexicon: Lexicon, body: str, request: str) -> Verdict:
         spans = lexicon.spans(body)
         holds = lexicon.fires(body) if self.wanted else not spans
         name = self._name(lexicon)
@@ -135,17 +135,15 @@ class RuleSpec:
             matched = ", ".join(f'"{term}"' for term in sorted(guard.hits(request))[:2])
             verb = "the request asked" if self.when else "the request never asked"
             lines.append(f"{verb} for {guard.name}: {matched or 'no match'}")
-        if lexicon.fix:
-            lines.append(f"fix: {lexicon.fix}")
+        lines.append(f"fix: {lexicon.fix}")
         result = "\n".join(lines)
         assert result, "_diagnosis always appends at least one line"
-        if lexicon.fix:
-            assert result.endswith(lexicon.fix), "the fix, if any, is the last line"
+        assert result.endswith(lexicon.fix), "the fix is always the last line"
         return result
 
 
 @dataclass(frozen=True)
-class ObserveSpec:
+class Observation:
     """The framework-agnostic core behind pydantic-evals `Observe`: labels, not assertions."""
 
     lexicons: Sequence[Lexicon]
@@ -153,7 +151,7 @@ class ObserveSpec:
     of: Literal["output", "inputs"] = "output"
 
     def __post_init__(self) -> None:
-        assert self.lexicons, "ObserveSpec needs at least one lexicon"
+        assert self.lexicons, "Observation needs at least one lexicon"
         assert all(lexicon.name for lexicon in self.lexicons), "every lexicon has a name"
 
     def signals(self, output: Any, inputs: Any) -> dict[str, str] | None:

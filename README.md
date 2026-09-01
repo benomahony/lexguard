@@ -52,9 +52,9 @@ filter in a log pipeline.
 uv add lexguard
 ```
 
-The core has no dependencies. `.spec()` compiles a lexicon into a framework-agnostic `RuleSpec`,
-which `.absent()` / `.expected()` and the [integrations](docs/integrations/index.md) turn into an
-evaluator for whichever eval framework you use; each is its own extra:
+The core has no dependencies. `Check(...)` compiles a lexicon into a framework-agnostic check,
+which the [integrations](docs/integrations/index.md) turn into an evaluator for whichever eval
+framework you use; each is its own extra:
 
 ```bash
 uv add "lexguard[pydantic-evals]"
@@ -87,13 +87,14 @@ def guard(reply: str) -> str:
 
 ## Running it inside pydantic-evals
 
-`.absent()` and `.expected()` turn a lexicon into an evaluator, for when you want the same check
-running as part of a `Dataset` alongside everything else.
+`absent()` and `expected()`, from `lexguard.integrations.pydantic_evals`, turn a lexicon into an
+evaluator, for when you want the same check running as part of a `Dataset` alongside everything else.
 
 ```py
 from pydantic_evals import Case, Dataset
 
 from lexguard import Servility, Slop
+from lexguard.integrations.pydantic_evals import absent
 
 
 async def agent(prompt: str) -> str:
@@ -103,7 +104,7 @@ async def agent(prompt: str) -> str:
 dataset = Dataset(
     name="prose",
     cases=[Case(name="explainer", inputs="explain database indexing")],
-    evaluators=[Slop.absent(), Servility.absent()],
+    evaluators=[absent(Slop), absent(Servility)],
 )
 report = dataset.evaluate_sync(agent)
 print(sorted(name for name, result in report.cases[0].assertions.items() if not result.value))
@@ -116,6 +117,7 @@ print(sorted(name for name, result in report.cases[0].assertions.items() if not 
 from pydantic_evals import Case, Dataset
 
 from lexguard import Slop
+from lexguard.integrations.pydantic_evals import absent
 
 
 async def agent(prompt: str) -> str:
@@ -123,7 +125,7 @@ async def agent(prompt: str) -> str:
 
 
 report = Dataset(
-    name="prose", cases=[Case(inputs="explain indexing")], evaluators=[Slop.absent()]
+    name="prose", cases=[Case(inputs="explain indexing")], evaluators=[absent(Slop)]
 ).evaluate_sync(agent)
 print(report.cases[0].assertions["no_slop"].reason)
 """
@@ -137,18 +139,19 @@ fix: swap for a plain verb or noun, or add these to the sampler ban list
 ## Closing the loop
 
 `fix` is not just for a test report. It works standing alone, so a guardrail in the agent loop
-does not just block a bad reply, it can hand the agent something to retry with.
+does not just block a bad reply, it can hand the agent something to retry with. Tag it with the
+name and the message says what fired, handed back on its own.
 
 ```py
 from lexguard import Slop
 
 
 def guard(reply: str) -> str | None:
-    return Slop.fix if Slop.fires(reply) else None
+    return f"{Slop.name}: {Slop.fix}" if Slop.fires(reply) else None
 
 
 print(guard("let us delve into the intricate tapestry"))
-#> swap for a plain verb or noun, or add these to the sampler ban list
+#> slop: swap for a plain verb or noun, or add these to the sampler ban list
 print(guard("caching skips repeated work"))
 #> None
 ```
@@ -189,7 +192,7 @@ lg() {
 - [Rules](docs/rules.md) and the `when` / `unless` guards
 - [Agents](docs/agents.md) under test with pydantic-ai
 - [Integrations](docs/integrations/index.md): pydantic-evals, DeepEval, Inspect AI, and the
-  framework-agnostic `RuleSpec`, each with its own page
+  framework-agnostic `Check`, each with its own page
 
 ## Prior art
 

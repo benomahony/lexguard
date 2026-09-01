@@ -24,21 +24,26 @@ Overreach = Bundle(members=(out.Overclaim, out.UnsourcedAuthority))
 
 
 def _prose() -> list:
-    result = [Bloat.absent(), Servility.absent(), Leakage.absent(), Overreach.absent()]
+    # imported here, not at module top, so importing lexguard never pulls in pydantic-evals
+    from .integrations.pydantic_evals import absent
+
+    result = [absent(Bloat), absent(Servility), absent(Leakage), absent(Overreach)]
     assert len(result) == 4, "PROSE is the four prose-quality bundles"
     assert all(rule is not None for rule in result), "every bundle builds a rule"
     return result
 
 
 def _adherence() -> list:
+    from .integrations.pydantic_evals import absent, expected
+
     result = [
-        out.Disclaimer.absent(unless=ask.AdviceDemand),
-        out.Hedging.absent(when=ask.NoCaveats),
-        Servility.absent(when=ask.NoPreamble),
-        out.Anthropomorphic.absent(unless=ask.RolePlay),
-        out.Overclaim.absent(unless=ask.CreativeDemand),
-        out.CitationMarker.expected(when=ask.CitationDemand),
-        out.UncertaintyAdmission.expected(when=ask.FactualDemand),
+        absent(out.Disclaimer, unless=ask.AdviceDemand),
+        absent(out.Hedging, when=ask.NoCaveats),
+        absent(Servility, when=ask.NoPreamble),
+        absent(out.Anthropomorphic, unless=ask.RolePlay),
+        absent(out.Overclaim, unless=ask.CreativeDemand),
+        expected(out.CitationMarker, when=ask.CitationDemand),
+        expected(out.UncertaintyAdmission, when=ask.FactualDemand),
     ]
     assert len(result) == 7, "ADHERENCE is the seven instruction-following rules"
     assert all(rule is not None for rule in result), "every entry builds a rule"

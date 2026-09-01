@@ -21,6 +21,7 @@ Shopping = Lexicon(
         "shopping",
         "top up",
     ],
+    fix="add it to what needs buying",
 )
 
 
@@ -43,6 +44,7 @@ Communication = Lexicon(
         "text",
         "whatsapp",
     ],
+    fix="reach out to the person named",
 )
 
 
@@ -68,6 +70,7 @@ Money = Lexicon(
         "top up",
         "transfer",
     ],
+    fix="handle the payment or amount owed",
 )
 
 
@@ -91,6 +94,7 @@ HealthAppointment = Lexicon(
         "surgery",
         "vaccination",
     ],
+    fix="keep the appointment; mind when and where",
 )
 
 
@@ -116,6 +120,7 @@ Travel = Lexicon(
         "train",
         "visa",
     ],
+    fix="arrange or catch the trip on time",
 )
 
 
@@ -143,6 +148,7 @@ Work = Lexicon(
         "ticket",
         "timesheet",
     ],
+    fix="handle it as part of your work",
 )
 
 
@@ -165,6 +171,7 @@ Household = Lexicon(
         "vacuum",
         "washing",
     ],
+    fix="get the chore done",
 )
 
 
@@ -186,6 +193,7 @@ Pets = Lexicon(
         "walk the",
         "worming",
     ],
+    fix="see to the pet's care",
 )
 
 
@@ -205,6 +213,7 @@ Children = Lexicon(
         "term starts",
         "uniform",
     ],
+    fix="see to the child's school or care need",
 )
 
 
@@ -225,6 +234,7 @@ Garden = Lexicon(
         "weeding",
         "weeds",
     ],
+    fix="get the gardening done",
 )
 
 
@@ -245,6 +255,7 @@ Maintenance = Lexicon(
         "tyres",
         "warranty",
     ],
+    fix="renew or service it before it lapses",
 )
 
 
@@ -266,6 +277,7 @@ Media = Lexicon(
         "video",
         "watch",
     ],
+    fix="keep it to read or watch, don't act on it as a task",
 )
 
 
@@ -289,6 +301,7 @@ Occasion = Lexicon(
         "wedding",
         "xmas",
     ],
+    fix="prepare for it ahead of the date",
 )
 
 
@@ -316,6 +329,7 @@ Location = Lexicon(
         "while i'm",
         "work",
     ],
+    fix="act on it where it happens",
 )
 
 
@@ -348,6 +362,7 @@ People = Lexicon(
         "wife",
         "with",
     ],
+    fix="involve the person named",
 )
 
 

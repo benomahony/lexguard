@@ -20,7 +20,9 @@ def test_unknown_attribute_still_raises_attribute_error():
 
 
 def _block_pydantic_evals(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.delitem(sys.modules, "lexguard.rule", raising=False)
+    # force a re-import of the pieces that reach for pydantic-evals so the block below bites
+    monkeypatch.delitem(sys.modules, "lexguard.suites", raising=False)
+    monkeypatch.delitem(sys.modules, "lexguard.integrations.pydantic_evals", raising=False)
     monkeypatch.delitem(sys.modules, "pydantic_evals", raising=False)
     monkeypatch.delitem(sys.modules, "pydantic_evals.evaluators", raising=False)
     real_import = builtins.__import__
@@ -33,9 +35,9 @@ def _block_pydantic_evals(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(builtins, "__import__", blocked)
 
 
-def test_rule_gives_an_install_hint_without_pydantic_evals(monkeypatch: pytest.MonkeyPatch):
-    _block_pydantic_evals(monkeypatch)
-    with pytest.raises(ImportError, match=r"lexguard\.Rule needs pydantic-evals"):
+def test_pydantic_evals_evaluators_are_not_top_level():
+    # the eval-framework adapters live under integrations, not on the package root
+    with pytest.raises(AttributeError, match="no attribute 'Rule'"):
         lexguard.Rule
 
 
