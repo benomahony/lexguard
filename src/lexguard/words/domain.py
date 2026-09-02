@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..lexicon import Lexicon
+from lexguard.lexicon import Lexicon
 
 Shopping = Lexicon(
     name="shopping",

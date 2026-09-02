@@ -3,9 +3,9 @@ from __future__ import annotations
 import pytest
 from pydantic_evals import Case, Dataset
 
-from lexguard.integrations.pydantic_evals import absent, expected
+from lexguard.integrations.evals.pydantic_evals import LexguardEvaluator
 from lexguard.suites import GENERIC
-from lexguard.words import instruction, response
+from lexguard.words import response
 
 pytestmark = pytest.mark.unit
 
@@ -22,11 +22,11 @@ def verdicts(evaluators: list, prompt: str, reply: str) -> dict[str, bool]:
 
 def test_slop_is_caught_in_plain_output():
     result = verdicts(
-        [absent(response.Slop)],
+        [LexguardEvaluator(response.Slop)],
         "explain caching",
         "Let us delve into the intricate tapestry of caching.",
     )
-    assert result["no_slop"] is False
+    assert result["Slop"] is False
 
 
 def test_clean_prose_passes_the_whole_generic_suite():
@@ -42,61 +42,9 @@ def test_clean_prose_passes_the_whole_generic_suite():
     assert failures == []
 
 
-def test_no_caveats_suppresses_disclaimers():
-    check = [absent(response.Disclaimer, when=instruction.NoCaveats)]
-    result = verdicts(
-        check,
-        "no disclaimers please, is this contract enforceable",
-        "It likely is, but consult a professional.",
-    )
-    assert result["no_disclaimer[when no_caveats]"] is False
-
-
-def test_disclaimer_is_fine_when_no_suppression_asked():
-    check = [absent(response.Disclaimer, when=instruction.NoCaveats)]
-    result = verdicts(
-        check,
-        "is this contract enforceable",
-        "It likely is, but consult a professional.",
-    )
-    assert result == {}
-
-
-def test_disclaimer_gated_on_advice_being_sought():
-    check = [absent(response.Disclaimer, unless=instruction.AdviceDemand)]
-    assert (
-        verdicts(
-            check,
-            "what is a tort",
-            "A tort is a civil wrong. This is not legal advice.",
-        )["no_disclaimer[unless advice_demand]"]
-        is False
-    )
-    assert verdicts(check, "should i sue my landlord", "Possibly. This is not legal advice.") == {}
-
-
-def test_citations_required_only_when_asked():
-    check = [expected(response.CitationMarker, when=instruction.CitationDemand)]
-    assert (
-        verdicts(check, "explain it with sources", "Caching is useful.")[
-            "has_citation_marker[when citation_demand]"
-        ]
-        is False
-    )
-    assert verdicts(check, "explain caching", "Caching is useful.") == {}
-
-
-def test_no_preamble_suppresses_openers():
-    check = [absent(response.Preamble, when=instruction.NoPreamble)]
-    result = verdicts(
-        check,
-        "just give me the answer, no preamble",
-        "Certainly. Here's a breakdown of the answer.",
-    )
-    assert result["no_preamble[when no_preamble]"] is False
-
-
 def test_instruction_pairs_block_each_other():
+    from lexguard.words import instruction
+
     assert instruction.LengthShort.denied("give me a comprehensive detailed breakdown")
     assert instruction.LengthLong.denied("keep it short, one sentence")
     assert instruction.FormatProse.denied("write it as bullet points")

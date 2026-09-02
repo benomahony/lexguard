@@ -3,7 +3,7 @@ from __future__ import annotations
 import argparse
 import sys
 
-from .words import LEXICONS
+from lexguard.words import LEXICONS
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -1,51 +1,54 @@
 from __future__ import annotations
 
-from .lexicon import Bundle
-from .words import instruction as ask
-from .words import request as req
-from .words import response as out
+from lexguard.lexicon import Bundle
+from lexguard.words import request, response
 
 Bloat = Bundle(
     members=(
-        out.Slop,
-        out.TransitionSlop,
-        out.EmptyIntensifier,
-        out.Padding,
-        out.ContrastCliche,
-        out.EngagementBait,
+        response.Slop,
+        response.TransitionSlop,
+        response.EmptyIntensifier,
+        response.Padding,
+        response.ContrastCliche,
+        response.EngagementBait,
     )
 )
 
-Servility = Bundle(members=(out.Preamble, out.Postamble, out.Sycophancy, out.Apology))
+Servility = Bundle(
+    members=(response.Preamble, response.Postamble, response.Sycophancy, response.Apology)
+)
 
-Leakage = Bundle(members=(out.SelfReference, out.SystemLeak, req.Injection, req.Placeholder))
+Leakage = Bundle(
+    members=(response.SelfReference, response.SystemLeak, request.Injection, request.Placeholder)
+)
 
-Overreach = Bundle(members=(out.Overclaim, out.UnsourcedAuthority))
+Overreach = Bundle(members=(response.Overclaim, response.UnsourcedAuthority))
 
 
 def _prose() -> list:
     # imported here, not at module top, so importing lexguard never pulls in pydantic-evals
-    from .integrations.pydantic_evals import absent
+    from lexguard.integrations.evals.pydantic_evals import LexguardEvaluator
 
-    result = [absent(Bloat), absent(Servility), absent(Leakage), absent(Overreach)]
-    assert len(result) == 4, "PROSE is the four prose-quality bundles"
-    assert all(rule is not None for rule in result), "every bundle builds a rule"
+    bundles = (Bloat, Servility, Leakage, Overreach)
+    result = [LexguardEvaluator(bundle) for bundle in bundles]
+    assert len(result) == len(bundles), "PROSE checks every prose-quality bundle, one rule each"
+    assert all(rule is not None for rule in result), "every bundle builds its own rule"
     return result
 
 
 def _adherence() -> list:
-    from .integrations.pydantic_evals import absent, expected
+    # unconditional house-style rules only: a rule that's only right when the request asked
+    # for it (e.g. "cite sources" or "admit uncertainty") needs a guard lexguard doesn't have
+    # yet — see when/unless in git history if reintroducing conditional rules.
+    from lexguard.integrations.evals.pydantic_evals import LexguardEvaluator
 
+    # Overclaim is already covered unconditionally by PROSE's Overreach bundle; not repeated here
     result = [
-        absent(out.Disclaimer, unless=ask.AdviceDemand),
-        absent(out.Hedging, when=ask.NoCaveats),
-        absent(Servility, when=ask.NoPreamble),
-        absent(out.Anthropomorphic, unless=ask.RolePlay),
-        absent(out.Overclaim, unless=ask.CreativeDemand),
-        expected(out.CitationMarker, when=ask.CitationDemand),
-        expected(out.UncertaintyAdmission, when=ask.FactualDemand),
+        LexguardEvaluator(response.Disclaimer),
+        LexguardEvaluator(response.Hedging),
+        LexguardEvaluator(response.Anthropomorphic),
     ]
-    assert len(result) == 7, "ADHERENCE is the seven instruction-following rules"
+    assert len(result) == 3, "ADHERENCE is the three unconditional instruction-following rules"
     assert all(rule is not None for rule in result), "every entry builds a rule"
     return result
 

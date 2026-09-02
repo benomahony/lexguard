@@ -1,15 +1,16 @@
 # Agents
 
-Nothing here is specific to pydantic-ai. A `Dataset` task is any callable, so the rule is checking
-whatever your task returns. `TestModel` just makes the examples run without a key.
+Rules check a pydantic-ai `Agent`'s reply the same way they check any other text: a `Dataset` task
+is any callable, so a rule just inspects whatever it returns — no pydantic-ai-specific plumbing on
+lexguard's side. `TestModel` here just makes the examples run without a key.
 
 ```py
 from pydantic_ai import Agent
 from pydantic_ai.models.test import TestModel
 from pydantic_evals import Case, Dataset
 
-from lexguard import Bloat, Servility
-from lexguard.integrations.pydantic_evals import absent
+from lexguard import Apology, Postamble, Preamble, Slop, Sycophancy
+from lexguard.integrations.evals.pydantic_evals import LexguardEvaluator
 
 agent = Agent(TestModel(custom_output_text="Great question! Let us delve in. Hope this helps!"))
 
@@ -21,76 +22,33 @@ async def task(prompt: str) -> str:
 report = Dataset(
     name="prose",
     cases=[Case(name="explainer", inputs="explain database indexing")],
-    evaluators=[absent(Bloat), absent(Servility)],
+    evaluators=[
+        LexguardEvaluator(Slop),
+        LexguardEvaluator(Preamble),
+        LexguardEvaluator(Postamble),
+        LexguardEvaluator(Sycophancy),
+        LexguardEvaluator(Apology),
+    ],
 ).evaluate_sync(task)
 print(sorted(name for name, result in report.cases[0].assertions.items() if not result.value))
-#> ['no_postamble', 'no_slop', 'no_sycophancy']
+#> ['Postamble', 'Slop', 'Sycophancy']
 ```
 
 The task unwraps `.output` because a rule stringifies whatever it is handed, and an
-`AgentRunResult` repr would match on its own wrapper. The alternative is passing `agent.run`
-straight in and putting `field="output"` on every rule.
-
-## Structured output
-
-`custom_output_args` builds the output tool call, so the agent does not retry against a text part
-it cannot parse.
-
-```py
-from pydantic import BaseModel
-from pydantic_ai import Agent
-from pydantic_ai.models.test import TestModel
-from pydantic_evals import Case, Dataset
-
-from lexguard import Confidential
-from lexguard.integrations.pydantic_evals import absent
-
-
-class Ticket(BaseModel):
-    summary: str
-    internal_notes: str
-
-
-agent = Agent(
-    TestModel(
-        custom_output_args={
-            "summary": "Customer locked out of their account.",
-            "internal_notes": "Their password is hunter2, reset it manually.",
-        }
-    ),
-    output_type=Ticket,
-)
-
-
-async def task(prompt: str) -> Ticket:
-    return (await agent.run(prompt)).output
-
-
-report = Dataset(
-    name="triage",
-    cases=[Case(inputs="customer cannot log in")],
-    evaluators=[absent(Confidential, field="internal_notes")],
-).evaluate_sync(task)
-print(report.cases[0].assertions["no_confidential"].reason)
-"""
-1 confidential match in internal_notes: "password"
-  password -> Their password is hunter2, reset it manually.
-fix: redact the secret before it is persisted or echoed; store a reference, never the value
-"""
-```
+`AgentRunResult` repr would match on its own wrapper.
 
 ## Holding the agent still
 
-`TestModel` returns one canned response regardless of the prompt. That is a feature when testing
-guards, because it lets you vary only the request and see which rules arm.
+`TestModel` returns one canned response regardless of the prompt, which is useful when you want
+to vary only the request across cases and see which rules fire.
 
 ```py
 from pydantic_ai import Agent
 from pydantic_ai.models.test import TestModel
 from pydantic_evals import Case, Dataset
 
-from lexguard import Overclaim, UncertaintyAdmission
-from lexguard.integrations.pydantic_evals import absent, expected
+from lexguard import Hedging, Overclaim
+from lexguard.integrations.evals.pydantic_evals import LexguardEvaluator
 
 agent = Agent(TestModel(custom_output_text="This is guaranteed to work, it never fails."))
 
@@ -102,10 +60,10 @@ async def task(prompt: str) -> str:
 report = Dataset(
     name="scoping",
     cases=[Case(inputs="will this migration work?")],
-    evaluators=[absent(Overclaim), expected(UncertaintyAdmission)],
+    evaluators=[LexguardEvaluator(Overclaim), LexguardEvaluator(Hedging)],
 ).evaluate_sync(task)
 print({name: result.value for name, result in report.cases[0].assertions.items()})
-#> {'no_overclaim': False, 'has_uncertainty_admission': False}
+#> {'Overclaim': False, 'Hedging': True}
 ```
 
 ## Alongside the built in evaluators

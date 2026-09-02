@@ -42,9 +42,42 @@ secrets and overclaimed confidence, alongside politeness; run `lexguard` to list
 Extending a lexicon means editing its list; `lexguard <name>` prints one as source to paste into
 your own module and change. See [Writing a lexicon](docs/writing-a-lexicon.md).
 
-`.signal()`, `.fires()` and `.denied()` are plain functions over text: call them directly on
+`.signal()`, `.matches()` and `.denied()` are plain functions over text: call them directly on
 whatever an agent returned, in a guardrail before a reply goes out, an `assert` in a unit test, or a
 filter in a log pipeline.
+
+## What a match means
+
+Most lexicons are checked for absence — `Slop`, `Confidential`, `Rudeness` are things you don't
+want, so a match is the failure. A few, like `Confirmation` and `Politeness`, are checked for
+presence instead: they set `fail_when_neutral=True`, so silence is the failure. Same two decisions
+every time; only the second answer changes.
+
+```mermaid
+flowchart LR
+    T([text]) --> M{matches text?}
+    M -->|yes| F1{fail_when_neutral?}
+    M -->|no| F2{fail_when_neutral?}
+    F1 -->|True| P1["✔ PASS
+    Confirmation, said"]
+    F1 -->|False| X1["✘ FAIL
+    Slop, found"]
+    F2 -->|True| X2["✘ FAIL
+    Confirmation, silent"]
+    F2 -->|False| P2["✔ PASS
+    Slop, clean"]
+
+    classDef pass fill:#1f8a5f,stroke:#156b48,stroke-width:2px,color:#ffffff
+    classDef fail fill:#c0435a,stroke:#9c2f43,stroke-width:2px,color:#ffffff
+    classDef decision fill:#5b4fc4,stroke:#453a99,stroke-width:1.5px,color:#ffffff
+
+    class M,F1,F2 decision
+    class P1,P2 pass
+    class X1,X2 fail
+```
+
+See [Writing a lexicon](docs/writing-a-lexicon.md#fail_when_neutral-what-a-match-means) for the
+full explanation.
 
 ## Install
 
@@ -52,14 +85,15 @@ filter in a log pipeline.
 uv add lexguard
 ```
 
-The core has no dependencies. `Check(...)` compiles a lexicon into a framework-agnostic check,
-which the [integrations](docs/integrations/index.md) turn into an evaluator for whichever eval
-framework you use; each is its own extra:
+The core has no dependencies. A `Lexicon` does everything itself — `lexicon.verdict(text)` is the
+framework-agnostic check every [integration](docs/integrations/index.md) wraps in a couple of
+lines, whether that's an eval framework or a guardrail; each is its own extra:
 
 ```bash
 uv add "lexguard[pydantic-evals]"
 uv add "lexguard[deepeval]"
 uv add "lexguard[inspect-ai]"
+uv add "lexguard[pydantic-ai-harness]"
 ```
 
 If you want to use it as a dev tool and not worry about which repo you are in then install it as a tool:
@@ -70,7 +104,7 @@ uv tool install lexguard
 
 ## Using it without an evals framework
 
-`signal()`, `fires()` and `denied()` are the whole API surface at this layer: plain calls over a
+`signal()`, `matches()` and `denied()` are the whole API surface at this layer: plain calls over a
 string. Nothing here needs `Dataset`, `Case`, or pydantic-evals in general, so a lexicon works just
 as well as a guardrail before a response goes out, a plain `assert` in a unit test, or a filter in
 a log pipeline.
@@ -80,21 +114,21 @@ from lexguard import Confidential
 
 
 def guard(reply: str) -> str:
-    if Confidential.fires(reply):
+    if Confidential.matches(reply):
         raise ValueError("reply leaks a secret, blocking send")
     return reply
 ```
 
 ## Running it inside pydantic-evals
 
-`absent()` and `expected()`, from `lexguard.integrations.pydantic_evals`, turn a lexicon into an
+`LexguardEvaluator`, from `lexguard.integrations.evals.pydantic_evals`, wraps a lexicon as an
 evaluator, for when you want the same check running as part of a `Dataset` alongside everything else.
 
 ```py
 from pydantic_evals import Case, Dataset
 
-from lexguard import Servility, Slop
-from lexguard.integrations.pydantic_evals import absent
+from lexguard import Apology, Postamble, Preamble, Slop, Sycophancy
+from lexguard.integrations.evals.pydantic_evals import LexguardEvaluator
 
 
 async def agent(prompt: str) -> str:
@@ -104,12 +138,54 @@ async def agent(prompt: str) -> str:
 dataset = Dataset(
     name="prose",
     cases=[Case(name="explainer", inputs="explain database indexing")],
-    evaluators=[absent(Slop), absent(Servility)],
+    evaluators=[
+        LexguardEvaluator(Slop),
+        LexguardEvaluator(Preamble),
+        LexguardEvaluator(Postamble),
+        LexguardEvaluator(Sycophancy),
+        LexguardEvaluator(Apology),
+    ],
 )
 report = dataset.evaluate_sync(agent)
 print(sorted(name for name, result in report.cases[0].assertions.items() if not result.value))
-#> ['no_postamble', 'no_slop', 'no_sycophancy']
+#> ['Postamble', 'Slop', 'Sycophancy']
 ```
+
+Each rule checks exactly one lexicon and reports under its own name — nothing merges multiple
+lexicons into a single pass/fail, so a failure always points at exactly what fired.
+
+## Running it as a guardrail
+
+`lexguard_guard`, from `lexguard.integrations.guardrails.pydantic_ai`, wraps a lexicon (or a
+`Bundle` of them) as a [pydantic-ai-harness](https://pydantic.dev/docs/ai/harness/guardrails/)
+`InputGuardrail`/`OutputGuardrail`/`ToolGuardrail` guard, blocking a reply before it goes out.
+
+```py
+from pydantic_ai import Agent
+from pydantic_ai.models.test import TestModel
+from pydantic_ai_harness.guardrails import OutputBlocked, OutputGuardrail
+
+from lexguard import Slop
+from lexguard.integrations.guardrails.pydantic_ai import lexguard_guard
+
+agent = Agent(
+    TestModel(custom_output_text="Let us delve into the intricate tapestry of caching."),
+    capabilities=[OutputGuardrail(guard=lexguard_guard(Slop))],
+)
+try:
+    agent.run_sync("explain caching")
+except OutputBlocked as blocked:
+    print(blocked)
+    """
+    3 slop matches: "delve", "intricate", "tapestry"
+      delve -> Let us delve into the intricate tapestry of ca…
+      intricate -> Let us delve into the intricate tapestry of caching.
+    fix: swap for a plain verb or noun, or add these to the sampler ban list
+    """
+```
+
+A guard can only return one `allow`/`block`, so this is the one place a `Bundle` genuinely
+combines several lexicons into a single decision — a block still lists every one that fired.
 
 ## Failures tell you what to change
 
@@ -117,7 +193,7 @@ print(sorted(name for name, result in report.cases[0].assertions.items() if not 
 from pydantic_evals import Case, Dataset
 
 from lexguard import Slop
-from lexguard.integrations.pydantic_evals import absent
+from lexguard.integrations.evals.pydantic_evals import LexguardEvaluator
 
 
 async def agent(prompt: str) -> str:
@@ -125,9 +201,9 @@ async def agent(prompt: str) -> str:
 
 
 report = Dataset(
-    name="prose", cases=[Case(inputs="explain indexing")], evaluators=[absent(Slop)]
+    name="prose", cases=[Case(inputs="explain indexing")], evaluators=[LexguardEvaluator(Slop)]
 ).evaluate_sync(agent)
-print(report.cases[0].assertions["no_slop"].reason)
+print(report.cases[0].assertions["Slop"].reason)
 """
 3 slop matches: "delve", "intricate", "tapestry"
   delve -> Let us delve into the intricate tapestry of in…
@@ -147,7 +223,7 @@ from lexguard import Slop
 
 
 def guard(reply: str) -> str | None:
-    return f"{Slop.name}: {Slop.fix}" if Slop.fires(reply) else None
+    return f"{Slop.name}: {Slop.fix}" if Slop.matches(reply) else None
 
 
 print(guard("let us delve into the intricate tapestry"))
@@ -189,10 +265,9 @@ lg() {
 - [Lexicons](docs/lexicons/index.md): every lexicon that ships in the box, generated from
   source, one page per group
 - [Writing a lexicon](docs/writing-a-lexicon.md) for your own domain
-- [Rules](docs/rules.md) and the `when` / `unless` guards
 - [Agents](docs/agents.md) under test with pydantic-ai
-- [Integrations](docs/integrations/index.md): pydantic-evals, DeepEval, Inspect AI, and the
-  framework-agnostic `Check`, each with its own page
+- [Integrations](docs/integrations/index.md): evals (pydantic-evals, DeepEval, Inspect AI) and
+  guardrails (pydantic-ai-harness), each with its own page
 
 ## Prior art
 

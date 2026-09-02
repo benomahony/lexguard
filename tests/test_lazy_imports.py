@@ -22,7 +22,7 @@ def test_unknown_attribute_still_raises_attribute_error():
 def _block_pydantic_evals(monkeypatch: pytest.MonkeyPatch) -> None:
     # force a re-import of the pieces that reach for pydantic-evals so the block below bites
     monkeypatch.delitem(sys.modules, "lexguard.suites", raising=False)
-    monkeypatch.delitem(sys.modules, "lexguard.integrations.pydantic_evals", raising=False)
+    monkeypatch.delitem(sys.modules, "lexguard.integrations.evals.pydantic_evals", raising=False)
     monkeypatch.delitem(sys.modules, "pydantic_evals", raising=False)
     monkeypatch.delitem(sys.modules, "pydantic_evals.evaluators", raising=False)
     real_import = builtins.__import__

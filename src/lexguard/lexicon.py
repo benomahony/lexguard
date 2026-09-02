@@ -15,6 +15,20 @@ class Signal(StrEnum):
     absent = "absent"
 
 
+@dataclass(frozen=True)
+class Verdict:
+    """A single lexicon's pass/fail outcome, independent of any eval framework."""
+
+    passed: bool
+    reason: str | None = None
+
+    def __post_init__(self) -> None:
+        if not self.passed:
+            assert self.reason is not None, "a failing Verdict must carry a reason"
+        else:
+            assert self.reason is None, "a passing Verdict carries no reason"
+
+
 def tidy(words: Collection[str]) -> frozenset[str]:
     result = frozenset(" ".join(word.split()).casefold() for word in words if word.strip())
     assert all(word for word in result), "tidy() must drop blank entries"
@@ -48,9 +62,15 @@ def snippet(text: str, start: int, end: int, width: int = 34) -> str:
 class Lexicon:
     name: str
     indicates: Collection[str]
-    # a one-sentence remedy: what to do when this fires. required, so a verdict is always actionable
+    # a one-sentence remedy: what to do on a match. required, so a verdict is always actionable
     fix: str
     rules_out: Collection[str] = ()
+    # does verdict() fail when this concept is neutral — absent, never mentioned — rather than
+    # when it's present? the lexicon is the domain object, so it, not a per-call flag on some
+    # evaluator, owns this judgement. True for a lexicon you want to see (Confirmation,
+    # Politeness: silence is the problem). The common case takes the default: Slop and Rudeness
+    # are things you don't want, so a match is the problem, not the silence.
+    fail_when_neutral: bool = False
     # a short citation for where the terms come from: dumped by as_code(), rendered next to the
     # lexicon in the docs, and readable at runtime (e.g. an agent citing why a check fired).
     # ignored by equality — two lexicons that match the same way are equal whatever their evidence
@@ -75,6 +95,17 @@ class Lexicon:
         assert all(word not in self.rules_out for word in self.indicates), (
             f"{self.name}: a phrase cannot both indicate and rule out the same concept"
         )
+
+    @property
+    def label(self) -> str:
+        """The PascalCase form of `.name` (e.g. `"transition_slop"` -> `"TransitionSlop"`),
+        matching the Python identifier it's shipped under. Used as the report/assertion key by
+        every eval-framework adapter; `.name` itself stays lowercase for CLI lookup and prose.
+        """
+        result = "".join(word.capitalize() for word in self.name.split("_"))
+        assert result, "a lexicon always has a name to derive a label from"
+        assert "_" not in result, "label is PascalCase, with no separators left in it"
+        return result
 
     def __repr__(self) -> str:
         result = (
@@ -104,20 +135,63 @@ class Lexicon:
         assert not ruled_out, "denied always takes priority over present/absent"
         return result
 
-    def fires(self, text: str) -> bool:
+    def matches(self, text: str) -> bool:
+        """Does `text` match this lexicon: an indicator hit that no blocker rules back out?"""
         outcome = self.signal(text)
         result = outcome is Signal.present
         if result:
             assert not self.denied(text), "present and denied are mutually exclusive"
         if outcome is Signal.absent:
-            assert not result, "absent never fires"
+            assert not result, "absent never matches"
+        return result
+
+    def __call__(self, text: str) -> bool:
+        """`Politeness("please")` — the same answer as `Politeness.matches("please")`."""
+        result = self.matches(text)
+        assert self.matches(text) is result, "matches is a pure function of the same text"
+        assert result == (self.signal(text) is Signal.present), "matches agrees with signal"
+        return result
+
+    def verdict(self, text: str) -> Verdict:
+        """The pass/fail judgment this lexicon makes about `text`.
+
+        `self.fail_when_neutral` is this lexicon's own call, not a per-call flag: a lexicon for
+        something you want present (`Confirmation`, `Politeness`) sets `fail_when_neutral=True`,
+        since silence is the failure. The common case, a lexicon for something you don't want
+        (`Slop`, `Rudeness`), leaves the default `False` — a match is the failure instead.
+        Framework-agnostic; every eval-framework adapter is a thin wrapper around this.
+        """
+        holds = self.matches(text) == self.fail_when_neutral
+        result = (
+            Verdict(passed=True) if holds else Verdict(passed=False, reason=self._diagnose(text))
+        )
+        assert result.passed == holds, "verdict mirrors the fail_when_neutral/actual match"
+        assert (result.reason is None) == result.passed, "a reason exists exactly when it failed"
+        return result
+
+    def _diagnose(self, text: str) -> str:
+        if self.fail_when_neutral:
+            examples = ", ".join(self.examples())
+            result = f"no {self.name} wording, expected something like: {examples}\nfix: {self.fix}"
+            assert self.name in result, "the diagnosis names the lexicon it's about"
+            assert result.endswith(self.fix), "the fix is always the last line"
+            return result
+        spans = self.spans(text)
+        terms = ", ".join(f'"{term}"' for term, _, _ in spans[:3])
+        plural = "es" if len(spans) != 1 else ""
+        lines = [f"{len(spans)} {self.name} match{plural}: {terms}"]
+        lines += [f"  {term} -> {snippet(text, start, end)}" for term, start, end in spans[:2]]
+        lines.append(f"fix: {self.fix}")
+        result = "\n".join(lines)
+        assert result.endswith(self.fix), "the fix is always the last line"
+        assert self.name in result, "the diagnosis names the lexicon it's about"
         return result
 
     def denied(self, text: str) -> bool:
         outcome = self.signal(text)
         result = outcome is Signal.denied
         if result:
-            assert not self.fires(text), "denied never fires"
+            assert not self.matches(text), "denied never matches"
         if outcome is Signal.present:
             assert not result, "present is not denied"
         return result
@@ -159,6 +233,8 @@ class Lexicon:
         if self.rules_out:
             fields["rules_out"] = sorted(self.rules_out)
         fields["fix"] = self.fix
+        if self.fail_when_neutral:
+            fields["fail_when_neutral"] = self.fail_when_neutral
         if self.evidence:
             fields["evidence"] = self.evidence
         result = "Lexicon(" + ", ".join(f"{key}={value!r}" for key, value in fields.items()) + ")"

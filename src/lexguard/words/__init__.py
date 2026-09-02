@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from ..lexicon import Lexicon
-from . import domain, instruction, request, response
+from lexguard.lexicon import Lexicon
+from lexguard.words import domain, instruction, request, response
 
 MODULES = {
     "request": request,

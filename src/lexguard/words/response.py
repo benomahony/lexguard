@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..lexicon import Lexicon
+from lexguard.lexicon import Lexicon
 
 Preamble = Lexicon(
     name="preamble",
@@ -474,6 +474,30 @@ Apology = Lexicon(
 )
 
 
+Rudeness = Lexicon(
+    name="rudeness",
+    indicates=[
+        "asshole",
+        "bullshit",
+        "could you not",
+        "fuck off",
+        "fucking",
+        "idiot",
+        "moron",
+        "no thanks to you",
+        "obviously",
+        "shit",
+        "shut up",
+        "sorry not sorry",
+        "stupid question",
+        "thanks for nothing",
+        "whatever",
+    ],
+    fix="drop the sarcasm, insults, and profanity; answer plainly and respectfully",
+    evidence="Brown & Levinson 1987; Stanford Politeness Corpus (Danescu-Niculescu-Mizil 2013)",
+)
+
+
 UncertaintyAdmission = Lexicon(
     name="uncertainty_admission",
     indicates=[
@@ -587,6 +611,7 @@ __all__ = [
     "EmptyIntensifier",
     "UnsourcedAuthority",
     "Apology",
+    "Rudeness",
     "UncertaintyAdmission",
     "SystemLeak",
     "EngagementBait",

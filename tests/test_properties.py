@@ -6,7 +6,7 @@ import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
-from lexguard import Recurrence, Signal, Slop
+from lexguard import Lexicon, Quantity, Recurrence, Signal, Slop
 from lexguard.lexicon import phrases, snippet, tidy
 
 pytestmark = pytest.mark.unit
@@ -52,10 +52,22 @@ def test_spans_are_in_bounds_and_sorted(text):
 
 
 @given(st.text(max_size=500))
-def test_fires_and_denied_are_mutually_exclusive(text):
-    assert not (Recurrence.fires(text) and Recurrence.denied(text))
+def test_matches_and_denied_are_mutually_exclusive(text):
+    assert not (Recurrence.matches(text) and Recurrence.denied(text))
 
 
 @given(st.text(max_size=500))
 def test_signal_is_always_a_valid_member(text):
     assert Recurrence.signal(text) in Signal
+
+
+def test_hits_works_for_a_lexicon_with_no_multiword_indicators():
+    assert Quantity._indicate is None
+    assert Quantity.hits("bring a dozen eggs") == {"dozen"}
+
+
+def test_a_casefold_expanding_hit_has_no_span_in_the_original_text():
+    lexicon = Lexicon(name="t", indicates=["strasse report"], fix="x")
+    text = "the straße report is ready"
+    assert lexicon.hits(text) == {"strasse report"}
+    assert lexicon.spans(text) == []

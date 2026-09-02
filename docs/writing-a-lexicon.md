@@ -72,6 +72,36 @@ print(SoftDeadline.signal("ideally friday, but it is a hard deadline"))
 #> denied
 ```
 
+## `fail_when_neutral` — what a match means
+
+`Lexicon.verdict()` — and every integration built on it (`LexguardEvaluator`, `LexguardMetric`,
+`lexguard_scorer`, `lexguard_guard`) — makes one call: does a match pass the check, or fail it?
+By default a match *is* the problem (`Slop`, `Rudeness`, `Confidential`): the check fails when the
+concept is present. For the rare lexicon where you're checking that a concept showed up —
+`Confirmation`, `Politeness` — set `fail_when_neutral=True` on it, so the check fails on *silence*
+instead. See the [top-level diagram](index.md) for the two-decision shape this always takes;
+here's the same rule in code:
+
+```py
+from lexguard import Politeness, Rudeness
+
+reply = "Sure, thank you so much for asking!"
+print(Politeness.verdict(reply).passed)
+#> True
+print(Rudeness.verdict(reply).passed)
+#> True
+```
+
+Both pass here, for different reasons: `Politeness` (`fail_when_neutral=True`) genuinely found
+courtesy language, so there's nothing to flag; `Rudeness` (the default) found no profanity, so
+there's nothing to flag either. Swap in a curt, unhelpful reply and they diverge — `Politeness`
+fails (silence on courtesy, and it wants to see some), `Rudeness` still passes (still no
+profanity).
+
+`fail_when_neutral` defaults to `False` because almost every lexicon is shaped like `Slop`: a
+concept you don't want, where a match is the failure. Set it `True` only when the lexicon names
+something you're checking *for*.
+
 ## Mutually-exclusive families
 
 Pairing generalises. When a set of lexicons are **mutually exclusive** — a request has one format,
@@ -185,5 +215,5 @@ print(Sycophancy)
 print(Sycophancy.examples())
 #> ['brilliant question', 'excellent point', 'excellent question', 'good catch']
 print({name: len(group) for name, group in GROUPS.items()})
-#> {'request': 37, 'instruction': 19, 'response': 20, 'domain': 15}
+#> {'request': 37, 'instruction': 19, 'response': 21, 'domain': 15}
 ```

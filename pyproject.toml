@@ -15,6 +15,9 @@ deepeval = [
 inspect-ai = [
     "inspect-ai>=0.3.259",
 ]
+pydantic-ai-harness = [
+    "pydantic-ai-harness>=0.28.0",
+]
 
 [project.scripts]
 lexguard = "lexguard.cli:main"
@@ -44,8 +47,9 @@ dev = [
     "pydantic-evals>=1.0",
     "deepeval>=4.1.8",
     "inspect-ai>=0.3.259",
+    "pydantic-ai-harness>=0.28.0",
     "hypothesis>=6.165.10",
-    "dddlint>=0.1.10",
+    "dddlint>=0.1.11",
 ]
 
 [tool.ruff]

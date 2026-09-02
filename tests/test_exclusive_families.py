@@ -93,9 +93,9 @@ def test_mirror_family_rules_out_every_sibling_term(family: Family):
 def test_low_priority_is_not_denied_by_its_own_phrase():
     # regression: a bare "priority" indicator (a substring of "low priority") would, once mirrored,
     # make low_priority deny "low priority" itself. "high priority" carries the signal instead.
-    assert LowPriority.fires("this is low priority")
+    assert LowPriority.matches("this is low priority")
     assert HighPriority.denied("this is low priority")
-    assert HighPriority.fires("this is high priority, drop everything")
+    assert HighPriority.matches("this is high priority, drop everything")
     assert LowPriority.denied("this is high priority, drop everything")
 
 

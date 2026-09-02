@@ -3,18 +3,8 @@ from __future__ import annotations
 import pytest
 from pydantic_evals import Case, Dataset
 
-from lexguard import (
-    AdviceDemand,
-    CitationDemand,
-    CitationMarker,
-    Disclaimer,
-    NoCaveats,
-    Politeness,
-    Preamble,
-    Servility,
-    Sycophancy,
-)
-from lexguard.integrations.pydantic_evals import Observe, absent, expected
+from lexguard import Confirmation, Politeness
+from lexguard.integrations.evals.pydantic_evals import LexguardEvaluator, Observe
 from lexguard.words.response import Slop
 
 pytestmark = pytest.mark.unit
@@ -36,89 +26,32 @@ def assertions(evaluators: list, prompt: str, reply: str) -> dict[str, bool]:
 
 
 def test_absent_reads_off_the_cue():
-    assert assertions([absent(Slop)], "explain", "let us delve in") == {"no_slop": False}
-    assert assertions([absent(Slop)], "explain", "caching skips repeated work") == {"no_slop": True}
-
-
-def test_expected_is_the_other_direction():
-    assert assertions([expected(Politeness)], "hi", "4") == {"has_politeness": False}
-
-
-def test_or_builds_a_set_that_keeps_its_members():
-    result = assertions(
-        [absent(Slop | Sycophancy | Preamble)],
-        "explain",
-        "Great question! Certainly, let us delve in.",
-    )
-    assert result == {"no_slop": False, "no_sycophancy": False, "no_preamble": False}
-
-
-def test_bundle_expected_checks_every_member():
-    result = assertions([expected(Politeness | CitationMarker)], "hi", "4")
-    assert result == {"has_politeness": False, "has_citation_marker": False}
-
-
-def test_named_bundles_are_cue_sets():
-    result = assertions(
-        [absent(Servility)], "explain", "Certainly! Great question, hope this helps."
-    )
-    assert result["no_preamble"] is False
-    assert result["no_sycophancy"] is False
-    assert result["no_postamble"] is False
-    assert result["no_apology"] is True
-
-
-def test_guards_are_keywords_on_the_verb():
-    check = [absent(Disclaimer, when=NoCaveats)]
-    assert assertions(
-        check,
-        "no disclaimers please, is it enforceable",
-        "Yes, but consult a professional.",
-    ) == {"no_disclaimer[when no_caveats]": False}
-    assert assertions(check, "is it enforceable", "Yes, but consult a professional.") == {}
-
-
-def test_unless_is_the_mirror():
-    check = [absent(Disclaimer, unless=AdviceDemand)]
-    assert assertions(check, "what is a tort", "A civil wrong. Not legal advice.") == {
-        "no_disclaimer[unless advice_demand]": False
+    assert assertions([LexguardEvaluator(Slop)], "explain", "let us delve in") == {"Slop": False}
+    assert assertions([LexguardEvaluator(Slop)], "explain", "caching skips repeated work") == {
+        "Slop": True
     }
-    assert assertions(check, "should i sue my landlord", "Possibly. Not legal advice.") == {}
 
 
-def test_presence_can_be_guarded_too():
-    check = [expected(CitationMarker, when=CitationDemand)]
-    assert assertions(check, "explain it with sources", "Caching is useful.") == {
-        "has_citation_marker[when citation_demand]": False
+def test_fail_when_neutral_requires_an_actual_match():
+    assert assertions([LexguardEvaluator(Confirmation)], "confirm?", "maybe, not sure yet") == {
+        "Confirmation": False
     }
-    assert assertions(check, "explain caching", "Caching is useful.") == {}
-
-
-def test_field_scopes_the_check():
-    from pydantic import BaseModel
-
-    class Out(BaseModel):
-        title: str
-        notes: str
-
-    dataset = Dataset(name="d", cases=[Case(inputs="x")], evaluators=[absent(Slop, field="notes")])
-
-    async def task(text: str) -> Out:
-        return Out(title="let us delve in", notes="clean")
-
-    case = dataset.evaluate_sync(task).cases[0]
-    assert case.assertions["no_slop"].value is True
+    assert assertions([LexguardEvaluator(Confirmation)], "confirm?", "yes, confirmed") == {
+        "Confirmation": True
+    }
 
 
 def test_observe_is_the_opt_in_for_labels():
-    case = run([Observe([Politeness])], "hi", "thanks!")
-    assert case.labels["politeness"].value == "present"
+    case = run([Observe(Politeness)], "hi", "thanks!")
+    assert case.labels["Politeness"].value == "present"
     assert case.assertions == {}
 
 
 def test_multiword_phrases_that_wrap_still_match():
-    assert Sycophancy.fires("you're absolutely right about that")
-    assert Preamble.fires("before we dive in, some context")
+    from lexguard import Preamble, Sycophancy
+
+    assert Sycophancy.matches("you're absolutely right about that")
+    assert Preamble.matches("before we dive in, some context")
 
 
 def failures(evaluators: list, prompt: str, reply: str) -> dict[str, str]:
@@ -132,54 +65,27 @@ def failures(evaluators: list, prompt: str, reply: str) -> dict[str, str]:
 
 
 def test_failure_names_the_matches_and_shows_them_in_context():
-    reason = failures([absent(Slop)], "explain", "Let us delve into the intricate tapestry.")[
-        "no_slop"
-    ]
+    reason = failures(
+        [LexguardEvaluator(Slop)], "explain", "Let us delve into the intricate tapestry."
+    )["Slop"]
     assert "3 slop matches" in reason
     assert '"delve"' in reason
     assert "delve -> Let us delve into the intricate tapestry." in reason
 
 
 def test_failure_carries_the_fix():
-    reason = failures([absent(Slop)], "explain", "let us delve in")["no_slop"]
+    reason = failures([LexguardEvaluator(Slop)], "explain", "let us delve in")["Slop"]
     assert reason.endswith(Slop.fix)
 
 
-def test_failure_quotes_the_request_words_that_triggered_the_rule():
-    reason = failures(
-        [absent(Disclaimer, when=NoCaveats)],
-        "no disclaimers please",
-        "Consult a professional.",
-    )["no_disclaimer[when no_caveats]"]
-    assert 'the request asked for no_caveats: "no disclaimers"' in reason
-
-
-def test_missing_presence_lists_what_would_satisfy_it():
-    reason = failures(
-        [expected(CitationMarker, when=CitationDemand)],
-        "explain with sources",
-        "Caching is useful.",
-    )["has_citation_marker[when citation_demand]"]
-    assert "expected something like: according to" in reason
-
-
-def test_field_is_named_in_the_failure():
-    from pydantic import BaseModel
-
-    class Out(BaseModel):
-        notes: str
-
-    dataset = Dataset(name="d", cases=[Case(inputs="x")], evaluators=[absent(Slop, field="notes")])
-
-    async def task(text: str) -> Out:
-        return Out(notes="a rich tapestry")
-
-    case = dataset.evaluate_sync(task).cases[0]
-    reason = case.assertions["no_slop"].reason
-    assert reason is not None
-    assert "in notes" in reason
+def test_fail_when_neutral_failure_lists_what_would_satisfy_it():
+    reason = failures([LexguardEvaluator(Confirmation)], "confirm?", "maybe, not sure yet")[
+        "Confirmation"
+    ]
+    assert "expected something like" in reason
+    assert reason.endswith(Confirmation.fix)
 
 
 def test_passing_assertions_carry_no_noise():
-    case = run([absent(Slop)], "explain", "caching skips repeated work")
-    assert case.assertions["no_slop"].reason is None
+    case = run([LexguardEvaluator(Slop)], "explain", "caching skips repeated work")
+    assert case.assertions["Slop"].reason is None

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..lexicon import Lexicon
+from lexguard.lexicon import Lexicon
 
 DueDate = Lexicon(
     name="due_date",
@@ -755,9 +755,10 @@ Politeness = Lexicon(
         "thanks for nothing",
     ],
     fix=(
-        """sarcasm, dismissal, and profanity do not read as politeness.
-        Write the actual request plainly"""
+        "add a courteous phrase (please, thanks, could you) and don't undercut it with "
+        "sarcasm or profanity"
     ),
+    fail_when_neutral=True,
     evidence="Brown & Levinson 1987; Stanford Politeness Corpus (Danescu-Niculescu-Mizil 2013)",
 )
 
@@ -787,6 +788,7 @@ Confirmation = Lexicon(
         "we'll see",
     ],
     fix="go ahead; don't ask again",
+    fail_when_neutral=True,
 )
 
 
