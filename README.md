@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/lexguard.png" alt="lexguard" width="50%">
+  <img src="https://raw.githubusercontent.com/benomahony/lexguard/main/docs/assets/lexguard.png" alt="lexguard" width="50%">
 </p>
 
 # Lexguard
