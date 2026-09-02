@@ -112,7 +112,7 @@ from lexguard.words.response import TransitionSlop as TransitionSlop
 from lexguard.words.response import UncertaintyAdmission as UncertaintyAdmission
 from lexguard.words.response import UnsourcedAuthority as UnsourcedAuthority
 
-__version__ = "0.1.13"
+__version__ = "0.1.14"
 
 # the shipped suites are pydantic-evals evaluator lists; deferred so importing lexguard never
 # requires pydantic-evals until one is touched. the evaluators themselves live in
