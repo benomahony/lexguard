@@ -34,8 +34,10 @@ merges multiple lexicons into a single pass/fail, so checking several means list
 
 ## Guardrails
 
-A guard can only return one `allow`/`block`, so this is the one place a `Bundle` genuinely combines
-several lexicons into a single decision — a block still lists every one that fired.
+A guard can only return one result, so this is the one place a `Bundle` genuinely combines
+several lexicons into a single decision — a failure still lists every one that fired. Failures
+retry by default, giving the model the reason and another attempt; pass `on_fail="block"` to
+reject the value outright instead.
 
 - [pydantic-ai-harness](pydantic-ai-harness.md): `lexguard_guard` wraps a `Lexicon` or `Bundle` as
   an `InputGuardrail`/`OutputGuardrail`/`ToolGuardrail` guard

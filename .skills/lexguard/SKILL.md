@@ -88,10 +88,11 @@ my_scorer = lexguard_scorer(Slop)
 ```
 
 **pydantic-ai-harness** — `lexguard_guard` wraps a `Lexicon` (or `Bundle`) as an
-`InputGuardrail`/`OutputGuardrail`/`ToolGuardrail` guard, blocking a reply before it goes out.
-Unlike the eval-framework adapters above, a `Bundle` here genuinely combines into one
-`allow`/`block` decision, since that's the only shape a guard can return. Needs
-`lexguard[pydantic-ai-harness]`:
+`InputGuardrail`/`OutputGuardrail`/`ToolGuardrail` guard. Unlike the eval-framework adapters
+above, a `Bundle` here genuinely combines into one decision, since that's the only shape a guard
+can return. A failed verdict retries by default, handing the model the reason and another
+attempt; pass `on_fail="block"` to reject the value outright instead (the right call for an
+`InputGuardrail`, where there's no model output to retry). Needs `lexguard[pydantic-ai-harness]`:
 
 ```python
 from pydantic_ai_harness.guardrails import OutputGuardrail

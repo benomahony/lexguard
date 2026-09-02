@@ -158,12 +158,14 @@ lexicons into a single pass/fail, so a failure always points at exactly what fir
 
 `lexguard_guard`, from `lexguard.integrations.guardrails.pydantic_ai`, wraps a lexicon (or a
 `Bundle` of them) as a [pydantic-ai-harness](https://pydantic.dev/docs/ai/harness/guardrails/)
-`InputGuardrail`/`OutputGuardrail`/`ToolGuardrail` guard, blocking a reply before it goes out.
+`InputGuardrail`/`OutputGuardrail`/`ToolGuardrail` guard. By default a failed verdict retries,
+handing the model the failure reason and another attempt; pass `on_fail="block"` to reject the
+value outright instead.
 
 ```py
-from pydantic_ai import Agent
+from pydantic_ai import Agent, UnexpectedModelBehavior
 from pydantic_ai.models.test import TestModel
-from pydantic_ai_harness.guardrails import OutputBlocked, OutputGuardrail
+from pydantic_ai_harness.guardrails import OutputGuardrail
 
 from lexguard import Slop
 from lexguard.integrations.guardrails.pydantic_ai import lexguard_guard
@@ -174,18 +176,13 @@ agent = Agent(
 )
 try:
     agent.run_sync("explain caching")
-except OutputBlocked as blocked:
-    print(blocked)
-    """
-    3 slop matches: "delve", "intricate", "tapestry"
-      delve -> Let us delve into the intricate tapestry of ca…
-      intricate -> Let us delve into the intricate tapestry of caching.
-    fix: swap for a plain verb or noun, or add these to the sampler ban list
-    """
+except UnexpectedModelBehavior as exceeded:
+    print(exceeded)
+    #> Exceeded maximum output retries (1)
 ```
 
-A guard can only return one `allow`/`block`, so this is the one place a `Bundle` genuinely
-combines several lexicons into a single decision — a block still lists every one that fired.
+A guard can only return one result, so this is the one place a `Bundle` genuinely combines
+several lexicons into a single decision — a failure still lists every one that fired.
 
 ## Failures tell you what to change
 

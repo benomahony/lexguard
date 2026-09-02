@@ -105,15 +105,28 @@ class TestGuardrails:
 
         guard = lexguard_guard(Slop)
         result = guard("caching skips repeated work")
+
         assert result.action == "allow"
         assert result.message is None
 
-    def test_guard_blocks_on_a_single_lexicon(self):
+    def test_guard_retries_on_a_single_lexicon_by_default(self):
         pytest.importorskip("pydantic_ai_harness")
         from lexguard.integrations.guardrails.pydantic_ai import lexguard_guard
 
         guard = lexguard_guard(Slop)
         result = guard("let us delve into the intricate tapestry")
+
+        assert result.action == "retry"
+        assert result.message is not None
+        assert "delve" in result.message
+
+    def test_guard_can_block_on_a_single_lexicon(self):
+        pytest.importorskip("pydantic_ai_harness")
+        from lexguard.integrations.guardrails.pydantic_ai import lexguard_guard
+
+        guard = lexguard_guard(Slop, on_fail="block")
+        result = guard("let us delve into the intricate tapestry")
+
         assert result.action == "block"
         assert result.message is not None
         assert "delve" in result.message
@@ -126,12 +139,29 @@ class TestGuardrails:
         assert guard("caching skips repeated work").action == "allow"
 
         result = guard("let us delve into the intricate tapestry, but basically it is simple")
-        assert result.action == "block"
+
+        assert result.action == "retry"
         assert result.message is not None
         assert "slop" in result.message
         assert "padding" in result.message
 
-    def test_guard_works_as_a_real_output_guardrail(self):
+    def test_retry_works_as_a_real_output_guardrail(self):
+        pytest.importorskip("pydantic_ai_harness")
+        from pydantic_ai import Agent, UnexpectedModelBehavior
+        from pydantic_ai.models.test import TestModel
+        from pydantic_ai_harness.guardrails import OutputGuardrail
+
+        from lexguard.integrations.guardrails.pydantic_ai import lexguard_guard
+
+        agent = Agent(
+            TestModel(custom_output_text="let us delve into the intricate tapestry"),
+            capabilities=[OutputGuardrail(guard=lexguard_guard(Slop))],
+        )
+
+        with pytest.raises(UnexpectedModelBehavior):
+            agent.run_sync("explain caching")
+
+    def test_block_works_as_a_real_output_guardrail(self):
         pytest.importorskip("pydantic_ai_harness")
         from pydantic_ai import Agent
         from pydantic_ai.models.test import TestModel
@@ -141,7 +171,12 @@ class TestGuardrails:
 
         agent = Agent(
             TestModel(custom_output_text="let us delve into the intricate tapestry"),
-            capabilities=[OutputGuardrail(guard=lexguard_guard(Slop))],
+            capabilities=[
+                OutputGuardrail(
+                    guard=lexguard_guard(Slop, on_fail="block"),
+                )
+            ],
         )
+
         with pytest.raises(OutputBlocked):
             agent.run_sync("explain caching")

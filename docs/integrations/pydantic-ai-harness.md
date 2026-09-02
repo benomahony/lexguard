@@ -5,10 +5,13 @@ guard from a `Lexicon`, checked against whatever value it's given. Whether it as
 absence is the lexicon's own `fail_when_neutral`, not a flag here — same rule as every other
 integration.
 
+By default a failed verdict retries, handing the model the lexicon failure reason and another
+attempt:
+
 ```py
-from pydantic_ai import Agent
+from pydantic_ai import Agent, UnexpectedModelBehavior
 from pydantic_ai.models.test import TestModel
-from pydantic_ai_harness.guardrails import OutputBlocked, OutputGuardrail
+from pydantic_ai_harness.guardrails import OutputGuardrail
 
 from lexguard import Slop
 from lexguard.integrations.guardrails.pydantic_ai import lexguard_guard
@@ -19,18 +22,13 @@ agent = Agent(
 )
 try:
     agent.run_sync("explain caching")
-except OutputBlocked as blocked:
-    print(blocked)
-    """
-    3 slop matches: "delve", "intricate", "tapestry"
-      delve -> Let us delve into the intricate tapestry of ca…
-      intricate -> Let us delve into the intricate tapestry of caching.
-    fix: swap for a plain verb or noun, or add these to the sampler ban list
-    """
+except UnexpectedModelBehavior as exceeded:
+    print(exceeded)
+    #> Exceeded maximum output retries (1)
 ```
 
-The same callable shape works for `InputGuardrail` and the argument half of `ToolGuardrail` too —
-pick whichever the check belongs to:
+Pass `on_fail="block"` to reject the value outright instead — the right call for an
+`InputGuardrail`, where there's no model output to retry:
 
 ```py
 from pydantic_ai_harness.guardrails import InputGuardrail
@@ -38,14 +36,14 @@ from pydantic_ai_harness.guardrails import InputGuardrail
 from lexguard import Confidential
 from lexguard.integrations.guardrails.pydantic_ai import lexguard_guard
 
-guardrail = InputGuardrail(guard=lexguard_guard(Confidential))
+guardrail = InputGuardrail(guard=lexguard_guard(Confidential, on_fail="block"))
 ```
 
 ## Checking a bundle
 
-A guard can only return one `allow`/`block`, unlike the eval-framework adapters, so a `Bundle`
-here does combine into a single decision — pass `lexguard_guard` a `Bundle` and it blocks if any
-member fires, listing every one that did in the block message so nothing is hidden.
+A guard can only return one result, unlike the eval-framework adapters, so a `Bundle` here does
+combine into a single decision — pass `lexguard_guard` a `Bundle` and it fails if any member
+fires, listing every one that did in the message so nothing is hidden.
 
 ```py
 from lexguard.integrations.guardrails.pydantic_ai import lexguard_guard
@@ -55,7 +53,7 @@ guard = lexguard_guard(Bloat)
 print(guard("caching skips repeated work").action)
 #> allow
 print(guard("let us delve into the intricate tapestry, but basically it is simple").action)
-#> block
+#> retry
 ```
 
 ## Install
