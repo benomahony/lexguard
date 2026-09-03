@@ -3,6 +3,8 @@ from __future__ import annotations
 from importlib import import_module
 
 from lexguard.lexicon import Bundle as Bundle
+from lexguard.lexicon import Density as Density
+from lexguard.lexicon import Hits as Hits
 from lexguard.lexicon import Lexicon as Lexicon
 from lexguard.lexicon import Signal as Signal
 from lexguard.lexicon import Verdict as Verdict

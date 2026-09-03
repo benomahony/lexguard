@@ -6,75 +6,65 @@
 
 ## The problem
 
-You're evaluating an AI agent. You want to know whether its reply is polite, or whether it
-overclaimed, leaked something it shouldn't have, or buried the answer under sycophantic preamble.
-The obvious move is to grep the output for a few words, and one list of words breaks fast: an agent
-that writes "could you please fix the fucking bug" used the word "please" and swore in the same
-breath. A single word list can't tell those two apart, so it either misses the problem or, worse,
-scores a bad reply as fine.
+You're evaluating an AI agent's reply: polite or rude, confident or overclaiming, clean or full of
+leaked secrets. The obvious move is to grep for a few words, and a single word list breaks fast: a
+reply that says "could you please fix the fucking bug" contains "please" and swears in the same
+breath. One list can't tell those apart — it either misses the swearing or scores the reply as polite.
 
-Lexguard is still just word matching, it's not doing anything clever with the text. The difference
-is a second list: words that rule the concept back out. Point it at a reply and get back one of
-three answers: the concept is there, it's absent, or the wording rules it out.
+Lexguard is still just word matching. The difference is a second list per concept: words that rule
+it back out. A check returns whether the concept holds, is simply absent, or is present but denied
+by the wording around it.
 
 ```py
 from lexguard import Politeness
 
-print(Politeness.signal("could you send this over when you get a sec?"))
-#> present
-print(Politeness.signal("send me the report"))
-#> absent
-print(Politeness.signal("could you please fix the fucking bug"))
-#> denied
+print(Politeness("could you send this over when you get a sec?"))
+#> True
+print(Politeness("send me the report"))
+#> False
+print(Politeness("could you please fix the fucking bug"))
+#> False
 ```
 
-`denied` is not the same as `absent`. A reply with no politeness words at all is merely unasked for.
-This one has a politeness word, but the swearing cancels it out, so it's rated denied, not present.
+The last two both fail, but for different reasons: the second reply never mentions politeness, the
+third does and then undercuts it. `.verdict(text).reason` is how you tell those apart:
+
+```py
+from lexguard import Politeness
+
+print(Politeness.verdict("could you please fix the fucking bug").reason)
+"""
+politeness wording present but denied by: "fucking"
+fix: add a courteous phrase (please, thanks, could you) and don't undercut it with sarcasm or profanity
+"""
+```
 
 ## How it works
 
-That three-way check is a `Lexicon`: a named set of words and phrases that signal a concept
-(`indicates`), the words that rule it out (`rules_out`), and a plain sentence saying what to do
-about a hit (`fix`). It's matched by plain substring, no model in the loop, so a check is instant
-and gives the same verdict every time. A set of them ship in the box already, tuned for agent
-transcripts: what a user asked for and what a model produced, from slop and sycophancy to leaked
-secrets and overclaimed confidence, alongside politeness; run `lexguard` to list every one.
-Extending a lexicon means editing its list; `lexguard <name>` prints one as source to paste into
-your own module and change. See [Writing a lexicon](docs/writing-a-lexicon.md).
+A `Lexicon` is a named set of words and phrases that signal a concept (`indicates`), the words that
+rule it back out (`rules_out`), and a one-sentence remedy for a hit (`fix`). It's matched by plain
+substring — no model in the loop, so a check is instant and deterministic. A set ships in the box
+already, tuned for agent transcripts — slop, sycophancy, leaked secrets, overclaimed confidence,
+politeness, and more; run `lexguard` to list every one. To extend one, edit its list: `lexguard
+<name>` prints it as source to paste into your own module. See
+[Writing a lexicon](docs/writing-a-lexicon.md).
 
-`.signal()`, `.matches()` and `.denied()` are plain functions over text: call them directly on
-whatever an agent returned, in a guardrail before a reply goes out, an `assert` in a unit test, or a
-filter in a log pipeline.
+A `Lexicon` is callable — `Politeness(text)` is shorthand for `Politeness.matches(text)`, itself
+built on a three-valued `.signal()` (`present` / `absent` / `denied`), with `.denied()` alongside it
+for the third case. Reach for those when you just want a plain value. `.verdict(text)` is the
+richer pass/fail-plus-`.reason` built on top, and it's the same call every integration below wraps,
+whether that's an eval framework or a guardrail.
 
 ## What a match means
 
 Most lexicons are checked for absence — `Slop`, `Confidential`, `Rudeness` are things you don't
 want, so a match is the failure. A few, like `Confirmation` and `Politeness`, are checked for
-presence instead: they set `fail_when_neutral=True`, so silence is the failure. Same two decisions
-every time; only the second answer changes.
+presence instead: they set `fail_when_neutral=True`, so silence is the failure.
 
-```mermaid
-flowchart LR
-    T([text]) --> M{matches text?}
-    M -->|yes| F1{fail_when_neutral?}
-    M -->|no| F2{fail_when_neutral?}
-    F1 -->|True| P1["✔ PASS
-    Confirmation, said"]
-    F1 -->|False| X1["✘ FAIL
-    Slop, found"]
-    F2 -->|True| X2["✘ FAIL
-    Confirmation, silent"]
-    F2 -->|False| P2["✔ PASS
-    Slop, clean"]
-
-    classDef pass fill:#1f8a5f,stroke:#156b48,stroke-width:2px,color:#ffffff
-    classDef fail fill:#c0435a,stroke:#9c2f43,stroke-width:2px,color:#ffffff
-    classDef decision fill:#5b4fc4,stroke:#453a99,stroke-width:1.5px,color:#ffffff
-
-    class M,F1,F2 decision
-    class P1,P2 pass
-    class X1,X2 fail
-```
+| matched? | `fail_when_neutral=False` (default) | `fail_when_neutral=True` |
+| --- | --- | --- |
+| yes | ✘ FAIL — e.g. `Slop`, found | ✔ PASS — e.g. `Confirmation`, said |
+| no | ✔ PASS — e.g. `Slop`, clean | ✘ FAIL — e.g. `Confirmation`, silent |
 
 See [Writing a lexicon](docs/writing-a-lexicon.md#fail_when_neutral-what-a-match-means) for the
 full explanation.
@@ -85,9 +75,7 @@ full explanation.
 uv add lexguard
 ```
 
-The core has no dependencies. A `Lexicon` does everything itself — `lexicon.verdict(text)` is the
-framework-agnostic check every [integration](docs/integrations/index.md) wraps in a couple of
-lines, whether that's an eval framework or a guardrail; each is its own extra:
+The core has no dependencies. Each [integration](docs/integrations/index.md) is its own extra:
 
 ```bash
 uv add "lexguard[pydantic-evals]"
@@ -96,7 +84,7 @@ uv add "lexguard[inspect-ai]"
 uv add "lexguard[pydantic-ai-harness]"
 ```
 
-If you want to use it as a dev tool and not worry about which repo you are in then install it as a tool:
+To use it as a dev tool without adding it to any particular project, install it as one:
 
 ```bash
 uv tool install lexguard
@@ -104,20 +92,27 @@ uv tool install lexguard
 
 ## Using it without an evals framework
 
-`signal()`, `matches()` and `denied()` are the whole API surface at this layer: plain calls over a
-string. Nothing here needs `Dataset`, `Case`, or pydantic-evals in general, so a lexicon works just
-as well as a guardrail before a response goes out, a plain `assert` in a unit test, or a filter in
-a log pipeline.
+`.verdict()` is a plain call over a string — nothing here needs `Dataset`, `Case`, or
+pydantic-evals in general, and you get the diagnostic reason for free:
 
 ```py
 from lexguard import Confidential
 
 
 def guard(reply: str) -> str:
-    if Confidential.matches(reply):
-        raise ValueError("reply leaks a secret, blocking send")
+    verdict = Confidential.verdict(reply)
+    if not verdict.passed:
+        raise ValueError(verdict.reason)
     return reply
+
+
+print(guard("send it over, all good"))
+#> send it over, all good
 ```
+
+A reply that actually leaks something raises with the full diagnosis attached — see
+[Failures tell you what to change](#failures-tell-you-what-to-change) below for what that
+`reason` text looks like.
 
 ## Running it inside pydantic-evals
 
@@ -151,8 +146,8 @@ print(sorted(name for name, result in report.cases[0].assertions.items() if not 
 #> ['Postamble', 'Slop', 'Sycophancy']
 ```
 
-Each rule checks exactly one lexicon and reports under its own name — nothing merges multiple
-lexicons into a single pass/fail, so a failure always points at exactly what fired.
+Each rule checks exactly one lexicon and reports under its own name — a failure always points at
+exactly what fired.
 
 ## Running it as a guardrail
 
@@ -186,51 +181,54 @@ several lexicons into a single decision — a failure still lists every one that
 
 ## Failures tell you what to change
 
+Every failing `Verdict` carries a `reason`, and every lexicon carries a `fix`. A `Dataset` report
+surfaces the first; called directly, a lexicon hands you the second on its own — enough to feed
+straight back into the agent for another turn instead of failing the whole run.
+
 ```py
-from pydantic_evals import Case, Dataset
-
 from lexguard import Slop
-from lexguard.integrations.evals.pydantic_evals import LexguardEvaluator
 
-
-async def agent(prompt: str) -> str:
-    return "Let us delve into the intricate tapestry of indexing."
-
-
-report = Dataset(
-    name="prose", cases=[Case(inputs="explain indexing")], evaluators=[LexguardEvaluator(Slop)]
-).evaluate_sync(agent)
-print(report.cases[0].assertions["Slop"].reason)
+report = Slop.verdict("Let us delve into the intricate tapestry of indexing.")
+print(report.reason)
 """
 3 slop matches: "delve", "intricate", "tapestry"
   delve -> Let us delve into the intricate tapestry of in…
   intricate -> Let us delve into the intricate tapestry of indexing.
 fix: swap for a plain verb or noun, or add these to the sampler ban list
 """
+
+print(f"{Slop.name}: {Slop.fix}" if Slop.matches("caching skips repeated work") else None)
+#> None
 ```
 
-## Closing the loop
+`.hits()` splits what it found into `.indicated` and `.ruled_out`, so a `denied` verdict can say
+what did the denying, not just that it happened:
 
-`fix` is not just for a test report. It works standing alone, so a guardrail in the agent loop
-does not just block a bad reply, it can hand the agent something to retry with. Tag it with the
-name and the message says what fired, handed back on its own.
+```py
+from lexguard import Politeness
+
+hits = Politeness.hits("could you please fix the fucking bug")
+print(sorted(hits.indicated), sorted(hits.ruled_out))
+#> ['could you', 'please'] ['fucking']
+print(Politeness.verdict("could you please fix the fucking bug").reason)
+"""
+politeness wording present but denied by: "fucking"
+fix: add a courteous phrase (please, thanks, could you) and don't undercut it with sarcasm or profanity
+"""
+```
+
+`.matches()` and `.verdict().passed` are both exactly `True`/`False` — one `Slop` hit in a
+sentence and ten in a page fail identically. `.density()` gives the same `indicated`/`ruled_out`
+split as a real rate — the fraction of words that are hits, always in `[0, 1]` — instead of a raw
+count, so it stays comparable once text gets long enough that presence alone stops being the
+interesting question:
 
 ```py
 from lexguard import Slop
 
-
-def guard(reply: str) -> str | None:
-    return f"{Slop.name}: {Slop.fix}" if Slop.matches(reply) else None
-
-
-print(guard("let us delve into the intricate tapestry"))
-#> slop: swap for a plain verb or noun, or add these to the sampler ban list
-print(guard("caching skips repeated work"))
-#> None
+print(Slop.density("Let us delve into the intricate tapestry of caching.").indicated)
+#> 0.3333333333333333
 ```
-
-A non-`None` result is the next prompt: feed it back in and let the agent take another turn,
-instead of failing the whole run.
 
 ## From the command line
 

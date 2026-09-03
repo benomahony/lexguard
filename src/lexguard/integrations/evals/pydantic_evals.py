@@ -25,14 +25,23 @@ class LexguardEvaluator(Evaluator):
 
     lexicon: Lexicon | Bundle
 
-    def evaluate(self, ctx: EvaluatorContext) -> dict[str, EvaluationReason]:
+    def evaluate(self, ctx: EvaluatorContext) -> dict[str, EvaluationReason | str | float]:
         output = str(ctx.output)
         lexicons = _lexicons(self.lexicon)
-        result: dict[str, EvaluationReason] = {}
+        result: dict[str, EvaluationReason | str | float] = {}
         for lexicon in lexicons:
             verdict = lexicon.verdict(output)
             result[lexicon.label] = EvaluationReason(value=verdict.passed, reason=verdict.reason)
-        assert len(result) == len(lexicons), "one assertion per lexicon, none merged"
+            density = lexicon.density(output)
+            result[f"{lexicon.label}IndicatedDensity"] = density.indicated
+            if lexicon.rules_out:
+                result[f"{lexicon.label}RuledOutDensity"] = density.ruled_out
+            hits = lexicon.hits(output)
+            if hits.indicated:
+                result[f"{lexicon.label}Indicated"] = ", ".join(sorted(hits.indicated))
+            if hits.ruled_out:
+                result[f"{lexicon.label}RuledOut"] = ", ".join(sorted(hits.ruled_out))
+        assert len(result) >= len(lexicons), "at least one assertion per lexicon"
         assert all(lexicon.label in result for lexicon in lexicons), "every label is a result key"
         return result
 

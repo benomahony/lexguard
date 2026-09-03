@@ -64,6 +64,51 @@ print(sorted(name for name, result in report.cases[0].assertions.items() if not 
 #> ['Postamble', 'Slop', 'Sycophancy']
 ```
 
+## Which terms fired, and how dense
+
+`LexguardEvaluator` reports two extra things per lexicon beyond the pass/fail assertion:
+
+- `{Label}Indicated` / `{Label}RuledOut` **labels** — which words matched, comma-joined, split by
+  which list they came from. Either is omitted when nothing from that side fired, so a clean case
+  adds no extra labels.
+- `{Label}IndicatedDensity` / `{Label}RuledOutDensity` **scores** — `Lexicon.density()`: the
+  fraction of words that are hits, always in `[0, 1]`. Unlike the labels, these land in
+  `case.scores`, pydantic-evals' real numeric-metric bucket, and are always present (0.0 on a
+  clean case), so `report.averages()` gives a genuine per-dataset rate rather than a count you'd
+  have to average yourself.
+
+```py
+from pydantic_evals import Case, Dataset
+
+from lexguard import Politeness
+from lexguard.integrations.evals.pydantic_evals import LexguardEvaluator
+
+
+async def agent(prompt: str) -> str:
+    return "could you please fix the fucking bug"
+
+
+report = Dataset(
+    name="tone",
+    cases=[Case(inputs="fix the bug")],
+    evaluators=[LexguardEvaluator(Politeness)],
+).evaluate_sync(agent)
+case = report.cases[0]
+print(case.labels["PolitenessIndicated"].value)
+#> could you, please
+print(case.labels["PolitenessRuledOut"].value)
+#> fucking
+print(case.scores["PolitenessRuledOutDensity"].value)
+#> 0.14285714285714285
+```
+
+`case.assertions["Politeness"].value` is always exactly `True` or `False` — it can't say whether a
+reply barely failed or is riddled with the problem. Two `Slop` hits in a three-sentence answer and
+two in a five-page report both fail identically there, but their `SlopIndicatedDensity` scores
+won't match — the first is a much higher density. Lean on the scores once outputs get long enough
+that whether the concept appears at all stops being the interesting question and how often it does
+becomes the one.
+
 ## Wanting a concept present
 
 `Confirmation` is built with `fail_when_neutral=True`, so `LexguardEvaluator(Confirmation)` fails

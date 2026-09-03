@@ -468,7 +468,9 @@ Apology = Lexicon(
         "my mistake",
         "sorry about",
         "sorry for the",
-        "you're right i",
+    ],
+    rules_out=[
+        "sorry not sorry",
     ],
     fix="correct the error and move on; repeated apology shifts work onto the reader",
 )

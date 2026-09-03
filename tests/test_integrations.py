@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from lexguard import Politeness, Verdict
+from lexguard import Density, Politeness, Verdict
 from lexguard.suites import Bloat
 from lexguard.words.response import Slop
 
@@ -12,6 +12,13 @@ pytestmark = pytest.mark.unit
 def test_verdict_failing_needs_a_reason():
     with pytest.raises(AssertionError):
         Verdict(passed=False)
+
+
+def test_density_rejects_values_outside_zero_to_one():
+    with pytest.raises(AssertionError):
+        Density(indicated=1.5, ruled_out=0.0)
+    with pytest.raises(AssertionError):
+        Density(indicated=0.0, ruled_out=-0.1)
 
 
 class TestDeepEval:
@@ -43,6 +50,41 @@ class TestDeepEval:
         assert score == 1.0
         assert metric.is_successful() is True
         assert metric.reason is None
+
+    def test_metric_breakdown_is_a_density_not_a_raw_count(self):
+        pytest.importorskip("deepeval")
+        from deepeval.test_case import LLMTestCase
+
+        from lexguard.integrations.evals.deepeval import LexguardMetric
+
+        metric = LexguardMetric(Politeness)
+        test_case = LLMTestCase(
+            input="fix the bug", actual_output="could you please fix the fucking bug"
+        )
+        metric.measure(test_case)
+        assert metric.score_breakdown == Politeness.density(str(test_case.actual_output)).__dict__
+
+        once = LLMTestCase(input="fix the bug", actual_output="fucking fix the bug now please")
+        metric.measure(once)
+        once_density = metric.score_breakdown["ruled_out"]
+
+        repeated = LLMTestCase(
+            input="fix the bug", actual_output="fucking fucking fucking fix the bug now please"
+        )
+        metric.measure(repeated)
+        assert metric.score_breakdown["ruled_out"] > once_density
+
+    def test_metric_breakdown_omits_ruled_out_for_a_lexicon_without_one(self):
+        pytest.importorskip("deepeval")
+        from deepeval.test_case import LLMTestCase
+
+        from lexguard.integrations.evals.deepeval import LexguardMetric
+
+        assert Slop.rules_out == frozenset()
+        metric = LexguardMetric(Slop)
+        test_case = LLMTestCase(input="explain caching", actual_output="let us delve in")
+        metric.measure(test_case)
+        assert "ruled_out" not in metric.score_breakdown
 
     def test_metric_name_matches_rule_naming(self):
         pytest.importorskip("deepeval")
@@ -96,6 +138,32 @@ class TestInspectAI:
         clean_state = self._state("caching skips repeated work", "explain caching")
         clean_result = asyncio.run(lexguard_scorer(Slop)(clean_state, Target("")))
         assert clean_result.value == CORRECT
+
+    def test_scorer_metadata_is_a_density_not_a_raw_count(self):
+        pytest.importorskip("inspect_ai")
+        import asyncio
+
+        from inspect_ai.scorer import Target
+
+        from lexguard.integrations.evals.inspect_ai import lexguard_scorer
+
+        text = "could you please fix the fucking bug"
+        state = self._state(text, "fix the bug")
+        result = asyncio.run(lexguard_scorer(Politeness)(state, Target("")))
+        assert result.metadata == Politeness.density(text).__dict__
+
+    def test_scorer_metadata_omits_ruled_out_for_a_lexicon_without_one(self):
+        pytest.importorskip("inspect_ai")
+        import asyncio
+
+        from inspect_ai.scorer import Target
+
+        from lexguard.integrations.evals.inspect_ai import lexguard_scorer
+
+        assert Slop.rules_out == frozenset()
+        state = self._state("let us delve in", "explain caching")
+        result = asyncio.run(lexguard_scorer(Slop)(state, Target("")))
+        assert "ruled_out" not in result.metadata
 
 
 class TestGuardrails:

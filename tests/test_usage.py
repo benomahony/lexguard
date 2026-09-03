@@ -89,3 +89,36 @@ def test_fail_when_neutral_failure_lists_what_would_satisfy_it():
 def test_passing_assertions_carry_no_noise():
     case = run([LexguardEvaluator(Slop)], "explain", "caching skips repeated work")
     assert case.assertions["Slop"].reason is None
+
+
+def test_denied_fail_when_neutral_names_the_blocker():
+    reason = Politeness.verdict("could you please fix the fucking bug").reason
+    assert reason is not None
+    assert 'denied by: "fucking"' in reason
+    assert reason.endswith(Politeness.fix)
+
+
+def test_evaluator_labels_split_indicated_from_ruled_out():
+    case = run(
+        [LexguardEvaluator(Politeness)], "fix the bug", "could you please fix the fucking bug"
+    )
+    assert case.labels["PolitenessIndicated"].value == "could you, please"
+    assert case.labels["PolitenessRuledOut"].value == "fucking"
+
+
+def test_evaluator_scores_a_real_density_not_a_raw_count():
+    reply = "could you please fix the fucking bug"
+    case = run([LexguardEvaluator(Politeness)], "fix the bug", reply)
+    density = Politeness.density(reply)
+    assert case.scores["PolitenessIndicatedDensity"].value == density.indicated
+    assert case.scores["PolitenessRuledOutDensity"].value == density.ruled_out
+
+    clean = run([LexguardEvaluator(Slop)], "explain", "caching skips repeated work")
+    assert clean.scores["SlopIndicatedDensity"].value == 0.0
+    assert "SlopRuledOutDensity" not in clean.scores
+
+
+def test_evaluator_omits_hit_labels_when_nothing_matched():
+    case = run([LexguardEvaluator(Slop)], "explain", "caching skips repeated work")
+    assert "SlopIndicated" not in case.labels
+    assert "SlopRuledOut" not in case.labels

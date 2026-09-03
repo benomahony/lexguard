@@ -6,7 +6,7 @@ import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
-from lexguard import Lexicon, Quantity, Recurrence, Signal, Slop
+from lexguard import Lexicon, Politeness, Quantity, Recurrence, Signal, Slop
 from lexguard.lexicon import phrases, snippet, tidy
 
 pytestmark = pytest.mark.unit
@@ -63,11 +63,53 @@ def test_signal_is_always_a_valid_member(text):
 
 def test_hits_works_for_a_lexicon_with_no_multiword_indicators():
     assert Quantity._indicate is None
-    assert Quantity.hits("bring a dozen eggs") == {"dozen"}
+    hits = Quantity.hits("bring a dozen eggs")
+    assert hits.indicated == {"dozen"}
+    assert hits.ruled_out == set()
 
 
 def test_a_casefold_expanding_hit_has_no_span_in_the_original_text():
     lexicon = Lexicon(name="t", indicates=["strasse report"], fix="x")
     text = "the straße report is ready"
-    assert lexicon.hits(text) == {"strasse report"}
+    assert lexicon.hits(text).indicated == {"strasse report"}
     assert lexicon.spans(text) == []
+
+
+def test_hits_splits_indicated_from_ruled_out():
+    hits = Politeness.hits("could you please fix the fucking bug")
+    assert hits.indicated == {"could you", "please"}
+    assert hits.ruled_out == {"fucking"}
+    assert hits.terms == {"could you", "please", "fucking"}
+
+
+def test_density_counts_repeats_that_hits_would_dedupe():
+    once = Slop.density("delve into caching once")
+    repeated = Slop.density("delve delve delve into caching")
+    assert repeated.indicated > once.indicated
+    assert (
+        Slop.hits("delve into caching once").indicated
+        == Slop.hits("delve delve delve into caching").indicated
+    )
+
+
+def test_density_is_zero_for_empty_text():
+    density = Slop.density("")
+    assert density.indicated == 0.0
+    assert density.ruled_out == 0.0
+
+
+def test_density_is_a_fraction_of_words():
+    text = "delve " + "word " * 99
+    density = Slop.density(text)
+    assert density.indicated == pytest.approx(0.01)
+
+
+def test_density_reaches_one_only_when_every_word_is_a_hit():
+    density = Slop.density("delve delve delve")
+    assert density.indicated == 1.0
+
+
+def test_density_caps_at_one_when_a_phrase_overlaps_its_own_word():
+    lexicon = Lexicon(name="t", indicates=["please", "please please"], fix="x")
+    density = lexicon.density("please please")
+    assert density.indicated == 1.0

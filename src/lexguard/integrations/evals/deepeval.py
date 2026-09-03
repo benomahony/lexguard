@@ -37,9 +37,14 @@ class LexguardMetric(BaseMetric):
         return result
 
     def measure(self, test_case: LLMTestCase, *args: Any, **kwargs: Any) -> float:
-        verdict = self.lexicon.verdict(str(test_case.actual_output))
+        output = str(test_case.actual_output)
+        verdict = self.lexicon.verdict(output)
+        density = self.lexicon.density(output)
         self.score = 1.0 if verdict.passed else 0.0
         self.reason = verdict.reason
+        self.score_breakdown = {"indicated": density.indicated}
+        if self.lexicon.rules_out:
+            self.score_breakdown["ruled_out"] = density.ruled_out
         self.success = self.is_successful()
         assert self.score is not None, "measure() always sets a score"
         assert self.success is not None, "measure() always sets success"

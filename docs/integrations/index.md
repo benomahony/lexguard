@@ -32,6 +32,23 @@ merges multiple lexicons into a single pass/fail, so checking several means list
 - [DeepEval](deepeval.md): `LexguardMetric` wraps a `Lexicon` as a `BaseMetric`
 - [Inspect AI](inspect-ai.md): `lexguard_scorer` wraps a `Lexicon` as a `Scorer`
 
+Each also surfaces two things beyond pass/fail, in whatever structured slot its framework gives a
+check: which words matched (`Lexicon.hits(text)`, split into `indicated`/`ruled_out`) and how
+dense that is (`Lexicon.density(text)`: the fraction of words that are hits, always in `[0, 1]`,
+same split, but a real computed rate rather than a raw count — three "delve"s in one paragraph
+reads as denser than one, even though `hits()` reports the same single term either way). pydantic-evals
+gets `{Label}Indicated`/`{Label}RuledOut` labels plus
+`{Label}IndicatedDensity`/`{Label}RuledOutDensity` scores, DeepEval and Inspect AI both fold the
+density into `score_breakdown`/`Score.metadata`. The `ruled_out` side of all of these is only
+emitted for a lexicon that actually has a `rules_out` list — most, like `Slop`, don't, so it stays
+out of the way rather than showing a permanent zero. See each page's "Which terms fired" section.
+
+`verdict.passed` is always exactly `True`/`False` — it can't say whether a reply barely failed or
+is riddled with the problem. Two `Slop` hits in a three-sentence answer and two in a five-page
+report both fail identically there, but their density won't match. Lean on `.density()` once
+outputs get long enough that whether the concept appears at all stops being the interesting
+question and how often it does becomes the one.
+
 ## Guardrails
 
 A guard can only return one result, so this is the one place a `Bundle` genuinely combines

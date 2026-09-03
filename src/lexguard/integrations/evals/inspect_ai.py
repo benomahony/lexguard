@@ -20,10 +20,15 @@ def lexguard_scorer(lexicon: Lexicon) -> Scorer:
             assert target is not None, "Inspect always passes a target, even when unused here"
             output = state.output.completion
             verdict = lexicon.verdict(output)
+            density = lexicon.density(output)
+            metadata = {"indicated": density.indicated}
+            if lexicon.rules_out:
+                metadata["ruled_out"] = density.ruled_out
             result = Score(
                 value=CORRECT if verdict.passed else INCORRECT,
                 answer=output,
                 explanation=verdict.reason or "the lexicon check passed",
+                metadata=metadata,
             )
             assert result.value in (CORRECT, INCORRECT), "score is CORRECT or INCORRECT"
             assert result.answer == output, "the score reports the completion it judged"

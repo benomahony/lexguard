@@ -29,6 +29,45 @@ class Verdict:
             assert self.reason is None, "a passing Verdict carries no reason"
 
 
+@dataclass(frozen=True)
+class Hits:
+    """The terms a text matched, split by which list they came from."""
+
+    indicated: frozenset[str] = frozenset()
+    ruled_out: frozenset[str] = frozenset()
+
+    def __post_init__(self) -> None:
+        assert self.indicated.isdisjoint(self.ruled_out), (
+            "the same term can't be both an indicator and a blocker"
+        )
+        assert all(term == term.casefold() for term in self.indicated | self.ruled_out), (
+            "hit terms are casefolded"
+        )
+
+    @property
+    def terms(self) -> frozenset[str]:
+        """Every hit, indicator and blocker alike, with the split dropped."""
+        result = self.indicated | self.ruled_out
+        assert result.issuperset(self.indicated), "terms keeps every indicated hit"
+        assert result.issuperset(self.ruled_out), "terms keeps every ruled-out hit"
+        return result
+
+
+@dataclass(frozen=True)
+class Density:
+    """The fraction of words that are hits, split the same way as `Hits` — magnitude rather than
+    a raw count, so it stays comparable across texts of different lengths. Always in [0, 1]: 1.0
+    only when every single word in the text is itself a hit.
+    """
+
+    indicated: float
+    ruled_out: float
+
+    def __post_init__(self) -> None:
+        assert 0.0 <= self.indicated <= 1.0, "density is a fraction of words, in [0, 1]"
+        assert 0.0 <= self.ruled_out <= 1.0, "density is a fraction of words, in [0, 1]"
+
+
 def tidy(words: Collection[str]) -> frozenset[str]:
     result = frozenset(" ".join(word.split()).casefold() for word in words if word.strip())
     assert all(word for word in result), "tidy() must drop blank entries"
@@ -171,8 +210,15 @@ class Lexicon:
 
     def _diagnose(self, text: str) -> str:
         if self.fail_when_neutral:
-            examples = ", ".join(self.examples())
-            result = f"no {self.name} wording, expected something like: {examples}\nfix: {self.fix}"
+            hits = self.hits(text)
+            if self.denied(text) and hits.indicated:
+                terms = ", ".join(f'"{term}"' for term in sorted(hits.ruled_out))
+                result = f"{self.name} wording present but denied by: {terms}\nfix: {self.fix}"
+            else:
+                examples = ", ".join(self.examples())
+                result = (
+                    f"no {self.name} wording, expected something like: {examples}\nfix: {self.fix}"
+                )
             assert self.name in result, "the diagnosis names the lexicon it's about"
             assert result.endswith(self.fix), "the fix is always the last line"
             return result
@@ -196,18 +242,59 @@ class Lexicon:
             assert not result, "present is not denied"
         return result
 
-    def hits(self, text: str) -> set[str]:
-        words = {word.casefold() for word in re.findall(WORD_PATTERN, text)}
-        found = words & {word for word in self.indicates if " " not in word}
-        if self._indicate:
-            found |= set(re.findall(self._indicate, self._fold(text)))
-        assert found.issubset(self.indicates), "hits are drawn from the indicators"
-        assert all(term == term.casefold() for term in found), "indicators are casefolded"
+    def hits(self, text: str) -> Hits:
+        """The terms from this text that matched, split into `.indicated` and `.ruled_out`."""
+        indicated = self._term_hits(text, self.indicates, self._indicate)
+        ruled_out = self._term_hits(text, self.rules_out, self._rule_out)
+        result = Hits(indicated=frozenset(indicated), ruled_out=frozenset(ruled_out))
+        assert result.indicated.issubset(self.indicates), "indicated hits come from `indicates`"
+        assert result.ruled_out.issubset(self.rules_out), "ruled-out hits come from `rules_out`"
+        return result
+
+    def _term_hits(self, text: str, words: Collection[str], pattern: str | None) -> set[str]:
+        folded_words = {word.casefold() for word in re.findall(WORD_PATTERN, text)}
+        singles = {word for word in words if " " not in word}
+        found = folded_words & singles
+        if pattern:
+            found |= set(re.findall(pattern, self._fold(text)))
+        assert found.issubset(words), "term hits are drawn from the given word list"
+        assert all(term == term.casefold() for term in found), "term hits are casefolded"
         return found
+
+    def density(self, text: str) -> Density:
+        """The fraction of words that are hits, split into `.indicated` and `.ruled_out`.
+
+        Unlike `.hits()`, which dedupes to the *distinct* terms found, this counts every
+        occurrence — "delve" three times in one paragraph is denser than "delve" once, even
+        though `.hits()` reports the same single term either way. Use this instead of leaning on
+        `.matches()`/`.verdict()` alone once text is long enough that whether a concept shows up
+        at all stops being the interesting question and how often it does becomes the one.
+        """
+        words = re.findall(WORD_PATTERN, text)
+        if not words:
+            return Density(indicated=0.0, ruled_out=0.0)
+        # capped: an `indicates` list mixing a word with a phrase built from it (e.g. "please"
+        # and "yes please") can otherwise double-count the same span past one hit per word.
+        indicated = min(self._term_occurrences(text, self.indicates, self._indicate), len(words))
+        ruled_out = min(self._term_occurrences(text, self.rules_out, self._rule_out), len(words))
+        assert indicated <= len(words), "indicated occurrences can't exceed the word count"
+        assert ruled_out <= len(words), "ruled-out occurrences can't exceed the word count"
+        return Density(indicated=indicated / len(words), ruled_out=ruled_out / len(words))
+
+    def _term_occurrences(self, text: str, words: Collection[str], pattern: str | None) -> int:
+        singles = {word for word in words if " " not in word}
+        folded_words = [word.casefold() for word in re.findall(WORD_PATTERN, text)]
+        single_count = sum(1 for word in folded_words if word in singles)
+        assert single_count <= len(folded_words), "single-word occurrences can't exceed the words"
+        result = single_count
+        if pattern:
+            result += len(re.findall(pattern, self._fold(text)))
+        assert result >= 0, "an occurrence count can't be negative"
+        return result
 
     def spans(self, text: str) -> list[tuple[str, int, int]]:
         found = []
-        for term in self.hits(text):
+        for term in self.hits(text).terms:
             match = re.search(rf"\b{re.escape(term)}\b", text, re.IGNORECASE)
             if match:
                 found.append((term, match.start(), match.end()))
