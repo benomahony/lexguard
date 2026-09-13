@@ -1,0 +1,131 @@
+from __future__ import annotations
+
+from lexguard.lexicon import Lexicon
+
+Effort = Lexicon(
+    name="effort",
+    indicates=[
+        "all afternoon",
+        "big job",
+        "easy",
+        "faff",
+        "fiddly",
+        "five minutes",
+        "long job",
+        "quick",
+        "quickly",
+        "small",
+        "ten minutes",
+        "tiny",
+        "two minutes",
+        "will take a while",
+    ],
+    fix="account for the effort this takes",
+)
+EnergyContext = Lexicon(
+    name="energy_context",
+    indicates=[
+        "admin",
+        "brain dead",
+        "deep work",
+        "first thing",
+        "focus time",
+        "head space",
+        "in the zone",
+        "last thing",
+        "low energy",
+        "mindless",
+        "when i'm fresh",
+    ],
+    fix="match this to the kind of focus it needs",
+)
+# HighPriority and LowPriority are opposite poles of one axis: each rules out every one of the
+# other's indicators (a full mirror), so any mix denies both and the two lists cannot drift.
+# tests/test_exclusive_families.py enforces that. Note bare "priority" is deliberately not an
+# indicator: it is a substring of "low priority", so as the opposite's blocker it would deny
+# "low priority" itself; "high priority" / "top priority" carry the signal instead.
+HighPriority = Lexicon(
+    name="high_priority",
+    indicates=[
+        "asap",
+        "blocking",
+        "can't wait",
+        "critical",
+        "drop everything",
+        "emergency",
+        "first thing",
+        "high priority",
+        "immediately",
+        "important",
+        "needs doing now",
+        "pressing",
+        "right away",
+        "right now",
+        "straight away",
+        "top priority",
+        "urgent",
+        "urgently",
+    ],
+    rules_out=[
+        "at some point",
+        "backlog",
+        "eventually",
+        "if i get a chance",
+        "low priority",
+        "maybe later",
+        "nice to have",
+        "no hurry",
+        "no rush",
+        "not urgent",
+        "someday",
+        "sometime",
+        "when i get round to it",
+        "when you can",
+        "whenever",
+    ],
+    fix="act on it before less urgent work",
+)
+LowPriority = Lexicon(
+    name="low_priority",
+    indicates=[
+        "at some point",
+        "backlog",
+        "eventually",
+        "if i get a chance",
+        "low priority",
+        "maybe later",
+        "nice to have",
+        "no hurry",
+        "no rush",
+        "someday",
+        "sometime",
+        "when i get round to it",
+        "whenever",
+    ],
+    rules_out=[
+        "asap",
+        "blocking",
+        "can't wait",
+        "critical",
+        "deadline",
+        "drop everything",
+        "emergency",
+        "first thing",
+        "high priority",
+        "immediately",
+        "important",
+        "needs doing now",
+        "now",
+        "pressing",
+        "right away",
+        "right now",
+        "straight away",
+        "today",
+        "top priority",
+        "urgent",
+        "urgently",
+    ],
+    fix="let more urgent work go first",
+)
+
+__all__ = ["Effort", "EnergyContext", "HighPriority", "LowPriority"]

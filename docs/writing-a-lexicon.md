@@ -228,5 +228,20 @@ print(Sycophancy)
 print(Sycophancy.examples())
 #> ['brilliant question', 'excellent point', 'excellent question', 'good catch']
 print({name: len(group) for name, group in GROUPS.items()})
-#> {'request': 37, 'instruction': 19, 'response': 21, 'domain': 15, 'interaction': 5}
+"""
+{
+    "time": 10,
+    "priority": 4,
+    "task": 10,
+    "intent": 10,
+    "shape": 11,
+    "demand": 8,
+    "style": 8,
+    "epistemics": 7,
+    "manner": 7,
+    "safety": 4,
+    "progress": 3,
+    "topic": 15,
+}
+"""
 ```

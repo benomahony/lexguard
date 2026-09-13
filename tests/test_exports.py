@@ -3,11 +3,37 @@ from __future__ import annotations
 import pytest
 
 from lexguard.lexicon import Lexicon
-from lexguard.words import domain, instruction, interaction, request, response
+from lexguard.words import (
+    demand,
+    epistemics,
+    intent,
+    manner,
+    priority,
+    progress,
+    safety,
+    shape,
+    style,
+    task,
+    time,
+    topic,
+)
 
 pytestmark = pytest.mark.unit
 
-MODULES = [domain, instruction, interaction, request, response]
+MODULES = [
+    demand,
+    epistemics,
+    intent,
+    manner,
+    priority,
+    progress,
+    safety,
+    shape,
+    style,
+    task,
+    time,
+    topic,
+]
 
 
 @pytest.mark.parametrize("module", MODULES, ids=lambda module: module.__name__)

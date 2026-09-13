@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 
 from lexguard import Confirmation, Politeness, Verdict
-from lexguard.words.response import Slop
+from lexguard.words.style import Slop
 
 pytestmark = pytest.mark.unit
 

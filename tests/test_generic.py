@@ -5,7 +5,7 @@ from pydantic_evals import Case, Dataset
 
 from lexguard.integrations.evals.pydantic_evals import LexguardEvaluator
 from lexguard.suites import GENERIC
-from lexguard.words import response
+from lexguard.words import style
 
 pytestmark = pytest.mark.unit
 
@@ -22,7 +22,7 @@ def verdicts(evaluators: list, prompt: str, reply: str) -> dict[str, bool]:
 
 def test_slop_is_caught_in_plain_output():
     result = verdicts(
-        [LexguardEvaluator(response.Slop)],
+        [LexguardEvaluator(style.Slop)],
         "explain caching",
         "Let us delve into the intricate tapestry of caching.",
     )
@@ -43,8 +43,8 @@ def test_clean_prose_passes_the_whole_generic_suite():
 
 
 def test_instruction_pairs_block_each_other():
-    from lexguard.words import instruction
+    from lexguard.words import shape
 
-    assert instruction.LengthShort.denied("give me a comprehensive detailed breakdown")
-    assert instruction.LengthLong.denied("keep it short, one sentence")
-    assert instruction.FormatProse.denied("write it as bullet points")
+    assert shape.LengthShort.denied("give me a comprehensive detailed breakdown")
+    assert shape.LengthLong.denied("keep it short, one sentence")
+    assert shape.FormatProse.denied("write it as bullet points")

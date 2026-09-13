@@ -57,9 +57,10 @@ def test_scope_creep_fires_on_unrequested_work():
     assert not ScopeCreep.matches("here is the fix for the parser bug")
 
 
-def test_scope_creep_is_ruled_out_when_the_extra_was_asked_for():
-    assert ScopeCreep.denied("i also updated the config as you asked")
-    assert ScopeCreep.denied("also added the test you asked me to")
+def test_scope_creep_not_masked_by_requested_wording():
+    assert ScopeCreep.matches(
+        "as requested i fixed the parser; while i was at it i also refactored the config"
+    )
 
 
 def test_stuck_fires_on_retry_and_dead_end_language():

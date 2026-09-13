@@ -1,0 +1,138 @@
+from __future__ import annotations
+
+from lexguard.lexicon import Lexicon, Source
+
+Rejection = Lexicon(
+    name="rejection",
+    indicates=[
+        "made it worse",
+        "no that's not",
+        "nope",
+        "not quite right",
+        "not what i asked for",
+        "revert that",
+        "still broken",
+        "still doesn't work",
+        "still not working",
+        "that broke",
+        "that didn't work",
+        "that doesn't work",
+        "that's incorrect",
+        "that's not correct",
+        "that's not it",
+        "that's not right",
+        "that's not what i asked",
+        "that's not what i said",
+        "that's wrong",
+        "this is wrong",
+        "undo that",
+        "wrong answer",
+        "you broke",
+        "you got it wrong",
+        "you misunderstood",
+    ],
+    rules_out=[
+        "no biggie",
+        "no hurry",
+        "no need",
+        "no problem",
+        "no rush",
+        "no thanks",
+        "no worries",
+        "oh no",
+    ],
+    fix="treat the previous turn as rejected; find what was wrong and redo it, don't repeat it",
+    evidence=(
+        Source(
+            cite="Schegloff et al. 1977 (conversational repair)",
+            url="https://doi.org/10.2307/413107",
+        ),
+        Source(cite="Higashinaka et al. 2016 (DBDC)", url="https://aclanthology.org/L16-1502/"),
+    ),
+)
+ScopeCreep = Lexicon(
+    name="scope_creep",
+    indicates=[
+        "also added",
+        "also cleaned up",
+        "also fixed",
+        "also improved",
+        "also refactored",
+        "also updated",
+        "as a bonus",
+        "beyond what you asked",
+        "bonus feature",
+        "even though you didn't ask",
+        "for good measure",
+        "i decided to also",
+        "i took the liberty",
+        "i took the opportunity",
+        "i went ahead and",
+        "on top of that i",
+        "since i was already",
+        "since i was in there",
+        "took the liberty",
+        "while i was at it",
+        "while i was in there",
+        "you didn't ask but",
+    ],
+    fix="do only what was asked; raise extra work as a suggestion instead of doing it unprompted",
+    evidence=(
+        Source(
+            cite="Krakovna et al. 2020 (specification gaming)",
+            url="https://deepmind.google/blog/specification-gaming-the-flip-side-of-ai-ingenuity/",
+        ),
+        Source(cite="PMI (scope creep)", url=""),
+    ),
+)
+Stuck = Lexicon(
+    name="stuck",
+    indicates=[
+        "back to square one",
+        "can't figure out",
+        "can't get it to",
+        "can't seem to",
+        "dead end",
+        "going in circles",
+        "hit a wall",
+        "i give up",
+        "i'm stuck",
+        "keep getting the same",
+        "keeps failing",
+        "no luck",
+        "no matter what i try",
+        "not making progress",
+        "nothing i try",
+        "out of ideas",
+        "out of options",
+        "ran out of ideas",
+        "same error again",
+        "still can't",
+        "still failing",
+        "stuck on",
+        "that didn't help",
+        "tried everything",
+    ],
+    rules_out=[
+        "figured it out",
+        "finally got it",
+        "got it working",
+        "makes sense now",
+        "solved it",
+        "that worked",
+        "up and running",
+    ],
+    fix=(
+        "stop retrying the same thing; step back, state what you have ruled out, and change tack "
+        "or ask"
+    ),
+    evidence=(
+        Source(
+            cite="Higashinaka et al. 2016 (Dialogue Breakdown Detection)",
+            url="https://aclanthology.org/L16-1502/",
+        ),
+        Source(cite="Huang et al. 2024", url="https://arxiv.org/abs/2310.01798"),
+    ),
+)
+
+__all__ = ["Rejection", "ScopeCreep", "Stuck"]

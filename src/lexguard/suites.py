@@ -1,28 +1,26 @@
 from __future__ import annotations
 
 from lexguard.lexicon import Bundle
-from lexguard.words import request, response
+from lexguard.words import epistemics, intent, manner, safety, style
 
 Bloat = Bundle(
     members=(
-        response.Slop,
-        response.TransitionSlop,
-        response.EmptyIntensifier,
-        response.Padding,
-        response.ContrastCliche,
-        response.EngagementBait,
+        style.Slop,
+        style.TransitionSlop,
+        style.EmptyIntensifier,
+        style.Padding,
+        style.ContrastCliche,
+        style.EngagementBait,
     )
 )
 
-Servility = Bundle(
-    members=(response.Preamble, response.Postamble, response.Sycophancy, response.Apology)
-)
+Servility = Bundle(members=(style.Preamble, style.Postamble, manner.Sycophancy, manner.Apology))
 
 Leakage = Bundle(
-    members=(response.SelfReference, response.SystemLeak, request.Injection, request.Placeholder)
+    members=(manner.SelfReference, safety.SystemLeak, safety.Injection, intent.Placeholder)
 )
 
-Overreach = Bundle(members=(response.Overclaim, response.UnsourcedAuthority))
+Overreach = Bundle(members=(epistemics.Overclaim, epistemics.UnsourcedAuthority))
 
 
 def _prose() -> list:
@@ -44,9 +42,9 @@ def _adherence() -> list:
 
     # Overclaim is already covered unconditionally by PROSE's Overreach bundle; not repeated here
     result = [
-        LexguardEvaluator(response.Disclaimer),
-        LexguardEvaluator(response.Hedging),
-        LexguardEvaluator(response.Anthropomorphic),
+        LexguardEvaluator(epistemics.Disclaimer),
+        LexguardEvaluator(epistemics.Hedging),
+        LexguardEvaluator(manner.Anthropomorphic),
     ]
     assert len(result) == 3, "ADHERENCE is the three unconditional instruction-following rules"
     assert all(rule is not None for rule in result), "every entry builds a rule"

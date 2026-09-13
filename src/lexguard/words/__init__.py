@@ -1,14 +1,34 @@
 from __future__ import annotations
 
 from lexguard.lexicon import Lexicon
-from lexguard.words import domain, instruction, interaction, request, response
+from lexguard.words import (
+    demand,
+    epistemics,
+    intent,
+    manner,
+    priority,
+    progress,
+    safety,
+    shape,
+    style,
+    task,
+    time,
+    topic,
+)
 
 MODULES = {
-    "request": request,
-    "instruction": instruction,
-    "response": response,
-    "domain": domain,
-    "interaction": interaction,
+    "time": time,
+    "priority": priority,
+    "task": task,
+    "intent": intent,
+    "shape": shape,
+    "demand": demand,
+    "style": style,
+    "epistemics": epistemics,
+    "manner": manner,
+    "safety": safety,
+    "progress": progress,
+    "topic": topic,
 }
 
 LEXICONS: dict[str, Lexicon] = {
@@ -23,4 +43,19 @@ GROUPS: dict[str, dict[str, Lexicon]] = {
     for label, module in MODULES.items()
 }
 
-__all__ = ["GROUPS", "LEXICONS", "domain", "instruction", "interaction", "request", "response"]
+__all__ = [
+    "GROUPS",
+    "LEXICONS",
+    "demand",
+    "epistemics",
+    "intent",
+    "manner",
+    "priority",
+    "progress",
+    "safety",
+    "shape",
+    "style",
+    "task",
+    "time",
+    "topic",
+]
