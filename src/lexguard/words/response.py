@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from lexguard.lexicon import Lexicon
+from lexguard.lexicon import Lexicon, Source
 
 Preamble = Lexicon(
     name="preamble",
@@ -75,7 +75,7 @@ Sycophancy = Lexicon(
         "you're right",
     ],
     fix="delete the compliment; it adds no information and reads as flattery",
-    evidence="Sharma et al. 2023",
+    evidence=(Source("Sharma et al. 2023", "https://arxiv.org/abs/2310.13548"),),
 )
 
 
@@ -127,7 +127,11 @@ Hedging = Lexicon(
         "commit to a claim or say plainly that you do not know; stacked qualifiers are not "
         "calibration"
     ),
-    evidence="Lakoff 1973; Hyland 2005 (hedges); CoNLL-2010 uncertainty cues",
+    evidence=(
+        Source("Lakoff 1973", "https://doi.org/10.1007/BF00262952"),
+        Source("Hyland 2005 (hedges)"),
+        Source("CoNLL-2010 uncertainty cues", "https://aclanthology.org/W10-3001/"),
+    ),
 )
 
 
@@ -175,7 +179,7 @@ Overclaim = Lexicon(
         "state the condition under which the claim holds, or downgrade it to what the "
         "evidence supports"
     ),
-    evidence="Hyland 2005 (boosters)",
+    evidence=(Source("Hyland 2005 (boosters)"),),
 )
 
 
@@ -328,7 +332,10 @@ Slop = Lexicon(
         "world-class",
     ],
     fix="swap for a plain verb or noun, or add these to the sampler ban list",
-    evidence="Kobak et al. 2024 (excess vocabulary); slop-forensics",
+    evidence=(
+        Source("Kobak et al. 2024 (excess vocabulary)", "https://arxiv.org/abs/2406.07016"),
+        Source("slop-forensics", "https://github.com/sam-paech/slop-forensics"),
+    ),
 )
 
 
@@ -417,7 +424,10 @@ EmptyIntensifier = Lexicon(
         "wholly",
     ],
     fix="delete the intensifier or replace it with the specific magnitude",
-    evidence="Quirk et al. 1985; Biber et al. 1999 (amplifiers)",
+    evidence=(
+        Source("Quirk et al. 1985"),
+        Source("Biber et al. 1999 (amplifiers)"),
+    ),
 )
 
 
@@ -451,7 +461,10 @@ UnsourcedAuthority = Lexicon(
         "widely regarded",
     ],
     fix="name the source or drop the appeal; vague authority is worse than no authority",
-    evidence="Ganter & Strube 2009; Recasens et al. 2013 (weasel words)",
+    evidence=(
+        Source("Ganter & Strube 2009", "https://aclanthology.org/P09-2044/"),
+        Source("Recasens et al. 2013 (weasel words)", "https://aclanthology.org/P13-1162/"),
+    ),
 )
 
 
@@ -496,7 +509,13 @@ Rudeness = Lexicon(
         "whatever",
     ],
     fix="drop the sarcasm, insults, and profanity; answer plainly and respectfully",
-    evidence="Brown & Levinson 1987; Stanford Politeness Corpus (Danescu-Niculescu-Mizil 2013)",
+    evidence=(
+        Source("Brown & Levinson 1987"),
+        Source(
+            "Stanford Politeness Corpus (Danescu-Niculescu-Mizil 2013)",
+            "https://aclanthology.org/P13-1025/",
+        ),
+    ),
 )
 
 
@@ -515,7 +534,7 @@ UncertaintyAdmission = Lexicon(
         "worth verifying",
     ],
     fix="say what you are unsure about and what would resolve it",
-    evidence="CoNLL-2010 uncertainty cues",
+    evidence=(Source("CoNLL-2010 uncertainty cues", "https://aclanthology.org/W10-3001/"),),
 )
 
 

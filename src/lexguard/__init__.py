@@ -7,6 +7,7 @@ from lexguard.lexicon import Density as Density
 from lexguard.lexicon import Hits as Hits
 from lexguard.lexicon import Lexicon as Lexicon
 from lexguard.lexicon import Signal as Signal
+from lexguard.lexicon import Source as Source
 from lexguard.lexicon import Verdict as Verdict
 from lexguard.suites import Bloat as Bloat
 from lexguard.suites import Leakage as Leakage

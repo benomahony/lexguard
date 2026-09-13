@@ -4,7 +4,7 @@ import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
-from lexguard import LEXICONS, Lexicon
+from lexguard import LEXICONS, Lexicon, Source
 from lexguard.lexicon import tidy
 
 pytestmark = pytest.mark.unit
@@ -76,24 +76,26 @@ def test_a_blank_fix_is_rejected():
 def test_evidence_round_trips_but_is_ignored_by_equality():
     # as_code() dumps the full source, evidence included, and it round-trips; but evidence does
     # not change what a lexicon matches, so it is ignored by equality
-    cited = Lexicon(name="x", indicates=["a"], fix="ask", evidence="Author 2013")
+    source = Source("Author 2013", "https://doi.org/10.0000/x")
+    cited = Lexicon(name="x", indicates=["a"], fix="ask", evidence=(source,))
     plain = Lexicon(name="x", indicates=["a"], fix="ask")
     code = cited.as_code()
-    assert "evidence='Author 2013'" in code
-    assert eval(code, {"Lexicon": Lexicon}).evidence == "Author 2013"  # noqa: S307
+    assert "Source(cite='Author 2013', url='https://doi.org/10.0000/x')" in code
+    assert eval(code, {"Lexicon": Lexicon, "Source": Source}).evidence == (source,)  # noqa: S307
     assert cited == plain
-    assert cited.evidence == "Author 2013"
+    assert cited.evidence == (source,)
 
 
 def test_evidence_whitespace_is_collapsed():
-    assert Lexicon(
-        name="x", indicates=["a"], fix="ask", evidence="line one\n   line two"
-    ).evidence == ("line one line two")
+    source = Lexicon(
+        name="x", indicates=["a"], fix="ask", evidence=(Source("line one\n   line two"),)
+    ).evidence[0]
+    assert source.cite == "line one line two"
 
 
 @pytest.mark.parametrize("lexicon", LEXICONS.values(), ids=LEXICONS.keys())
 def test_every_shipped_lexicon_round_trips_and_is_stable(lexicon: Lexicon):
     code = lexicon.as_code()
-    rebuilt = eval(code, {"Lexicon": Lexicon})  # noqa: S307
+    rebuilt = eval(code, {"Lexicon": Lexicon, "Source": Source})  # noqa: S307
     assert rebuilt == lexicon
     assert rebuilt.as_code() == code

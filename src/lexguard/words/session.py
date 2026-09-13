@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from lexguard.lexicon import Lexicon
+from lexguard.lexicon import Lexicon, Source
 
 Rejection = Lexicon(
     name="rejection",
@@ -42,7 +42,10 @@ Rejection = Lexicon(
         "oh no",
     ],
     fix="treat the previous turn as rejected; find what was wrong and redo it, don't repeat it",
-    evidence="Schegloff et al. 1977 (conversational repair); Higashinaka et al. 2016 (DBDC)",
+    evidence=(
+        Source("Schegloff et al. 1977 (conversational repair)", "https://doi.org/10.2307/413107"),
+        Source("Higashinaka et al. 2016 (DBDC)", "https://aclanthology.org/L16-1502/"),
+    ),
 )
 
 
@@ -90,7 +93,14 @@ Frustration = Lexicon(
     ],
     fix="acknowledge the repeated ask and change approach; do not make the user repeat it again",
     evidence=(
-        "Ang et al. 2002 (annoyance/frustration prosody); Klein et al. 2002 (frustration in HCI)"
+        Source(
+            "Ang et al. 2002 (annoyance/frustration prosody)",
+            "https://www.isca-archive.org/icslp_2002/ang02_icslp.html",
+        ),
+        Source(
+            "Klein et al. 2002 (frustration in HCI)",
+            "https://doi.org/10.1016/S0953-5438(01)00053-4",
+        ),
     ),
 )
 
@@ -142,7 +152,13 @@ UnverifiedClaim = Lexicon(
         "verified",
     ],
     fix="run it and show the result before claiming it works, or say you have not verified it",
-    evidence="Huang et al. 2024 (intrinsic self-correction limits); Hyland 2005 (boosters)",
+    evidence=(
+        Source(
+            "Huang et al. 2024 (intrinsic self-correction limits)",
+            "https://arxiv.org/abs/2310.01798",
+        ),
+        Source("Hyland 2005 (boosters)"),
+    ),
 )
 
 
@@ -182,7 +198,13 @@ ScopeCreep = Lexicon(
         "you wanted",
     ],
     fix="do only what was asked; raise extra work as a suggestion instead of doing it unprompted",
-    evidence="Krakovna et al. 2020 (specification gaming); PMI (scope creep)",
+    evidence=(
+        Source(
+            "Krakovna et al. 2020 (specification gaming)",
+            "https://deepmind.google/blog/specification-gaming-the-flip-side-of-ai-ingenuity/",
+        ),
+        Source("PMI (scope creep)"),
+    ),
 )
 
 
@@ -227,7 +249,13 @@ Stuck = Lexicon(
         "stop retrying the same thing; step back, state what you have ruled out, and change tack "
         "or ask"
     ),
-    evidence="Higashinaka et al. 2016 (Dialogue Breakdown Detection); Huang et al. 2024",
+    evidence=(
+        Source(
+            "Higashinaka et al. 2016 (Dialogue Breakdown Detection)",
+            "https://aclanthology.org/L16-1502/",
+        ),
+        Source("Huang et al. 2024", "https://arxiv.org/abs/2310.01798"),
+    ),
 )
 
 

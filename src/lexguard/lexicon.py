@@ -68,6 +68,22 @@ class Density:
         assert 0.0 <= self.ruled_out <= 1.0, "density is a fraction of words, in [0, 1]"
 
 
+@dataclass(frozen=True)
+class Source:
+    """A citation for a lexicon's terms: a human-readable reference and, where one exists, a
+    persistent link to it — a DOI resolver (https://doi.org/...), else an arXiv or ACL permalink,
+    else the canonical URL. Books and the like carry no url.
+    """
+
+    cite: str
+    url: str = ""
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "cite", " ".join(self.cite.split()))
+        object.__setattr__(self, "url", self.url.strip())
+        assert self.cite, "a source needs a citation"
+
+
 def tidy(words: Collection[str]) -> frozenset[str]:
     result = frozenset(" ".join(word.split()).casefold() for word in words if word.strip())
     assert all(word for word in result), "tidy() must drop blank entries"
@@ -110,10 +126,11 @@ class Lexicon:
     # Politeness: silence is the problem). The common case takes the default: Slop and Rudeness
     # are things you don't want, so a match is the problem, not the silence.
     fail_when_neutral: bool = False
-    # a short citation for where the terms come from: dumped by as_code(), rendered next to the
-    # lexicon in the docs, and readable at runtime (e.g. an agent citing why a check fired).
-    # ignored by equality — two lexicons that match the same way are equal whatever their evidence
-    evidence: str = field(default="", compare=False)
+    # the sources the terms come from, each a Source(cite, url): dumped by as_code(), rendered as
+    # links next to the lexicon in the docs, and readable at runtime (e.g. an agent citing why a
+    # check fired). ignored by equality — two lexicons that match the same way are equal whatever
+    # their evidence
+    evidence: tuple[Source, ...] = field(default=(), compare=False)
     _indicate: str | None = field(init=False, repr=False, compare=False)
     _rule_out: str | None = field(init=False, repr=False, compare=False)
 
@@ -128,7 +145,7 @@ class Lexicon:
         object.__setattr__(self, "rules_out", tidy(self.rules_out))
         object.__setattr__(self, "fix", " ".join(self.fix.split()))
         assert self.fix, f"{self.name}: lexicon must have a fix"
-        object.__setattr__(self, "evidence", " ".join(self.evidence.split()))
+        object.__setattr__(self, "evidence", tuple(self.evidence))
         object.__setattr__(self, "_indicate", phrases(self.indicates))
         object.__setattr__(self, "_rule_out", phrases(self.rules_out))
         assert all(word not in self.rules_out for word in self.indicates), (

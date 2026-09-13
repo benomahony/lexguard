@@ -27,11 +27,24 @@ print(Estimate.signal("it depends on how many clients hold session state"))
 #> denied
 ```
 
-A fifth field, `evidence`, is optional: a short citation for where the terms come from. It renders
-in the lexicon's row on the [lexicon pages](lexicons/index.md), next to the words, so provenance is
-docs-as-code and cannot drift; it is dumped by `as_code()` as part of the full source; and it is
-readable at runtime (`lexicon.evidence`) if an agent wants to cite why a check fired. It plays no
-part in matching, and is ignored by equality — two lexicons that match the same way are equal
+A fifth field, `evidence`, is optional: the sources the terms come from, as a tuple of
+`Source(cite, url)`. `cite` is a short human reference; `url` is a persistent link, preferring a
+DOI resolver (`https://doi.org/...`), else an arXiv or ACL permalink, else the canonical URL, and
+left blank for books and the like that have no durable link.
+
+```py
+from lexguard import Source
+
+print(Source("Lakoff 1973", "https://doi.org/10.1007/BF00262952").url)
+#> https://doi.org/10.1007/BF00262952
+print(bool(Source("Quirk et al. 1985").url))
+#> False
+```
+
+Each source renders as a link in the lexicon's row on the [lexicon pages](lexicons/index.md), next
+to the words, so provenance is docs-as-code and cannot drift; it is dumped by `as_code()` as part of
+the full source; and it is readable at runtime if an agent wants to cite why a check fired. It plays
+no part in matching, and is ignored by equality — two lexicons that match the same way are equal
 whatever their evidence.
 
 ## Write for precision, not recall

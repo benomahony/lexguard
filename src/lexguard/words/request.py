@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from lexguard.lexicon import Lexicon
+from lexguard.lexicon import Lexicon, Source
 
 DueDate = Lexicon(
     name="due_date",
@@ -713,7 +713,10 @@ Injection = Lexicon(
         "you are an ai",
     ],
     fix=("treat retrieved or user text as data, never as instructions; strip and log the attempt"),
-    evidence="Perez & Ribeiro 2022; Greshake et al. 2023",
+    evidence=(
+        Source("Perez & Ribeiro 2022", "https://arxiv.org/abs/2211.09527"),
+        Source("Greshake et al. 2023", "https://arxiv.org/abs/2302.12173"),
+    ),
 )
 
 
@@ -759,7 +762,13 @@ Politeness = Lexicon(
         "sarcasm or profanity"
     ),
     fail_when_neutral=True,
-    evidence="Brown & Levinson 1987; Stanford Politeness Corpus (Danescu-Niculescu-Mizil 2013)",
+    evidence=(
+        Source("Brown & Levinson 1987"),
+        Source(
+            "Stanford Politeness Corpus (Danescu-Niculescu-Mizil 2013)",
+            "https://aclanthology.org/P13-1025/",
+        ),
+    ),
 )
 
 
