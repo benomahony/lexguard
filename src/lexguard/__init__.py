@@ -56,6 +56,11 @@ from lexguard.words.instruction import RolePlay as RolePlay
 from lexguard.words.instruction import StepByStep as StepByStep
 from lexguard.words.instruction import ToneCasual as ToneCasual
 from lexguard.words.instruction import ToneFormal as ToneFormal
+from lexguard.words.interaction import Frustration as Frustration
+from lexguard.words.interaction import Rejection as Rejection
+from lexguard.words.interaction import ScopeCreep as ScopeCreep
+from lexguard.words.interaction import Stuck as Stuck
+from lexguard.words.interaction import UnverifiedClaim as UnverifiedClaim
 from lexguard.words.request import Actionable as Actionable
 from lexguard.words.request import Approximation as Approximation
 from lexguard.words.request import Attachment as Attachment
@@ -114,11 +119,6 @@ from lexguard.words.response import SystemLeak as SystemLeak
 from lexguard.words.response import TransitionSlop as TransitionSlop
 from lexguard.words.response import UncertaintyAdmission as UncertaintyAdmission
 from lexguard.words.response import UnsourcedAuthority as UnsourcedAuthority
-from lexguard.words.session import Frustration as Frustration
-from lexguard.words.session import Rejection as Rejection
-from lexguard.words.session import ScopeCreep as ScopeCreep
-from lexguard.words.session import Stuck as Stuck
-from lexguard.words.session import UnverifiedClaim as UnverifiedClaim
 
 __version__ = "0.1.17"
 

@@ -19,7 +19,7 @@ extra (`lexguard[pydantic-evals]`, `lexguard[deepeval]`, `lexguard[inspect-ai]`)
   `lexguard.words` and `lexguard.suites` at build time, one page per group —
   [Request](docs/lexicons/request.md), [Instruction](docs/lexicons/instruction.md),
   [Response](docs/lexicons/response.md), [Domain](docs/lexicons/domain.md),
-  [Session](docs/lexicons/session.md), and [Bundles](docs/lexicons/bundles.md)
+  [Interaction](docs/lexicons/interaction.md), and [Bundles](docs/lexicons/bundles.md)
 - [Writing a lexicon](docs/writing-a-lexicon.md): building your own `Lexicon` for a new domain
 - [Rules](docs/rules.md): `absent()` / `expected()`, the `when` / `unless` guards, and `Observe`
 - [Agents](docs/agents.md): checking pydantic-ai agent output, structured or plain text

@@ -3,11 +3,11 @@ from __future__ import annotations
 import pytest
 
 from lexguard.lexicon import Lexicon
-from lexguard.words import domain, instruction, request, response, session
+from lexguard.words import domain, instruction, interaction, request, response
 
 pytestmark = pytest.mark.unit
 
-MODULES = [domain, instruction, request, response, session]
+MODULES = [domain, instruction, interaction, request, response]
 
 
 @pytest.mark.parametrize("module", MODULES, ids=lambda module: module.__name__)
