@@ -12,4 +12,6 @@ Import any of these by their class name, e.g. `from lexguard import DueDate`.
 - [Response](response.md): what a model's reply looks like — hedging, slop, sycophancy,
   refusals
 - [Domain](domain.md): what the request is about — money, travel, household, people
+- [Session](session.md): what happens over a coding-agent session — rejection, frustration,
+  unverified claims, scope creep, stuck
 - [Bundles](bundles.md): prebuilt groupings of the lexicons above

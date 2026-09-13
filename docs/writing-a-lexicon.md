@@ -215,5 +215,5 @@ print(Sycophancy)
 print(Sycophancy.examples())
 #> ['brilliant question', 'excellent point', 'excellent question', 'good catch']
 print({name: len(group) for name, group in GROUPS.items()})
-#> {'request': 37, 'instruction': 19, 'response': 21, 'domain': 15}
+#> {'request': 37, 'instruction': 19, 'response': 21, 'domain': 15, 'session': 5}
 ```

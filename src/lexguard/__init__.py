@@ -113,6 +113,11 @@ from lexguard.words.response import SystemLeak as SystemLeak
 from lexguard.words.response import TransitionSlop as TransitionSlop
 from lexguard.words.response import UncertaintyAdmission as UncertaintyAdmission
 from lexguard.words.response import UnsourcedAuthority as UnsourcedAuthority
+from lexguard.words.session import Frustration as Frustration
+from lexguard.words.session import Rejection as Rejection
+from lexguard.words.session import ScopeCreep as ScopeCreep
+from lexguard.words.session import Stuck as Stuck
+from lexguard.words.session import UnverifiedClaim as UnverifiedClaim
 
 __version__ = "0.1.17"
 
