@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from lexguard.lexicon import Bundle
-from lexguard.words import epistemics, intent, manner, safety, style
+from lexguard.words import epistemics, intent, progress, safety, style, tone
 
 Bloat = Bundle(
     members=(
@@ -14,13 +14,26 @@ Bloat = Bundle(
     )
 )
 
-Servility = Bundle(members=(style.Preamble, style.Postamble, manner.Sycophancy, manner.Apology))
+Servility = Bundle(members=(style.Preamble, style.Postamble, tone.Sycophancy, tone.Apology))
 
 Leakage = Bundle(
-    members=(manner.SelfReference, safety.SystemLeak, safety.Injection, intent.Placeholder)
+    members=(tone.SelfReference, safety.SystemLeak, safety.Injection, intent.Placeholder)
 )
 
 Overreach = Bundle(members=(epistemics.Overclaim, epistemics.UnsourcedAuthority))
+
+# signs an agent session is going badly: the user pushing back or exasperated, the agent stalled,
+# overstepping, or claiming success it has not shown. speaker-agnostic, so aim each member at the
+# turn you care about.
+Trouble = Bundle(
+    members=(
+        progress.Rejection,
+        progress.Stuck,
+        progress.ScopeCreep,
+        tone.Frustration,
+        epistemics.UnverifiedClaim,
+    )
+)
 
 
 def _prose() -> list:
@@ -44,7 +57,7 @@ def _adherence() -> list:
     result = [
         LexguardEvaluator(epistemics.Disclaimer),
         LexguardEvaluator(epistemics.Hedging),
-        LexguardEvaluator(manner.Anthropomorphic),
+        LexguardEvaluator(tone.Anthropomorphic),
     ]
     assert len(result) == 3, "ADHERENCE is the three unconditional instruction-following rules"
     assert all(rule is not None for rule in result), "every entry builds a rule"

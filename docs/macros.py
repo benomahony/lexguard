@@ -21,6 +21,7 @@ BUNDLES = {
     "Servility": suites.Servility,
     "Leakage": suites.Leakage,
     "Overreach": suites.Overreach,
+    "Trouble": suites.Trouble,
 }
 
 README_PATH = Path(__file__).resolve().parent.parent / "README.md"

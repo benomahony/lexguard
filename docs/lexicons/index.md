@@ -17,7 +17,7 @@ meaning, not a split by who is speaking. Run any of them over whichever turn you
 - [Demand](demand.md): what the output must include or do (citations, opinion, comparison, roleplay)
 - [Style](style.md): writing tics to avoid (slop, filler, preamble, engagement bait)
 - [Epistemics](epistemics.md): how claims are grounded (hedging, overclaiming, sourcing, uncertainty)
-- [Manner](manner.md): how it comes across (politeness, rudeness, sycophancy, persona, affect)
+- [Tone](tone.md): how it comes across (politeness, rudeness, sycophancy, persona, affect)
 - [Safety](safety.md): security and disclosure (refusal, prompt injection, secrets, config leaks)
 - [Progress](progress.md): how the interaction is going (rejection, being stuck, scope creep)
 - [Topic](topic.md): what the message is about (money, travel, household, people)

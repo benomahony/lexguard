@@ -13,6 +13,7 @@ from lexguard.suites import Bloat as Bloat
 from lexguard.suites import Leakage as Leakage
 from lexguard.suites import Overreach as Overreach
 from lexguard.suites import Servility as Servility
+from lexguard.suites import Trouble as Trouble
 from lexguard.words import GROUPS as GROUPS
 from lexguard.words import LEXICONS as LEXICONS
 
@@ -47,13 +48,6 @@ from lexguard.words.intent import Placeholder as Placeholder
 from lexguard.words.intent import PriorReference as PriorReference
 from lexguard.words.intent import Question as Question
 from lexguard.words.intent import Vague as Vague
-from lexguard.words.manner import Anthropomorphic as Anthropomorphic
-from lexguard.words.manner import Apology as Apology
-from lexguard.words.manner import Frustration as Frustration
-from lexguard.words.manner import Politeness as Politeness
-from lexguard.words.manner import Rudeness as Rudeness
-from lexguard.words.manner import SelfReference as SelfReference
-from lexguard.words.manner import Sycophancy as Sycophancy
 from lexguard.words.priority import Effort as Effort
 from lexguard.words.priority import EnergyContext as EnergyContext
 from lexguard.words.priority import HighPriority as HighPriority
@@ -104,6 +98,13 @@ from lexguard.words.time import HardDeadline as HardDeadline
 from lexguard.words.time import Past as Past
 from lexguard.words.time import Recurrence as Recurrence
 from lexguard.words.time import SoftDeadline as SoftDeadline
+from lexguard.words.tone import Anthropomorphic as Anthropomorphic
+from lexguard.words.tone import Apology as Apology
+from lexguard.words.tone import Frustration as Frustration
+from lexguard.words.tone import Politeness as Politeness
+from lexguard.words.tone import Rudeness as Rudeness
+from lexguard.words.tone import SelfReference as SelfReference
+from lexguard.words.tone import Sycophancy as Sycophancy
 from lexguard.words.topic import Children as Children
 from lexguard.words.topic import Communication as Communication
 from lexguard.words.topic import Garden as Garden

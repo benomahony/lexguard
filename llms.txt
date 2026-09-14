@@ -17,7 +17,7 @@ extra (`lexguard[pydantic-evals]`, `lexguard[deepeval]`, `lexguard[inspect-ai]`)
   standalone and framework-integrated ways of running a lexicon
 - [Lexicons](docs/lexicons/index.md): every lexicon that ships in the box, rendered from
   `lexguard.words` and `lexguard.suites` at build time, one page per facet group:
-  time, priority, task, intent, shape, demand, style, epistemics, manner, safety, progress,
+  time, priority, task, intent, shape, demand, style, epistemics, tone, safety, progress,
   topic, and [Bundles](docs/lexicons/bundles.md)
 - [Writing a lexicon](docs/writing-a-lexicon.md): building your own `Lexicon` for a new domain
 - [Rules](docs/rules.md): `absent()` / `expected()`, the `when` / `unless` guards, and `Observe`

@@ -43,19 +43,23 @@ Confirmation = Lexicon(
 Correction = Lexicon(
     name="correction",
     indicates=[
-        "actually",
         "change that",
         "correction",
         "i meant",
-        "instead",
         "make that",
-        "my mistake",
         "no wait",
         "on second thoughts",
         "other way round",
-        "rather",
         "scratch that",
-        "sorry",
+    ],
+    rules_out=[
+        "as i said",
+        "keep it as is",
+        "leave it as is",
+        "like i said",
+        "no change",
+        "same as before",
+        "stick with",
     ],
     fix="use the corrected version, not the earlier one",
 )

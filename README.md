@@ -55,6 +55,26 @@ for the third case. Reach for those when you just want a plain value. `.verdict(
 richer pass/fail-plus-`.reason` built on top, and it's the same call every integration below wraps,
 whether that's an eval framework or a guardrail.
 
+## One lexicon, either turn
+
+A lexicon detects a raw semantic act, not a speaker, so the same lexicon reads whichever turn you
+point it at. `Correction` is the act of taking back a previous statement: run it over the user's
+message to catch them revising their own request, or over the agent's message to catch the agent
+walking back its own output.
+
+```py
+from lexguard import Correction
+
+print(Correction("scratch that, use a set instead"))
+#> True
+print(Correction("on second thoughts that won't compile, let me change that"))
+#> True
+```
+
+The built-ins are grouped into [facets](docs/lexicons/index.md) of meaning (time, intent, tone,
+epistemics, safety, and more), never by who is speaking, because who speaks is a wiring choice you
+make when you hand a turn to a check.
+
 ## What a match means
 
 Most lexicons are checked for absence — `Slop`, `Confidential`, `Rudeness` are things you don't

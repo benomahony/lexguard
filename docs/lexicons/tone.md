@@ -2,8 +2,8 @@
 render_macros: true
 ---
 
-# Manner
+# Tone
 
 How it comes across: politeness, rudeness, sycophancy, persona, affect.
 
-{{ lexicon_table("manner") }}
+{{ lexicon_table("tone") }}

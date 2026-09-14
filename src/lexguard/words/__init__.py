@@ -5,7 +5,6 @@ from lexguard.words import (
     demand,
     epistemics,
     intent,
-    manner,
     priority,
     progress,
     safety,
@@ -13,6 +12,7 @@ from lexguard.words import (
     style,
     task,
     time,
+    tone,
     topic,
 )
 
@@ -25,7 +25,7 @@ MODULES = {
     "demand": demand,
     "style": style,
     "epistemics": epistemics,
-    "manner": manner,
+    "tone": tone,
     "safety": safety,
     "progress": progress,
     "topic": topic,
@@ -49,7 +49,6 @@ __all__ = [
     "demand",
     "epistemics",
     "intent",
-    "manner",
     "priority",
     "progress",
     "safety",
@@ -57,5 +56,6 @@ __all__ = [
     "style",
     "task",
     "time",
+    "tone",
     "topic",
 ]

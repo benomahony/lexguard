@@ -238,7 +238,7 @@ print({name: len(group) for name, group in GROUPS.items()})
     "demand": 8,
     "style": 8,
     "epistemics": 7,
-    "manner": 7,
+    "tone": 7,
     "safety": 4,
     "progress": 3,
     "topic": 15,

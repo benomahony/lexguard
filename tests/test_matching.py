@@ -2,7 +2,26 @@ from __future__ import annotations
 
 import pytest
 
-from lexguard import Frustration, Rejection, ScopeCreep, Stuck, UnverifiedClaim
+from lexguard import (
+    Actionable,
+    Apology,
+    Approximation,
+    CitationDemand,
+    ClockTime,
+    Completion,
+    Correction,
+    DueDate,
+    Frustration,
+    OpinionDemand,
+    Question,
+    Recurrence,
+    Rejection,
+    ScopeCreep,
+    SelfAssigned,
+    Stuck,
+    UnverifiedClaim,
+)
+from lexguard.lexicon import Lexicon
 
 pytestmark = pytest.mark.unit
 
@@ -72,3 +91,27 @@ def test_stuck_fires_on_retry_and_dead_end_language():
 def test_stuck_is_ruled_out_by_recovery():
     assert Stuck.denied("i was stuck on this but finally got it working")
     assert Stuck.denied("tried everything, then solved it")
+
+
+DENIAL_CASES: list[tuple[Lexicon, str, str]] = [
+    (Correction, "scratch that, use a set instead", "as i said, keep it as is"),
+    (DueDate, "email me tomorrow", "reply whenever, no rush"),
+    (Recurrence, "water the plants every day", "just once is fine"),
+    (ClockTime, "call at noon", "any time is fine"),
+    (Approximation, "get there about 3pm", "arrive at 3pm exactly"),
+    (Completion, "already done, all sorted", "it's not done yet"),
+    (Actionable, "book the table for two", "just wondering, no action needed"),
+    (SelfAssigned, "note to self, pay the rent", "sort it out on behalf of me"),
+    (Question, "what time is the meeting", "what should i add to the list"),
+    (CitationDemand, "cite your sources for that", "off the top of your head is fine"),
+    (OpinionDemand, "what do you think we should do", "just the facts, no opinions"),
+    (Apology, "sorry for the delay", "sorry not sorry"),
+]
+
+
+@pytest.mark.parametrize(
+    ("lexicon", "fires", "denied"), DENIAL_CASES, ids=[case[0].name for case in DENIAL_CASES]
+)
+def test_indicator_fires_and_blocker_denies(lexicon: Lexicon, fires: str, denied: str):
+    assert lexicon.matches(fires), f"{lexicon.name} should fire on {fires!r}"
+    assert lexicon.denied(denied), f"{lexicon.name} should be denied on {denied!r}"
