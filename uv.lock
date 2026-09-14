@@ -1537,7 +1537,7 @@ wheels = [
 
 [[package]]
 name = "lexguard"
-version = "0.1.17"
+version = "0.1.18"
 source = { editable = "." }
 
 [package.optional-dependencies]
