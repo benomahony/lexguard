@@ -82,6 +82,7 @@ class Source:
         object.__setattr__(self, "cite", " ".join(self.cite.split()))
         object.__setattr__(self, "url", self.url.strip())
         assert self.cite, "a source needs a citation"
+        assert " " not in self.url, "a url carries no spaces"
 
 
 def tidy(words: Collection[str]) -> frozenset[str]:
