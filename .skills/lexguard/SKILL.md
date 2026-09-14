@@ -132,6 +132,8 @@ guardrail = OutputGuardrail(guard=lexguard_guard(Slop))
 - [README.md](../../README.md) — install, the core API, and every way of running a lexicon
 - [docs/writing-a-lexicon.md](../../docs/writing-a-lexicon.md) — building a `Lexicon` for your own
   domain, precision-over-recall, `rules_out`, and `fail_when_neutral`
+- [docs/testing.md](../../docs/testing.md) — the `expect` DSL (`lexguard.testing`) for pinning a
+  lexicon's behaviour with present/denied/absent and pass/fail examples
 - [docs/agents.md](../../docs/agents.md) — checking pydantic-ai agent output
 - [docs/integrations/index.md](../../docs/integrations/index.md) — evals (pydantic-evals, DeepEval,
   Inspect AI) and guardrails (pydantic-ai-harness), each with its own page

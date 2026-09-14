@@ -20,6 +20,8 @@ extra (`lexguard[pydantic-evals]`, `lexguard[deepeval]`, `lexguard[inspect-ai]`)
   time, priority, task, intent, shape, demand, style, epistemics, tone, safety, progress,
   topic, and [Bundles](docs/lexicons/bundles.md)
 - [Writing a lexicon](docs/writing-a-lexicon.md): building your own `Lexicon` for a new domain
+- [Testing a lexicon](docs/testing.md): the `expect` DSL for pinning a lexicon's behaviour with
+  present/denied/absent and pass/fail examples, checked in one call
 - [Rules](docs/rules.md): `absent()` / `expected()`, the `when` / `unless` guards, and `Observe`
 - [Agents](docs/agents.md): checking pydantic-ai agent output, structured or plain text
 - [Integrations](docs/integrations/index.md): the framework-agnostic `Check`, with its own

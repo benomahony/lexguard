@@ -280,6 +280,7 @@ lg() {
 - [Lexicons](docs/lexicons/index.md): every lexicon that ships in the box, generated from
   source, one page per group
 - [Writing a lexicon](docs/writing-a-lexicon.md) for your own domain
+- [Testing a lexicon](docs/testing.md) with the `expect` DSL
 - [Agents](docs/agents.md) under test with pydantic-ai
 - [Integrations](docs/integrations/index.md): evals (pydantic-evals, DeepEval, Inspect AI) and
   guardrails (pydantic-ai-harness), each with its own page
