@@ -21,6 +21,7 @@ BUNDLES = {
     "Servility": suites.Servility,
     "Leakage": suites.Leakage,
     "Overreach": suites.Overreach,
+    "Trouble": suites.Trouble,
 }
 
 README_PATH = Path(__file__).resolve().parent.parent / "README.md"
@@ -41,7 +42,11 @@ def _field_rows(lexicon: Lexicon) -> list[str]:
     if lexicon.fix:
         rows.append(f"| fix | {lexicon.fix} |")
     if lexicon.evidence:
-        rows.append(f"| evidence | {lexicon.evidence} |")
+        cited = ", ".join(
+            f"[{source.cite}]({source.url})" if source.url else source.cite
+            for source in lexicon.evidence
+        )
+        rows.append(f"| evidence | {cited} |")
     assert rows, "a lexicon always indicates something"
     assert all(row.startswith("| ") and row.endswith(" |") for row in rows), (
         "every row is a markdown table cell"

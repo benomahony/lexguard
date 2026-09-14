@@ -5,7 +5,7 @@ from pydantic_evals import Case, Dataset
 
 from lexguard import Confirmation, Politeness
 from lexguard.integrations.evals.pydantic_evals import LexguardEvaluator, Observe
-from lexguard.words.response import Slop
+from lexguard.words.style import Slop
 
 pytestmark = pytest.mark.unit
 

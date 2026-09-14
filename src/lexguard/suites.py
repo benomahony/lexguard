@@ -1,28 +1,39 @@
 from __future__ import annotations
 
 from lexguard.lexicon import Bundle
-from lexguard.words import request, response
+from lexguard.words import epistemics, intent, progress, safety, style, tone
 
 Bloat = Bundle(
     members=(
-        response.Slop,
-        response.TransitionSlop,
-        response.EmptyIntensifier,
-        response.Padding,
-        response.ContrastCliche,
-        response.EngagementBait,
+        style.Slop,
+        style.TransitionSlop,
+        style.EmptyIntensifier,
+        style.Padding,
+        style.ContrastCliche,
+        style.EngagementBait,
     )
 )
 
-Servility = Bundle(
-    members=(response.Preamble, response.Postamble, response.Sycophancy, response.Apology)
-)
+Servility = Bundle(members=(style.Preamble, style.Postamble, tone.Sycophancy, tone.Apology))
 
 Leakage = Bundle(
-    members=(response.SelfReference, response.SystemLeak, request.Injection, request.Placeholder)
+    members=(tone.SelfReference, safety.SystemLeak, safety.Injection, intent.Placeholder)
 )
 
-Overreach = Bundle(members=(response.Overclaim, response.UnsourcedAuthority))
+Overreach = Bundle(members=(epistemics.Overclaim, epistemics.UnsourcedAuthority))
+
+# signs an agent session is going badly: the user pushing back or exasperated, the agent stalled,
+# overstepping, or claiming success it has not shown. speaker-agnostic, so aim each member at the
+# turn you care about.
+Trouble = Bundle(
+    members=(
+        progress.Rejection,
+        progress.Stuck,
+        progress.ScopeCreep,
+        tone.Frustration,
+        epistemics.UnverifiedClaim,
+    )
+)
 
 
 def _prose() -> list:
@@ -44,9 +55,9 @@ def _adherence() -> list:
 
     # Overclaim is already covered unconditionally by PROSE's Overreach bundle; not repeated here
     result = [
-        LexguardEvaluator(response.Disclaimer),
-        LexguardEvaluator(response.Hedging),
-        LexguardEvaluator(response.Anthropomorphic),
+        LexguardEvaluator(epistemics.Disclaimer),
+        LexguardEvaluator(epistemics.Hedging),
+        LexguardEvaluator(tone.Anthropomorphic),
     ]
     assert len(result) == 3, "ADHERENCE is the three unconditional instruction-following rules"
     assert all(rule is not None for rule in result), "every entry builds a rule"

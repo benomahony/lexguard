@@ -4,7 +4,7 @@ import pytest
 
 from lexguard import Density, Politeness, Verdict
 from lexguard.suites import Bloat
-from lexguard.words.response import Slop
+from lexguard.words.style import Slop
 
 pytestmark = pytest.mark.unit
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from lexguard import LEXICONS, Lexicon
+from lexguard import LEXICONS, Lexicon, Source
 from lexguard.cli import main
 
 pytestmark = pytest.mark.unit
@@ -17,7 +17,7 @@ def test_name_prints_source_that_round_trips(capsys):
     assert main(["slop"]) == 0
     out = capsys.readouterr().out
     assert out.startswith("Lexicon(")
-    assert eval(out, {"Lexicon": Lexicon}) == LEXICONS["slop"]  # noqa: S307
+    assert eval(out, {"Lexicon": Lexicon, "Source": Source}) == LEXICONS["slop"]  # noqa: S307
 
 
 def test_name_is_case_insensitive(capsys):
