@@ -58,6 +58,9 @@ reject the value outright instead.
 
 - [pydantic-ai-harness](pydantic-ai-harness.md): `lexguard_guard` wraps a `Lexicon` or `Bundle` as
   an `InputGuardrail`/`OutputGuardrail`/`ToolGuardrail` guard
+- [LangChain](langchain.md): `lexguard_middleware` wraps a `Lexicon` or `Bundle` as a
+  `create_agent` middleware — an `after_model` output guard (retry or block) or a `before_model`
+  input guard
 
 ## Install
 
@@ -68,6 +71,7 @@ uv add "lexguard[pydantic-evals]"
 uv add "lexguard[deepeval]"
 uv add "lexguard[inspect-ai]"
 uv add "lexguard[pydantic-ai-harness]"
+uv add "lexguard[langchain]"
 ```
 
 The core — `Lexicon`, `Bundle`, and `.signal()` / `.matches()` / `.denied()` / `.verdict()` — needs
