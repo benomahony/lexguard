@@ -39,6 +39,9 @@ fix: add a courteous phrase (please, thanks, could you) and don't undercut it wi
 """
 ```
 
+Paste your own text into the [playground](docs/playground.md) to watch every lexicon score it live
+in the browser, no install needed.
+
 ## How it works
 
 A `Lexicon` is a named set of words and phrases that signal a concept (`indicates`), the words that
