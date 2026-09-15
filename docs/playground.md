@@ -4,9 +4,7 @@ title: Playground
 
 # Playground
 
-Paste an agent turn and see every lexicon score it live. It runs the published `lexguard` from PyPI
-entirely in your browser via [PyScript](https://pyscript.net), so these are the same values
-`signal()`, `verdict()`, and `hits()` return in your own code. No server, no key.
+Paste an agent response and see every lexicon score it live in your browser.
 
 <style>
 #lexguard-playground { margin: 1.2rem 0; }
