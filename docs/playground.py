@@ -21,12 +21,12 @@ state = {"all": True, "focus": ""}
 
 def build_chips() -> None:
     document.querySelector("#bundles").innerHTML = "".join(
-        f'<button type="button" class="tog" data-scope="bundle" data-key="{name}"'
+        f'<button type="button" class="filt" data-scope="bundle" data-key="{name}"'
         f' aria-pressed="false">{name}<span class="cnt" hidden></span></button>'
         for name in BUNDLES
     )
     document.querySelector("#groups").innerHTML = "".join(
-        f'<button type="button" class="tog" data-scope="group" data-key="{group}"'
+        f'<button type="button" class="filt" data-scope="group" data-key="{group}"'
         f' aria-pressed="false">{group}<span class="cnt" hidden></span></button>'
         for group in GROUPS
     )
@@ -39,7 +39,7 @@ def members_of(scope: str, key: str) -> list[str]:
 
 
 def refresh_chips(fired: set[str]) -> None:
-    nodes = document.querySelectorAll("#lexguard-playground .tog")
+    nodes = document.querySelectorAll("#lexguard-playground .filt")
     for i in range(nodes.length):
         btn = nodes.item(i)
         scope = btn.getAttribute("data-scope")
@@ -169,8 +169,11 @@ def render() -> None:
     if state["focus"] not in fired:
         state["focus"] = ""
     focused = [state["focus"]] if state["focus"] else names
-    document.querySelector("#highlights").innerHTML = highlight(text, focused) if text else "&nbsp;"
-    document.querySelector("#highlights").style.transform = f"translateY({-scroll_top()}px)"
+    document.querySelector("#highlights").innerHTML = (
+        highlight(text, focused)
+        if text
+        else '<span class="empty">the annotated text appears here</span>'
+    )
     results = document.querySelector("#results")
     if not text.strip():
         results.innerHTML = '<p class="empty">Type or paste text above to score it.</p>'
@@ -196,10 +199,6 @@ def _reset_detail() -> None:
     )
 
 
-def scroll_top() -> int:
-    return document.querySelector("#text").scrollTop
-
-
 def closest_button(node):
     while node is not None and getattr(node, "tagName", "") != "BUTTON":
         node = node.parentElement
@@ -212,7 +211,7 @@ def on_click(event) -> None:
     if btn is None:
         return
     cls = btn.getAttribute("class") or ""
-    if "tog" in cls:
+    if "filt" in cls:
         scope = btn.getAttribute("data-scope")
         if scope == "all":
             state["all"] = True
@@ -234,12 +233,6 @@ def on_click(event) -> None:
 @when("input", "#text")
 def on_input(event) -> None:
     render()
-
-
-@when("scroll", "#text")
-def on_scroll(event) -> None:
-    offset = -event.target.scrollTop
-    document.querySelector("#highlights").style.transform = f"translateY({offset}px)"
 
 
 @when("change", "#onlyfired")

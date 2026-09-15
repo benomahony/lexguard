@@ -4,9 +4,10 @@ title: Playground
 
 # Playground
 
-Paste an agent turn: firing words are highlighted in place like a linter, and every lexicon shows
-as a named pill with a tick or cross. Filter to any bundles or groups, or click a pill to highlight
-just that lexicon and see how to fix it. It runs entirely in your browser:
+Paste an agent turn: firing words are highlighted below like a linter (hover any to see which
+lexicon fired), and every lexicon shows as a named pill with a tick or cross. Filter to any bundles
+or groups, or click a pill to highlight just that lexicon and see how to fix it. It runs entirely in
+your browser:
 [PyScript](https://pyscript.net) loads a real Python and installs the published `lexguard` from
 PyPI, so these are the same values `Lexicon.signal()`, `.verdict()`, and `.hits()` return in your
 own code. No server, no key, nothing sent anywhere.
@@ -15,21 +16,19 @@ own code. No server, no key, nothing sent anywhere.
 #lexguard-playground { margin: 1.2rem 0; }
 #lexguard-playground .scoperow { display: flex; gap: .5rem; align-items: baseline; margin-bottom: .5rem; flex-wrap: wrap; }
 #lexguard-playground .scoperow .lbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: var(--md-default-fg-color--light); min-width: 4.2rem; }
-#lexguard-playground .scopes { display: flex; flex-wrap: wrap; gap: .35rem; }
-#lexguard-playground .tog { font: inherit; font-size: .8rem; line-height: 1.4; padding: .18rem .6rem; border-radius: 1rem; border: 1px solid var(--md-default-fg-color--lighter); background: var(--md-default-bg-color); color: var(--md-default-fg-color--light); cursor: pointer; }
-#lexguard-playground .tog:hover { color: var(--md-default-fg-color); border-color: var(--md-default-fg-color--light); }
-#lexguard-playground .tog[aria-pressed="true"] { border-color: var(--md-primary-fg-color); color: var(--md-primary-fg-color); background: color-mix(in srgb, var(--md-primary-fg-color) 12%, transparent); font-weight: 600; }
-#lexguard-playground .tog.everything[aria-pressed="true"] { background: var(--md-primary-fg-color); color: var(--md-primary-bg-color); }
-#lexguard-playground .tog .cnt { margin-left: .4rem; font-size: .68rem; font-weight: 700; padding: 0 .32rem; border-radius: .7rem; background: #e6a100; color: #3a2c00; }
+#lexguard-playground .scopes { display: flex; flex-wrap: wrap; gap: .1rem .85rem; }
+#lexguard-playground .filt { font: inherit; font-size: .82rem; line-height: 1.5; padding: .1rem 0; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--md-default-fg-color--light); cursor: pointer; }
+#lexguard-playground .filt:hover { color: var(--md-default-fg-color); }
+#lexguard-playground .filt[aria-pressed="true"] { color: var(--md-primary-fg-color); border-bottom-color: var(--md-primary-fg-color); font-weight: 600; }
+#lexguard-playground .filt .cnt { margin-left: .2rem; font-size: .72rem; font-weight: 700; color: #b8860b; }
+[data-md-color-scheme="slate"] #lexguard-playground .filt .cnt { color: #e6b84d; }
 #lexguard-playground .rowend { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; margin: .2rem 0 .7rem; }
 #lexguard-playground .onlyfired { display: inline-flex; align-items: center; gap: .4rem; font-size: .82rem; color: var(--md-default-fg-color--light); cursor: pointer; }
-#lexguard-playground .editor { position: relative; }
-#lexguard-playground .editor .backdrop, #lexguard-playground .editor textarea { box-sizing: border-box; width: 100%; margin: 0; padding: .7rem .8rem; border: 1px solid transparent; border-radius: .4rem; font: inherit; font-size: .88rem; line-height: 1.6; letter-spacing: normal; }
-#lexguard-playground .editor .backdrop { position: absolute; inset: 0; overflow: hidden; z-index: 1; pointer-events: none; color: var(--md-default-fg-color); background: var(--md-code-bg-color); }
-#lexguard-playground .editor #highlights { white-space: pre-wrap; overflow-wrap: break-word; word-break: normal; }
-#lexguard-playground .editor textarea { position: relative; z-index: 2; display: block; min-height: 7rem; resize: vertical; background: transparent; color: transparent; caret-color: var(--md-default-fg-color); border-color: var(--md-default-fg-color--lighter); }
+#lexguard-playground .editor textarea { box-sizing: border-box; width: 100%; min-height: 6rem; padding: .7rem .8rem; border-radius: .4rem; border: 1px solid var(--md-default-fg-color--lighter); background: var(--md-code-bg-color); color: var(--md-default-fg-color); font: inherit; font-size: .88rem; line-height: 1.6; resize: vertical; }
 #lexguard-playground .editor textarea::placeholder { color: var(--md-default-fg-color--light); }
-#lexguard-playground #highlights mark.hi { color: inherit; background: transparent; border-radius: .15rem; padding: .05em 0; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+#lexguard-playground .annotated { margin-top: .5rem; padding: .7rem .8rem; border-radius: .4rem; background: var(--md-code-bg-color); border: 1px solid var(--md-default-fg-color--lightest); font: inherit; font-size: .88rem; line-height: 1.6; white-space: pre-wrap; overflow-wrap: break-word; }
+#lexguard-playground .annotated .empty { color: var(--md-default-fg-color--light); }
+#lexguard-playground #highlights mark.hi { color: inherit; background: transparent; border-radius: .15rem; padding: .05em 0; cursor: help; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 #lexguard-playground #highlights mark.hi.hit { background: #fff3d6; box-shadow: inset 0 -.14em #e6a100; }
 #lexguard-playground #highlights mark.hi.blocked { background: #dbe9ff; box-shadow: inset 0 -.14em #3d8bfd; }
 #lexguard-playground #highlights mark.hi.both { background: #fff3d6; box-shadow: inset 0 -.14em #3d8bfd; }
@@ -79,10 +78,10 @@ own code. No server, no key, nothing sent anywhere.
 <script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
 
 <div id="lexguard-playground">
-<div class="rowend"><button type="button" class="tog everything" data-scope="all" data-key="" aria-pressed="true">Everything<span class="cnt" hidden></span></button><label class="onlyfired"><input type="checkbox" id="onlyfired"> only show what fires</label></div>
+<div class="rowend"><button type="button" class="filt everything" data-scope="all" data-key="" aria-pressed="true">Everything<span class="cnt" hidden></span></button><label class="onlyfired"><input type="checkbox" id="onlyfired"> only show what fires</label></div>
 <div class="scoperow"><span class="lbl">Bundles</span><span class="scopes" id="bundles"></span></div>
 <div class="scoperow"><span class="lbl">Groups</span><span class="scopes" id="groups"></span></div>
-<div class="editor"><div class="backdrop"><div id="highlights"></div></div><textarea id="text" placeholder="Paste an agent turn...">Great question! I'd be happy to help. Honestly this is a game-changer. Let me delve into it. Could you please fix the fucking bug by tomorrow? Hope this helps!</textarea></div>
+<div class="editor"><textarea id="text" placeholder="Paste an agent turn...">Great question! I'd be happy to help. Honestly this is a game-changer. Let me delve into it. Could you please fix the fucking bug by tomorrow? Hope this helps!</textarea><div id="highlights" class="annotated"></div></div>
 <div id="results"><p class="empty">Loading Python and lexguard...</p></div>
 <div id="detail"></div>
 </div>
