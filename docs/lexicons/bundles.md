@@ -4,7 +4,6 @@ render_macros: true
 
 # Bundles
 
-Prebuilt groupings, each a plain `|` of lexicons from [Request](request.md),
-[Instruction](instruction.md), [Response](response.md), and [Domain](domain.md).
+Prebuilt groupings, each a plain `|` of lexicons drawn from the [facets](index.md).
 
 {{ bundle_table() }}

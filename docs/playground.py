@@ -18,26 +18,36 @@ focus = {"name": ""}
 
 
 def members_of(scope: str, key: str) -> list[str]:
+    assert scope in ("bundle", "group"), f"unknown scope: {scope}"
     if scope == "bundle":
-        return [member.name for member in BUNDLES[key].members]
-    return list(GROUPS[key])
+        result = [member.name for member in BUNDLES[key].members]
+    else:
+        result = list(GROUPS[key])
+    assert result, f"{scope} {key} has members"
+    return result
 
 
 def build_chips() -> None:
-    document.querySelector("#bundles").innerHTML = "".join(
+    bundles_html = "".join(
         f'<button type="button" class="filt" data-scope="bundle" data-key="{name}"'
         f' aria-pressed="false">{name}<span class="cnt" hidden></span></button>'
         for name in BUNDLES
     )
-    document.querySelector("#groups").innerHTML = "".join(
+    groups_html = "".join(
         f'<button type="button" class="filt" data-scope="group" data-key="{group}"'
         f' aria-pressed="false">{group}<span class="cnt" hidden></span></button>'
         for group in GROUPS
     )
+    assert bundles_html, "bundle chips are built from BUNDLES"
+    assert groups_html, "group chips are built from GROUPS"
+    document.querySelector("#bundles").innerHTML = bundles_html
+    document.querySelector("#groups").innerHTML = groups_html
 
 
 def refresh_toolbar(fired: set[str]) -> None:
+    assert fired <= ALL, "fired names are all lexicons"
     nodes = document.querySelectorAll("#lexguard-playground .filt")
+    assert nodes.length >= 1, "the toolbar carries at least the Everything chip"
     for i in range(nodes.length):
         btn = nodes.item(i)
         scope = btn.getAttribute("data-scope")
@@ -62,6 +72,7 @@ def highlight(text: str, names: list[str]) -> str:
     inds: list[set[str]] = [set() for _ in text]
     blks: list[set[str]] = [set() for _ in text]
     for name in names:
+        assert name in LEXICONS, "highlight only marks known lexicons"
         lex = LEXICONS[name]
         ruled = lex.hits(text).ruled_out
         for term, start, end in lex.spans(text):
@@ -90,14 +101,17 @@ def highlight(text: str, names: list[str]) -> str:
         title = html.escape(" · ".join(parts))
         out.append(f'<mark class="hi {kind}" data-tip="{title}">{segment}</mark>')
         i = j
+    assert i == len(text), "the scan consumed the whole text"
     return "".join(out) or "&nbsp;"
 
 
 def grid(text: str, fired: set[str], only_fired: bool) -> str:
+    assert fired <= ALL, "fired names are all lexicons"
     blocks = []
     for group, members in GROUPS.items():
         pills = []
         for name in members:
+            assert name in LEXICONS, "grid iterates known lexicons"
             if only_fired and name not in fired:
                 continue
             lex = LEXICONS[name]
@@ -122,6 +136,7 @@ def grid(text: str, fired: set[str], only_fired: bool) -> str:
 
 
 def detail(name: str, text: str) -> None:
+    assert name in LEXICONS, "detail is for a known lexicon"
     lex = LEXICONS[name]
     signal = lex.signal(text)
     verdict = lex.verdict(text)
@@ -141,6 +156,7 @@ def detail(name: str, text: str) -> None:
     else:
         note = "present as required" if lex.fail_when_neutral else "absent, nothing to flag"
         body += f'<p class="ok">{note}</p><p class="fixline">on a match: {html.escape(lex.fix)}</p>'
+    assert body.startswith("<div"), "detail always opens with its header"
     document.querySelector("#detail").innerHTML = body
 
 
@@ -148,6 +164,8 @@ def render() -> None:
     text = document.querySelector("#text").value
     only_fired = document.querySelector("#onlyfired").checked
     fired = {name for name in LEXICONS if LEXICONS[name].signal(text) is not Signal.absent}
+    assert fired <= ALL, "fired is a subset of all lexicons"
+    assert selected <= ALL, "selection stays within the lexicons"
     refresh_toolbar(fired)
     if focus["name"] not in selected:
         focus["name"] = ""
@@ -174,24 +192,35 @@ def render() -> None:
 
 
 def _reset_detail() -> None:
-    document.querySelector("#detail").innerHTML = (
+    node = document.querySelector("#detail")
+    assert node is not None, "the detail container exists"
+    assert node.tagName == "DIV", "the detail container is a div"
+    node.innerHTML = (
         '<p class="hint">Click a lexicon to select it and see how to fix it. '
         "A bundle or group ticks the lexicons it is made of.</p>"
     )
 
 
 def closest_button(node):
-    while node is not None and getattr(node, "tagName", "") != "BUTTON":
+    hops = 0
+    while node is not None:
+        assert hops < 64, "the DOM climb stays bounded"
+        assert node.nodeType == 1, "the climb visits element nodes"
+        if node.tagName == "BUTTON":
+            return node
         node = node.parentElement
-    return node
+        hops += 1
+    return None
 
 
 @when("click", "#lexguard-playground")
 def on_click(event) -> None:
+    assert event is not None, "the click handler receives an event"
     btn = closest_button(event.target)
     if btn is None:
         return
     cls = btn.getAttribute("class") or ""
+    assert cls, "a playground button carries a class"
     if "filt" in cls:
         scope = btn.getAttribute("data-scope")
         if scope == "all":
@@ -209,19 +238,23 @@ def on_click(event) -> None:
 
 
 def tip_of(node):
-    for _ in range(6):
-        if node is None or getattr(node, "getAttribute", None) is None:
-            return None
-        text = node.getAttribute("data-tip")
-        if text:
-            return text
+    hops = 0
+    while node is not None:
+        assert hops < 64, "the tooltip lookup climb stays bounded"
+        assert node.nodeType == 1, "the climb visits element nodes"
+        value = node.getAttribute("data-tip")
+        if value:
+            return value
         node = node.parentElement
+        hops += 1
     return None
 
 
 @when("mousemove", "#lexguard-playground")
 def on_move(event) -> None:
     tip = document.querySelector("#pgtip")
+    assert tip is not None, "the tooltip element exists"
+    assert tip.tagName == "DIV", "the tooltip is a div"
     text = tip_of(event.target)
     if text:
         tip.textContent = text
@@ -234,16 +267,23 @@ def on_move(event) -> None:
 
 @when("mouseleave", "#lexguard-playground")
 def on_leave(event) -> None:
-    document.querySelector("#pgtip").hidden = True
+    assert event is not None, "the leave handler receives an event"
+    tip = document.querySelector("#pgtip")
+    assert tip is not None, "the tooltip element exists"
+    tip.hidden = True
 
 
 @when("input", "#text")
 def on_input(event) -> None:
+    assert event is not None, "the input handler receives an event"
+    assert document.querySelector("#text") is not None, "the textarea is present"
     render()
 
 
 @when("change", "#onlyfired")
 def on_toggle(event) -> None:
+    assert event is not None, "the change handler receives an event"
+    assert document.querySelector("#onlyfired") is not None, "the toggle is present"
     render()
 
 
