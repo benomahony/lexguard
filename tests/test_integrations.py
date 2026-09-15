@@ -248,3 +248,133 @@ class TestGuardrails:
 
         with pytest.raises(OutputBlocked):
             agent.run_sync("explain caching")
+
+
+class TestLangChain:
+    def _agent(self, *replies: str, middleware: object):
+        from langchain.agents import create_agent
+        from langchain_core.language_models import FakeMessagesListChatModel
+        from langchain_core.messages import AIMessage
+
+        model = FakeMessagesListChatModel(responses=[AIMessage(reply) for reply in replies])
+        return create_agent(model=model, tools=[], middleware=[middleware])
+
+    def test_clean_output_passes_straight_through(self):
+        pytest.importorskip("langchain")
+        from langchain_core.messages import HumanMessage
+
+        from lexguard.integrations.guardrails.langchain import lexguard_middleware
+
+        agent = self._agent("caching skips repeated work", middleware=lexguard_middleware(Slop))
+        out = agent.invoke({"messages": [HumanMessage("explain caching")]})
+
+        assert out["messages"][-1].text == "caching skips repeated work"
+        assert out.get("lexguard_retries") is None
+
+    def test_output_retries_back_to_the_model_with_the_reason(self):
+        pytest.importorskip("langchain")
+        from langchain_core.messages import HumanMessage
+
+        from lexguard.integrations.guardrails.langchain import lexguard_middleware
+
+        agent = self._agent(
+            "let us delve into the intricate tapestry",
+            "caching skips repeated work",
+            middleware=lexguard_middleware(Slop),
+        )
+        out = agent.invoke({"messages": [HumanMessage("explain caching")]})
+
+        assert out["messages"][-1].text == "caching skips repeated work"
+        assert out["lexguard_retries"] == 1
+        assert any("delve" in message.text for message in out["messages"])
+
+    def test_output_raises_once_the_retry_budget_is_spent(self):
+        pytest.importorskip("langchain")
+        from langchain_core.messages import HumanMessage
+
+        from lexguard.integrations.guardrails.langchain import (
+            LexguardBlockedError,
+            lexguard_middleware,
+        )
+
+        agent = self._agent(
+            *(["let us delve into the intricate tapestry"] * 5),
+            middleware=lexguard_middleware(Slop, retries=1),
+        )
+
+        with pytest.raises(LexguardBlockedError, match="delve"):
+            agent.invoke({"messages": [HumanMessage("explain caching")]})
+
+    def test_block_lets_clean_output_through(self):
+        pytest.importorskip("langchain")
+        from langchain_core.messages import HumanMessage
+
+        from lexguard.integrations.guardrails.langchain import lexguard_middleware
+
+        agent = self._agent(
+            "caching skips repeated work",
+            middleware=lexguard_middleware(Slop, on_fail="block"),
+        )
+        out = agent.invoke({"messages": [HumanMessage("explain caching")]})
+
+        assert out["messages"][-1].text == "caching skips repeated work"
+
+    def test_block_rejects_the_first_bad_output(self):
+        pytest.importorskip("langchain")
+        from langchain_core.messages import HumanMessage
+
+        from lexguard.integrations.guardrails.langchain import (
+            LexguardBlockedError,
+            lexguard_middleware,
+        )
+
+        agent = self._agent(
+            "let us delve into the intricate tapestry",
+            middleware=lexguard_middleware(Slop, on_fail="block"),
+        )
+
+        with pytest.raises(LexguardBlockedError, match="delve"):
+            agent.invoke({"messages": [HumanMessage("explain caching")]})
+
+    def test_input_guard_blocks_a_bad_incoming_message(self):
+        pytest.importorskip("langchain")
+        from langchain_core.messages import HumanMessage
+
+        from lexguard.integrations.guardrails.langchain import (
+            LexguardBlockedError,
+            lexguard_middleware,
+        )
+
+        agent = self._agent(
+            "caching skips repeated work",
+            middleware=lexguard_middleware(Slop, on="input", on_fail="block"),
+        )
+
+        with pytest.raises(LexguardBlockedError, match="delve"):
+            agent.invoke({"messages": [HumanMessage("let us delve into the tapestry")]})
+
+    def test_input_guard_rejects_a_retry_config(self):
+        pytest.importorskip("langchain")
+        from lexguard.integrations.guardrails.langchain import lexguard_middleware
+
+        with pytest.raises(AssertionError, match="input guard can't retry"):
+            lexguard_middleware(Slop, on="input")
+
+    def test_a_bundle_combines_into_one_decision(self):
+        pytest.importorskip("langchain")
+        from langchain_core.messages import HumanMessage
+
+        from lexguard.integrations.guardrails.langchain import (
+            LexguardBlockedError,
+            lexguard_middleware,
+        )
+
+        agent = self._agent(
+            "let us delve into the tapestry, but basically it is simple",
+            middleware=lexguard_middleware(Bloat, on_fail="block"),
+        )
+
+        with pytest.raises(LexguardBlockedError) as caught:
+            agent.invoke({"messages": [HumanMessage("explain caching")]})
+        assert "slop" in str(caught.value)
+        assert "padding" in str(caught.value)
