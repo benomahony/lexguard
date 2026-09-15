@@ -12,11 +12,15 @@ BUNDLES = {
     "Overreach": suites.Overreach,
     "Trouble": suites.Trouble,
 }
-NAME_GROUP = {name: group for group, members in GROUPS.items() for name in members}
+ALL = set(LEXICONS)
+selected: set[str] = set(LEXICONS)
+focus = {"name": ""}
 
-selected_bundles: set[str] = set()
-selected_groups: set[str] = set()
-state = {"all": True, "focus": ""}
+
+def members_of(scope: str, key: str) -> list[str]:
+    if scope == "bundle":
+        return [member.name for member in BUNDLES[key].members]
+    return list(GROUPS[key])
 
 
 def build_chips() -> None:
@@ -32,45 +36,25 @@ def build_chips() -> None:
     )
 
 
-def members_of(scope: str, key: str) -> list[str]:
-    if scope == "bundle":
-        return [member.name for member in BUNDLES[key].members]
-    return list(GROUPS[key])
-
-
-def refresh_chips(fired: set[str]) -> None:
+def refresh_toolbar(fired: set[str]) -> None:
     nodes = document.querySelectorAll("#lexguard-playground .filt")
     for i in range(nodes.length):
         btn = nodes.item(i)
         scope = btn.getAttribute("data-scope")
         key = btn.getAttribute("data-key")
         if scope == "all":
-            on = state["all"]
-        elif scope == "bundle":
-            on = key in selected_bundles
+            on = selected == ALL
+            hits = len(fired)
         else:
-            on = key in selected_groups
+            members = set(members_of(scope, key))
+            on = bool(members) and members <= selected
+            hits = len(members & fired)
         btn.setAttribute("aria-pressed", "true" if on else "false")
         cnt = btn.querySelector(".cnt")
         if cnt is None:
             continue
-        if scope == "all":
-            hits = len(fired)
-        else:
-            hits = sum(1 for name in members_of(scope, key) if name in fired)
         cnt.textContent = str(hits)
         cnt.hidden = hits == 0
-
-
-def selected_names() -> list[str]:
-    if state["all"]:
-        return list(LEXICONS)
-    chosen: set[str] = set()
-    for bundle in selected_bundles:
-        chosen.update(members_of("bundle", bundle))
-    for group in selected_groups:
-        chosen.update(GROUPS[group])
-    return [name for name in LEXICONS if name in chosen]
 
 
 def highlight(text: str, names: list[str]) -> str:
@@ -104,27 +88,27 @@ def highlight(text: str, names: list[str]) -> str:
         if blk:
             parts.append("blocks " + ", ".join(sorted(blk)))
         title = html.escape(" · ".join(parts))
-        out.append(f'<mark class="hi {kind}" title="{title}">{segment}</mark>')
+        out.append(f'<mark class="hi {kind}" data-tip="{title}">{segment}</mark>')
         i = j
     return "".join(out) or "&nbsp;"
 
 
-def wall(text: str, names: list[str], only_fired: bool, fired: set[str]) -> str:
-    scope = set(names)
+def grid(text: str, fired: set[str], only_fired: bool) -> str:
     blocks = []
     for group, members in GROUPS.items():
         pills = []
         for name in members:
-            if name not in scope or (only_fired and name not in fired):
+            if only_fired and name not in fired:
                 continue
             lex = LEXICONS[name]
             passed = lex.verdict(text).passed
             result = "pass" if passed else "fail"
-            active = " active" if state["focus"] == name else ""
+            state = " selected" if name in selected else ""
+            state += " focused" if focus["name"] == name else ""
             mark = "✓" if passed else "✗"
             pills.append(
-                f'<button type="button" class="pill {result}{active}" data-lex="{name}"'
-                f' title="{html.escape(lex.fix)}">{html.escape(lex.label)}'
+                f'<button type="button" class="pill {result}{state}" data-lex="{name}"'
+                f' data-tip="{html.escape(lex.fix)}">{html.escape(lex.label)}'
                 f' <span class="tick">{mark}</span></button>'
             )
         if pills:
@@ -133,7 +117,7 @@ def wall(text: str, names: list[str], only_fired: bool, fired: set[str]) -> str:
                 f'<div class="pills">{"".join(pills)}</div></div>'
             )
     if not blocks:
-        return '<p class="empty">Nothing fired in the selected set.</p>'
+        return '<p class="empty">Nothing fired. Turn off &ldquo;only show what fires&rdquo;.</p>'
     return "".join(blocks)
 
 
@@ -163,14 +147,13 @@ def detail(name: str, text: str) -> None:
 def render() -> None:
     text = document.querySelector("#text").value
     only_fired = document.querySelector("#onlyfired").checked
-    names = selected_names()
-    fired = {name for name in names if LEXICONS[name].signal(text) is not Signal.absent}
-    refresh_chips(fired)
-    if state["focus"] not in fired:
-        state["focus"] = ""
-    focused = [state["focus"]] if state["focus"] else names
+    fired = {name for name in LEXICONS if LEXICONS[name].signal(text) is not Signal.absent}
+    refresh_toolbar(fired)
+    if focus["name"] not in selected:
+        focus["name"] = ""
+    picked = [name for name in LEXICONS if name in selected]
     document.querySelector("#highlights").innerHTML = (
-        highlight(text, focused)
+        highlight(text, picked)
         if text
         else '<span class="empty">the annotated text appears here</span>'
     )
@@ -179,23 +162,21 @@ def render() -> None:
         results.innerHTML = '<p class="empty">Type or paste text above to score it.</p>'
         _reset_detail()
         return
-    if not names:
-        results.innerHTML = '<p class="empty">Pick a bundle or group, or choose Everything.</p>'
-        _reset_detail()
-        return
-    summary = f'<p class="summary">{len(fired)} fired of {len(names)} selected</p>'
-    results.innerHTML = summary + wall(text, names, only_fired, fired)
-    if state["focus"]:
-        detail(state["focus"], text)
+    summary = (
+        f'<p class="summary">{len(fired)} of {len(LEXICONS)} fired'
+        f" · {len(selected)} selected (highlighted)</p>"
+    )
+    results.innerHTML = summary + grid(text, fired, only_fired)
+    if focus["name"]:
+        detail(focus["name"], text)
     else:
         _reset_detail()
 
 
 def _reset_detail() -> None:
-    document.querySelector(
-        "#detail"
-    ).innerHTML = (
-        '<p class="hint">Click a lexicon to highlight only its matches and see how to fix it.</p>'
+    document.querySelector("#detail").innerHTML = (
+        '<p class="hint">Click a lexicon to select it and see how to fix it. '
+        "A bundle or group ticks the lexicons it is made of.</p>"
     )
 
 
@@ -214,20 +195,46 @@ def on_click(event) -> None:
     if "filt" in cls:
         scope = btn.getAttribute("data-scope")
         if scope == "all":
-            state["all"] = True
-            selected_bundles.clear()
-            selected_groups.clear()
+            selected.clear() if selected == ALL else selected.update(ALL)
         else:
-            target = selected_bundles if scope == "bundle" else selected_groups
-            key = btn.getAttribute("data-key")
-            target.discard(key) if key in target else target.add(key)
-            state["all"] = False
-        state["focus"] = ""
+            members = set(members_of(scope, btn.getAttribute("data-key")))
+            selected.difference_update(members) if members <= selected else selected.update(members)
+        focus["name"] = ""
         render()
     elif "pill" in cls:
         name = btn.getAttribute("data-lex")
-        state["focus"] = "" if state["focus"] == name else name
+        selected.discard(name) if name in selected else selected.add(name)
+        focus["name"] = name if name in selected else ""
         render()
+
+
+def tip_of(node):
+    for _ in range(6):
+        if node is None or getattr(node, "getAttribute", None) is None:
+            return None
+        text = node.getAttribute("data-tip")
+        if text:
+            return text
+        node = node.parentElement
+    return None
+
+
+@when("mousemove", "#lexguard-playground")
+def on_move(event) -> None:
+    tip = document.querySelector("#pgtip")
+    text = tip_of(event.target)
+    if text:
+        tip.textContent = text
+        tip.style.left = f"{event.clientX + 12}px"
+        tip.style.top = f"{event.clientY + 14}px"
+        tip.hidden = False
+    else:
+        tip.hidden = True
+
+
+@when("mouseleave", "#lexguard-playground")
+def on_leave(event) -> None:
+    document.querySelector("#pgtip").hidden = True
 
 
 @when("input", "#text")

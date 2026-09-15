@@ -5,9 +5,9 @@ title: Playground
 # Playground
 
 Paste an agent turn: firing words are highlighted below like a linter (hover any to see which
-lexicon fired), and every lexicon shows as a named pill with a tick or cross. Filter to any bundles
-or groups, or click a pill to highlight just that lexicon and see how to fix it. It runs entirely in
-your browser:
+lexicon fired). Every lexicon is a pill with a tick or cross showing whether it fired; select any of
+them, or tick a whole bundle or group, to highlight their matches, and click one for how to fix it.
+It runs entirely in your browser:
 [PyScript](https://pyscript.net) loads a real Python and installs the published `lexguard` from
 PyPI, so these are the same values `Lexicon.signal()`, `.verdict()`, and `.hits()` return in your
 own code. No server, no key, nothing sent anywhere.
@@ -44,7 +44,9 @@ own code. No server, no key, nothing sent anywhere.
 #lexguard-playground .pill.pass .tick { color: #1b8a4a; }
 #lexguard-playground .pill.fail { border-color: #e39aa0; background: #fbe0e0; color: #a12727; }
 #lexguard-playground .pill.fail .tick { color: #a12727; }
-#lexguard-playground .pill.active { outline: 2px solid var(--md-primary-fg-color); outline-offset: 1px; }
+#lexguard-playground .pill:not(.selected) { opacity: .4; }
+#lexguard-playground .pill.focused { outline: 2px solid var(--md-primary-fg-color); outline-offset: 1px; }
+#pgtip { position: fixed; z-index: 100; max-width: 22rem; padding: .3rem .5rem; border-radius: .3rem; background: var(--md-default-fg-color); color: var(--md-default-bg-color); font-size: .76rem; line-height: 1.35; pointer-events: none; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
 #detail { margin-top: .9rem; padding-top: .6rem; border-top: 1px solid var(--md-default-fg-color--lightest); }
 #detail .hint { color: var(--md-default-fg-color--light); font-size: .85rem; margin: .2rem 0; }
 #detail .dhead { display: flex; align-items: center; gap: .5rem; margin-bottom: .2rem; }
@@ -78,12 +80,13 @@ own code. No server, no key, nothing sent anywhere.
 <script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
 
 <div id="lexguard-playground">
+<div class="editor"><textarea id="text" placeholder="Paste an agent turn...">Great question! I'd be happy to help. Honestly this is a game-changer. Let me delve into it. Could you please fix the fucking bug by tomorrow? Hope this helps!</textarea><div id="highlights" class="annotated"></div></div>
 <div class="rowend"><button type="button" class="filt everything" data-scope="all" data-key="" aria-pressed="true">Everything<span class="cnt" hidden></span></button><label class="onlyfired"><input type="checkbox" id="onlyfired"> only show what fires</label></div>
 <div class="scoperow"><span class="lbl">Bundles</span><span class="scopes" id="bundles"></span></div>
 <div class="scoperow"><span class="lbl">Groups</span><span class="scopes" id="groups"></span></div>
-<div class="editor"><textarea id="text" placeholder="Paste an agent turn...">Great question! I'd be happy to help. Honestly this is a game-changer. Let me delve into it. Could you please fix the fucking bug by tomorrow? Hope this helps!</textarea><div id="highlights" class="annotated"></div></div>
 <div id="results"><p class="empty">Loading Python and lexguard...</p></div>
 <div id="detail"></div>
+<div id="pgtip" hidden></div>
 </div>
 
 <script type="py" config='{"packages": ["lexguard"], "splashscreen": {"enabled": false}}' src="playground.py"></script>
