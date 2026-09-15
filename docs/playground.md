@@ -4,13 +4,9 @@ title: Playground
 
 # Playground
 
-Paste an agent turn: firing words are highlighted below like a linter (hover any to see which
-lexicon fired). Every lexicon is a pill with a tick or cross showing whether it fired; select any of
-them, or tick a whole bundle or group, to highlight their matches, and click one for how to fix it.
-It runs entirely in your browser:
-[PyScript](https://pyscript.net) loads a real Python and installs the published `lexguard` from
-PyPI, so these are the same values `Lexicon.signal()`, `.verdict()`, and `.hits()` return in your
-own code. No server, no key, nothing sent anywhere.
+Paste an agent turn and see every lexicon score it live. It runs the published `lexguard` from PyPI
+entirely in your browser via [PyScript](https://pyscript.net), so these are the same values
+`signal()`, `verdict()`, and `hits()` return in your own code. No server, no key.
 
 <style>
 #lexguard-playground { margin: 1.2rem 0; }
