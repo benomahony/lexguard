@@ -1,10 +1,6 @@
----
-title: Playground
----
-
 # Playground
 
-Paste an agent response and see every lexicon score it live in your browser.
+Paste an agent (or human) response and see every lexguard hit, live in your browser.
 
 <style>
 #lexguard-playground { margin: 1.2rem 0; }
