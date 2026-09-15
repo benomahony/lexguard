@@ -52,6 +52,8 @@ def refresh_chips(fired: set[str]) -> None:
             on = key in selected_groups
         btn.setAttribute("aria-pressed", "true" if on else "false")
         cnt = btn.querySelector(".cnt")
+        if cnt is None:
+            continue
         if scope == "all":
             hits = len(fired)
         else:

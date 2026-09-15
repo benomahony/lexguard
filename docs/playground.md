@@ -79,9 +79,9 @@ own code. No server, no key, nothing sent anywhere.
 <script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
 
 <div id="lexguard-playground">
+<div class="rowend"><button type="button" class="tog everything" data-scope="all" data-key="" aria-pressed="true">Everything<span class="cnt" hidden></span></button><label class="onlyfired"><input type="checkbox" id="onlyfired"> only show what fires</label></div>
 <div class="scoperow"><span class="lbl">Bundles</span><span class="scopes" id="bundles"></span></div>
 <div class="scoperow"><span class="lbl">Groups</span><span class="scopes" id="groups"></span></div>
-<div class="rowend"><button type="button" class="tog everything" data-scope="all" data-key="" aria-pressed="true">Everything</button><label class="onlyfired"><input type="checkbox" id="onlyfired"> only show what fires</label></div>
 <div class="editor"><div class="backdrop"><div id="highlights"></div></div><textarea id="text" placeholder="Paste an agent turn...">Great question! I'd be happy to help. Honestly this is a game-changer. Let me delve into it. Could you please fix the fucking bug by tomorrow? Hope this helps!</textarea></div>
 <div id="results"><p class="empty">Loading Python and lexguard...</p></div>
 <div id="detail"></div>
