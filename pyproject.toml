@@ -105,6 +105,8 @@ typeCheckingMode = "standard"
 extend_exclude = ["tests"]
 
 [tool.deptry.per_rule_ignores]
+# pyscript is provided by the PyScript runtime in the browser (docs/playground.py), never installed
+DEP001 = ["pyscript"]
 DEP002 = ["pytest", "pytest-cov", "pytest-examples", "pytest-xdist", "ruff", "basedpyright", "prek", "vulture", "bandit", "deptry", "bump-my-version", "zensical", "pydantic-ai-slim", "hypothesis"]
 DEP003 = ["lexguard", "pydantic"]
 

@@ -15,6 +15,8 @@ extra (`lexguard[pydantic-evals]`, `lexguard[deepeval]`, `lexguard[inspect-ai]`)
 
 - [README](README.md): install, the core `signal()`/`fires()`/`denied()` API, and both the
   standalone and framework-integrated ways of running a lexicon
+- [Playground](docs/playground.md): score text against every lexicon live in the browser, with
+  no server, running the published `lexguard` under PyScript
 - [Lexicons](docs/lexicons/index.md): every lexicon that ships in the box, rendered from
   `lexguard.words` and `lexguard.suites` at build time, one page per facet group:
   time, priority, task, intent, shape, demand, style, epistemics, tone, safety, progress,
