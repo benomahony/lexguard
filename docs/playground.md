@@ -16,12 +16,12 @@ own code. No server, no key, nothing sent anywhere.
 #lexguard-playground { margin: 1.2rem 0; }
 #lexguard-playground .scoperow { display: flex; gap: .5rem; align-items: baseline; margin-bottom: .5rem; flex-wrap: wrap; }
 #lexguard-playground .scoperow .lbl { font-size: .68rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: var(--md-default-fg-color--light); min-width: 4.2rem; }
-#lexguard-playground .scopes { display: flex; flex-wrap: wrap; gap: .1rem .85rem; }
-#lexguard-playground .filt { font: inherit; font-size: .82rem; line-height: 1.5; padding: .1rem 0; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--md-default-fg-color--light); cursor: pointer; }
-#lexguard-playground .filt:hover { color: var(--md-default-fg-color); }
-#lexguard-playground .filt[aria-pressed="true"] { color: var(--md-primary-fg-color); border-bottom-color: var(--md-primary-fg-color); font-weight: 600; }
-#lexguard-playground .filt .cnt { margin-left: .2rem; font-size: .72rem; font-weight: 700; color: #b8860b; }
-[data-md-color-scheme="slate"] #lexguard-playground .filt .cnt { color: #e6b84d; }
+#lexguard-playground .scopes { display: flex; flex-wrap: wrap; gap: .35rem; }
+#lexguard-playground .filt, #lexguard-playground .pill { font: inherit; font-size: .8rem; line-height: 1.4; display: inline-flex; align-items: center; gap: .3rem; padding: .16rem .6rem; border-radius: 1rem; border: 1px solid var(--md-default-fg-color--lighter); background: var(--md-default-bg-color); color: var(--md-default-fg-color--light); cursor: pointer; }
+#lexguard-playground .filt:hover, #lexguard-playground .pill:hover { border-color: var(--md-default-fg-color--light); color: var(--md-default-fg-color); }
+#lexguard-playground .filt[aria-pressed="true"], #lexguard-playground .pill.selected { border-color: var(--md-primary-fg-color); background: color-mix(in srgb, var(--md-primary-fg-color) 12%, transparent); color: var(--md-primary-fg-color); font-weight: 600; }
+#lexguard-playground .cnt { font-size: .72rem; font-weight: 700; color: #b8860b; }
+[data-md-color-scheme="slate"] #lexguard-playground .cnt { color: #e6b84d; }
 #lexguard-playground .rowend { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; margin: .2rem 0 .7rem; }
 #lexguard-playground .onlyfired { display: inline-flex; align-items: center; gap: .4rem; font-size: .82rem; color: var(--md-default-fg-color--light); cursor: pointer; }
 #lexguard-playground .editor textarea { box-sizing: border-box; width: 100%; min-height: 6rem; padding: .7rem .8rem; border-radius: .4rem; border: 1px solid var(--md-default-fg-color--lighter); background: var(--md-code-bg-color); color: var(--md-default-fg-color); font: inherit; font-size: .88rem; line-height: 1.6; resize: vertical; }
@@ -38,13 +38,9 @@ own code. No server, no key, nothing sent anywhere.
 #results .grp { margin: .5rem 0; }
 #results .grplabel { display: block; font-size: .66rem; text-transform: uppercase; letter-spacing: .06em; font-weight: 700; color: var(--md-default-fg-color--light); margin-bottom: .28rem; }
 #results .pills { display: flex; flex-wrap: wrap; gap: .35rem; }
-#lexguard-playground .pill { font: inherit; font-size: .8rem; display: inline-flex; align-items: center; gap: .3rem; padding: .16rem .55rem; border-radius: 1rem; border: 1px solid var(--md-default-fg-color--lighter); background: var(--md-default-bg-color); color: var(--md-default-fg-color--light); cursor: pointer; }
-#lexguard-playground .pill:hover { border-color: var(--md-default-fg-color--light); }
 #lexguard-playground .pill .tick { font-weight: 700; line-height: 1; }
 #lexguard-playground .pill.pass .tick { color: #1b8a4a; }
-#lexguard-playground .pill.fail { border-color: #e39aa0; background: #fbe0e0; color: #a12727; }
-#lexguard-playground .pill.fail .tick { color: #a12727; }
-#lexguard-playground .pill:not(.selected) { opacity: .4; }
+#lexguard-playground .pill.fail .tick { color: #c0392b; }
 #lexguard-playground .pill.focused { outline: 2px solid var(--md-primary-fg-color); outline-offset: 1px; }
 #pgtip { position: fixed; z-index: 100; max-width: 22rem; padding: .3rem .5rem; border-radius: .3rem; background: var(--md-default-fg-color); color: var(--md-default-bg-color); font-size: .76rem; line-height: 1.35; pointer-events: none; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
 #detail { margin-top: .9rem; padding-top: .6rem; border-top: 1px solid var(--md-default-fg-color--lightest); }
@@ -67,8 +63,7 @@ own code. No server, no key, nothing sent anywhere.
 [data-md-color-scheme="slate"] #lexguard-playground #highlights mark.hi.hit { background: #4a3a00; }
 [data-md-color-scheme="slate"] #lexguard-playground #highlights mark.hi.blocked { background: #12305e; }
 [data-md-color-scheme="slate"] #lexguard-playground #highlights mark.hi.both { background: #4a3a00; }
-[data-md-color-scheme="slate"] #lexguard-playground .pill.fail { background: #4a1717; color: #ffb0b0; border-color: #7a2a2a; }
-[data-md-color-scheme="slate"] #lexguard-playground .pill.fail .tick { color: #ffb0b0; }
+[data-md-color-scheme="slate"] #lexguard-playground .pill.fail .tick { color: #ff9b93; }
 [data-md-color-scheme="slate"] #lexguard-playground .pill.pass .tick { color: #8fe0a8; }
 [data-md-color-scheme="slate"] #lexguard-playground .badge.present, [data-md-color-scheme="slate"] #lexguard-playground .chip.hit { background: #4a3a00; color: #ffdd8a; }
 [data-md-color-scheme="slate"] #lexguard-playground .badge.denied, [data-md-color-scheme="slate"] #lexguard-playground .chip.blocked { background: #12305e; color: #a8c6ff; }
