@@ -82,6 +82,26 @@ Pass it to an agent like any capability, `Agent(model, capabilities=[lexguard])`
 lives on `lexguard.lexicons`, so it carries across runs of the same agent and you can read back
 what the agent changed.
 
+Like `CapabilityCreation`, give it a `directory` to keep the agent's lexguards across processes:
+every edit is saved to `<directory>/lexguards.json`, and a new `DynamicLexguard` over the same
+directory loads them back. Once something is saved, that file is the whole set, removals included;
+the lexicons you pass in only seed an empty directory.
+
+```py
+from pathlib import Path
+from tempfile import mkdtemp
+
+from lexguard import Slop
+from lexguard.integrations.guardrails.pydantic_ai import DynamicLexguard
+
+directory = Path(mkdtemp())
+DynamicLexguard(Slop, directory=directory).update_lexguard(
+    "banned", indicates=["cache"], fix="say store instead"
+)
+print(sorted(DynamicLexguard(Slop, directory=directory).lexicons))
+#> ['banned', 'slop']
+```
+
 ## Install
 
 ```bash

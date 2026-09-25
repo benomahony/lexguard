@@ -341,3 +341,28 @@ class TestDynamicLexguard:
         capability.lexicons.clear()
         assert capability.list_lexguards() == "No lexguards are active."
         assert capability.check("let us delve").action == "allow"
+
+    def test_edits_persist_to_a_directory(self, tmp_path):
+        pytest.importorskip("pydantic_ai_harness")
+        from lexguard.integrations.guardrails.pydantic_ai import DynamicLexguard
+
+        capability = DynamicLexguard(Bloat, directory=tmp_path)
+        capability.update_lexguard("banned", indicates=["cache"], rules_out=["no cache"], fix="no")
+        capability.remove_lexguard("padding")
+
+        reloaded = DynamicLexguard(Slop, directory=tmp_path)
+
+        assert reloaded.lexicons == capability.lexicons
+        assert "padding" not in reloaded.lexicons
+        assert reloaded.lexicons["slop"].evidence == Slop.evidence
+        assert reloaded.check("the cache helps").action == "retry"
+
+    def test_without_a_directory_nothing_is_saved(self, tmp_path):
+        pytest.importorskip("pydantic_ai_harness")
+        from lexguard.integrations.guardrails.pydantic_ai import DynamicLexguard
+
+        capability = DynamicLexguard()
+        capability.update_lexguard("banned", indicates=["cache"], fix="no")
+
+        assert capability.path is None
+        assert list(tmp_path.iterdir()) == []

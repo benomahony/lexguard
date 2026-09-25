@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+import json
+import os
+import tempfile
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field, replace
+from pathlib import Path
 from typing import Literal
 
 from pydantic_ai.exceptions import ModelRetry
 from pydantic_ai.toolsets import FunctionToolset
 from pydantic_ai_harness.guardrails import GuardrailResult, OutputGuardrail, OutputGuardrailFunc
 
-from lexguard.lexicon import Bundle, Lexicon, tidy
+from lexguard.lexicon import Bundle, Lexicon, Source, tidy
 
 
 def lexguard_guard(
@@ -76,10 +80,16 @@ class DynamicLexguard(OutputGuardrail[object]):
     output of the same run. The edited set lives on the capability, so it carries across runs of
     the same agent, and `lexicons` shows what the agent has changed.
 
-        agent = Agent(model, capabilities=[DynamicLexguard(Slop | Padding)])
+    Give it a `directory` and every edit is saved to `<directory>/lexguards.json`, so a fresh
+    process picks the agent's lexguards back up. Once saved, that file is the whole set: `target`
+    only seeds a directory with nothing saved in it yet.
+
+        lexguard = DynamicLexguard(Slop | Padding, directory=Path(".lexguard"))
+        agent = Agent(model, capabilities=[lexguard])
     """
 
     target: Lexicon | Bundle | None = None
+    directory: Path | None = None
     on_fail: Literal["block", "retry"] = "retry"
     guidance: str = GUIDANCE
     guard: OutputGuardrailFunc[object] | Sequence[OutputGuardrailFunc[object]] = field(init=False)
@@ -91,6 +101,24 @@ class DynamicLexguard(OutputGuardrail[object]):
         self.lexicons = {lexicon.name: lexicon for lexicon in members}
         self.guard = self.check
         assert set(self.lexicons) == {lexicon.name for lexicon in members}, "one per name"
+        if self.path and self.path.exists():
+            saved = json.loads(self.path.read_text(encoding="utf-8"))
+            self.lexicons = {entry["name"]: load(entry) for entry in saved}
+
+    @property
+    def path(self) -> Path | None:
+        return self.directory / "lexguards.json" if self.directory else None
+
+    def save(self) -> None:
+        if self.path is None:
+            return
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        entries = [dump(lexicon) for lexicon in self.lexicons.values()]
+        fd, tmp = tempfile.mkstemp(dir=self.path.parent, suffix=".json.tmp")
+        with os.fdopen(fd, "w", encoding="utf-8") as file:
+            json.dump(entries, file, indent=2)
+        os.replace(tmp, self.path)
+        assert self.path.exists(), "the saved set is on disk"
 
     def check(self, value: object) -> GuardrailResult:
         if not self.lexicons:
@@ -150,6 +178,7 @@ class DynamicLexguard(OutputGuardrail[object]):
             ),
         )
         self.lexicons[name] = lexicon
+        self.save()
         assert self.lexicons[name] is lexicon, "the edit is live for the next check"
         return f"{'updated' if existing else 'created'} {lexicon!r}"
 
@@ -161,4 +190,36 @@ class DynamicLexguard(OutputGuardrail[object]):
         """
         if self.lexicons.pop(name, None) is None:
             return f"No lexguard named {name!r}."
+        self.save()
         return f"removed {name}"
+
+
+def dump(lexicon: Lexicon) -> dict[str, object]:
+    result: dict[str, object] = {
+        "name": lexicon.name,
+        "indicates": sorted(lexicon.indicates),
+        "rules_out": sorted(lexicon.rules_out),
+        "fix": lexicon.fix,
+        "fail_when_neutral": lexicon.fail_when_neutral,
+        "evidence": [{"cite": source.cite, "url": source.url} for source in lexicon.evidence],
+    }
+    assert load(result) == lexicon, "a dumped lexicon loads back the same"
+    return result
+
+
+def load(entry: dict[str, object]) -> Lexicon:
+    evidence = entry.get("evidence") or []
+    assert isinstance(evidence, list), "evidence is saved as a list"
+    return Lexicon(
+        name=str(entry["name"]),
+        indicates=terms(entry.get("indicates")),
+        rules_out=terms(entry.get("rules_out")),
+        fix=str(entry["fix"]),
+        fail_when_neutral=bool(entry.get("fail_when_neutral", False)),
+        evidence=tuple(Source(**source) for source in evidence),
+    )
+
+
+def terms(value: object) -> list[str]:
+    assert value is None or isinstance(value, list), "terms are saved as a list"
+    return [str(term) for term in value or []]
