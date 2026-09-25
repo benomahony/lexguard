@@ -19,6 +19,9 @@ inspect-ai = [
 pydantic-ai-harness = [
     "pydantic-ai-harness>=0.28.0",
 ]
+langchain = [
+    "langchain>=1.0",
+]
 
 [project.scripts]
 lexguard = "lexguard.cli:main"
@@ -51,6 +54,7 @@ dev = [
     "pydantic-ai-harness>=0.28.0",
     "hypothesis>=6.165.10",
     "dddlint>=0.1.11",
+    "langchain>=1.0",
 ]
 
 [tool.ruff]
