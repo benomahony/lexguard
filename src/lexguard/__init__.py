@@ -121,7 +121,7 @@ from lexguard.words.topic import Shopping as Shopping
 from lexguard.words.topic import Travel as Travel
 from lexguard.words.topic import Work as Work
 
-__version__ = "0.1.21"
+__version__ = "0.1.22"
 
 # the shipped suites are pydantic-evals evaluator lists; deferred so importing lexguard never
 # requires pydantic-evals until one is touched. the evaluators themselves live in
