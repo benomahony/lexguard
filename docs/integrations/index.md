@@ -57,7 +57,8 @@ retry by default, giving the model the reason and another attempt; pass `on_fail
 reject the value outright instead.
 
 - [pydantic-ai-harness](pydantic-ai-harness.md): `lexguard_guard` wraps a `Lexicon` or `Bundle` as
-  an `InputGuardrail`/`OutputGuardrail`/`ToolGuardrail` guard
+  an `InputGuardrail`/`OutputGuardrail`/`ToolGuardrail` guard, and `DynamicLexguard` is an
+  `OutputGuardrail` whose lexicons the agent can edit mid-run through its own tools
 
 ## Install
 

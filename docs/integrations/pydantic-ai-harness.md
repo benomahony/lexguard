@@ -56,6 +56,32 @@ print(guard("let us delve into the intricate tapestry, but basically it is simpl
 #> retry
 ```
 
+## Letting the agent edit its own lexguards
+
+`DynamicLexguard` is an `OutputGuardrail` over lexicons the agent can change mid-run, through three
+tools: `list_lexguards`, `update_lexguard` (add or remove terms, or create a lexicon), and
+`remove_lexguard`. Unlike harness
+[`CapabilityCreation`](https://pydantic.dev/docs/ai/harness/capability-creation/), which authors
+code that goes live on the next run, lexicons are data: an edit is checked against the very next
+output of the same run. Tell the agent "never say cache" and its next reply is held to it.
+
+```py
+from lexguard import Slop
+from lexguard.integrations.guardrails.pydantic_ai import DynamicLexguard
+
+lexguard = DynamicLexguard(Slop)
+lexguard.update_lexguard("banned", indicates=["cache"], fix="say store instead")
+print(lexguard.check("the cache helps").action)
+#> retry
+lexguard.update_lexguard("banned", remove=["cache"])
+print(lexguard.check("the cache helps").action)
+#> allow
+```
+
+Pass it to an agent like any capability, `Agent(model, capabilities=[lexguard])`. The edited set
+lives on `lexguard.lexicons`, so it carries across runs of the same agent and you can read back
+what the agent changed.
+
 ## Install
 
 ```bash

@@ -266,3 +266,78 @@ class TestGuardrails:
 
         with pytest.raises(OutputBlocked):
             agent.run_sync("explain caching")
+
+
+class TestDynamicLexguard:
+    def test_an_agent_created_lexguard_checks_the_same_run(self):
+        pytest.importorskip("pydantic_ai_harness")
+        from pydantic_ai import Agent
+        from pydantic_ai.messages import ModelMessage, ModelResponse, TextPart, ToolCallPart
+        from pydantic_ai.models.function import AgentInfo, FunctionModel
+
+        from lexguard.integrations.guardrails.pydantic_ai import DynamicLexguard
+
+        def model(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+            match len(messages):
+                case 1:
+                    ban = {"name": "banned", "indicates": ["cache"], "fix": "say store"}
+                    return ModelResponse(parts=[ToolCallPart("update_lexguard", ban)])
+                case 3:
+                    return ModelResponse(parts=[TextPart("the cache helps")])
+                case _:
+                    return ModelResponse(parts=[TextPart("the store helps")])
+
+        capability = DynamicLexguard(Slop)
+        result = Agent(FunctionModel(model), capabilities=[capability]).run_sync("explain")
+
+        assert result.output == "the store helps"
+        assert set(capability.lexicons) == {"slop", "banned"}
+
+    def test_update_edits_terms_in_place(self):
+        pytest.importorskip("pydantic_ai_harness")
+        from lexguard.integrations.guardrails.pydantic_ai import DynamicLexguard
+
+        capability = DynamicLexguard(Slop)
+        capability.update_lexguard("slop", indicates=["Synergy"], remove=["delve"])
+
+        assert "synergy" in capability.lexicons["slop"].indicates
+        assert "delve" not in capability.lexicons["slop"].indicates
+        assert capability.lexicons["slop"].fix == Slop.fix
+        assert capability.check("let us delve").action == "allow"
+        assert capability.check("pure synergy").action == "retry"
+
+    def test_update_moves_a_term_between_lists(self):
+        pytest.importorskip("pydantic_ai_harness")
+        from lexguard.integrations.guardrails.pydantic_ai import DynamicLexguard
+
+        capability = DynamicLexguard()
+        capability.update_lexguard("banned", indicates=["cache"], fix="say store")
+        capability.update_lexguard("banned", rules_out=["cache"])
+
+        assert capability.lexicons["banned"].rules_out == frozenset({"cache"})
+        assert capability.lexicons["banned"].indicates == frozenset()
+
+    def test_update_refuses_bad_edits(self):
+        pytest.importorskip("pydantic_ai_harness")
+        from pydantic_ai.exceptions import ModelRetry
+
+        from lexguard.integrations.guardrails.pydantic_ai import DynamicLexguard
+
+        capability = DynamicLexguard()
+        with pytest.raises(ModelRetry, match="pass a `fix`"):
+            capability.update_lexguard("banned", indicates=["cache"])
+        with pytest.raises(ModelRetry, match="both indicate and rule out"):
+            capability.update_lexguard("banned", indicates=["x"], rules_out=["X"], fix="no")
+
+    def test_list_and_remove(self):
+        pytest.importorskip("pydantic_ai_harness")
+        from lexguard.integrations.guardrails.pydantic_ai import DynamicLexguard
+
+        capability = DynamicLexguard(Bloat)
+        assert "Lexicon(name='padding'" in capability.list_lexguards()
+
+        assert capability.remove_lexguard("padding") == "removed padding"
+        assert capability.remove_lexguard("padding") == "No lexguard named 'padding'."
+        capability.lexicons.clear()
+        assert capability.list_lexguards() == "No lexguards are active."
+        assert capability.check("let us delve").action == "allow"
