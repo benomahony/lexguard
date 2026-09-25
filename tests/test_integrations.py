@@ -251,13 +251,14 @@ class TestGuardrails:
 
 
 class TestLangChain:
-    def _agent(self, *replies: str, middleware: object):
+    def _agent(self, *replies: str, middleware: object, checkpointer: object = None):
         from langchain.agents import create_agent
         from langchain_core.language_models import FakeMessagesListChatModel
         from langchain_core.messages import AIMessage
 
         model = FakeMessagesListChatModel(responses=[AIMessage(reply) for reply in replies])
-        return create_agent(model=model, tools=[], middleware=[middleware])
+        stack = middleware if isinstance(middleware, list) else [middleware]
+        return create_agent(model=model, tools=[], middleware=stack, checkpointer=checkpointer)
 
     def test_clean_output_passes_straight_through(self):
         pytest.importorskip("langchain")
@@ -285,8 +286,47 @@ class TestLangChain:
         out = agent.invoke({"messages": [HumanMessage("explain caching")]})
 
         assert out["messages"][-1].text == "caching skips repeated work"
-        assert out["lexguard_retries"] == 1
         assert any("delve" in message.text for message in out["messages"])
+
+    def test_a_pass_resets_the_retry_budget_for_later_turns(self):
+        pytest.importorskip("langchain")
+        from langchain_core.messages import HumanMessage
+        from langgraph.checkpoint.memory import InMemorySaver
+
+        from lexguard.integrations.guardrails.langchain import lexguard_middleware
+
+        bad, good = "let us delve into the intricate tapestry", "caching skips repeated work"
+        agent = self._agent(
+            bad,
+            good,
+            bad,
+            good,
+            middleware=lexguard_middleware(Slop, retries=1),
+            checkpointer=InMemorySaver(),
+        )
+        thread = {"configurable": {"thread_id": "t"}}
+        agent.invoke({"messages": [HumanMessage("explain caching")]}, thread)
+        out = agent.invoke({"messages": [HumanMessage("and again")]}, thread)
+
+        assert out["messages"][-1].text == good
+
+    def test_input_and_output_guards_combine_on_one_agent(self):
+        pytest.importorskip("langchain")
+        from langchain_core.messages import HumanMessage
+
+        from lexguard.integrations.guardrails.langchain import lexguard_middleware
+
+        agent = self._agent(
+            "caching skips repeated work",
+            middleware=[
+                lexguard_middleware(Slop, on="input", on_fail="block"),
+                lexguard_middleware(Slop),
+                lexguard_middleware(Bloat),
+            ],
+        )
+        out = agent.invoke({"messages": [HumanMessage("explain caching")]})
+
+        assert out["messages"][-1].text == "caching skips repeated work"
 
     def test_output_raises_once_the_retry_budget_is_spent(self):
         pytest.importorskip("langchain")

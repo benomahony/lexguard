@@ -23,7 +23,16 @@ class LexguardBlockedError(Exception):
 
 
 class _RetryState(AgentState):
-    lexguard_retries: NotRequired[int]
+    # Keyed by middleware name, so several retry guards on one agent keep separate budgets.
+    lexguard_retries: NotRequired[dict[str, int]]
+
+
+def _middleware_name(lexicons: tuple[Lexicon, ...], on: str, on_fail: str) -> str:
+    """A deterministic name per guard, since `create_agent` rejects duplicate middleware names."""
+    assert lexicons, "a guard checks at least one lexicon"
+    name = f"Lexguard_{on}_{on_fail}_" + "_".join(lexicon.name for lexicon in lexicons)
+    assert lexicons[0].name in name, "the name identifies what the guard checks"
+    return name
 
 
 def _combined_reason(lexicons: tuple[Lexicon, ...], text: str) -> str | None:
@@ -53,7 +62,7 @@ def _block_middleware(lexicons: tuple[Lexicon, ...], on: str) -> AgentMiddleware
         raise LexguardBlockedError(reason)
 
     builder = before_model if on == "input" else after_model
-    return builder(name="LexguardMiddleware")(block_hook)
+    return builder(name=_middleware_name(lexicons, on, "block"))(block_hook)
 
 
 def _retry_middleware(
@@ -62,27 +71,32 @@ def _retry_middleware(
     """A middleware that loops a failing reply back to the model, then raises once out of budget."""
     assert lexicons, "a middleware needs at least one lexicon to check"
     assert retries >= 1, "a retry budget of at least 1 is needed to retry"
+    name = _middleware_name(lexicons, "output", "retry")
 
     def retry_hook(state: _RetryState, _runtime: Any) -> dict[str, Any] | None:
         messages = state["messages"]
         assert messages, "the middleware checks the last message, so there must be one"
+        counts = state.get("lexguard_retries", {})
+        used = counts.get(name, 0)
+        assert used <= retries, "the retry counter never runs past the budget"
         reason = _combined_reason(lexicons, messages[-1].text)
         if reason is None:
-            return None
-        used = state.get("lexguard_retries", 0)
-        assert used <= retries, "the retry counter never runs past the budget"
+            if not used:
+                return None
+            # Reset on a pass so a checkpointed thread's later turns get the full budget again.
+            return {"lexguard_retries": {**counts, name: 0}}
         if used >= retries:
             raise LexguardBlockedError(reason)
         return {
             "messages": [HumanMessage(reason)],
             "jump_to": "model",
-            "lexguard_retries": used + 1,
+            "lexguard_retries": {**counts, name: used + 1},
         }
 
     return after_model(
         state_schema=_RetryState,
         can_jump_to=["model", "end"],
-        name="LexguardMiddleware",
+        name=name,
     )(retry_hook)
 
 
