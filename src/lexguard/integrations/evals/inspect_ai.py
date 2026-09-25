@@ -14,7 +14,9 @@ def lexguard_scorer(lexicon: Lexicon) -> Scorer:
     """
     assert lexicon.name, "a scorer needs a real lexicon to check"
 
-    @scorer(metrics=[accuracy()])
+    # named for the lexicon, as every other adapter is; left to Inspect, every lexguard scorer
+    # would share this closure's name and only be told apart by a numeric suffix
+    @scorer(metrics=[accuracy()], name=lexicon.label)
     def _lexguard_scorer() -> Scorer:
         async def score(state: TaskState, target: Target) -> Score:
             assert target is not None, "Inspect always passes a target, even when unused here"

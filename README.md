@@ -113,6 +113,9 @@ To use it as a dev tool without adding it to any particular project, install it 
 uv tool install lexguard
 ```
 
+Lexguard is pre-1.0, so any release may break things: word lists, score and label names, and the
+API itself. Pin an exact version if you depend on scores staying comparable across upgrades.
+
 ## Using it without an evals framework
 
 `.verdict()` is a plain call over a string — nothing here needs `Dataset`, `Case`, or

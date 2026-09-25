@@ -3,7 +3,7 @@ from __future__ import annotations
 import pytest
 from pydantic_evals import Case, Dataset
 
-from lexguard import Confirmation, Politeness
+from lexguard import Bundle, Confirmation, Politeness
 from lexguard.integrations.evals.pydantic_evals import LexguardEvaluator, Observe
 from lexguard.words.style import Slop
 
@@ -106,19 +106,60 @@ def test_evaluator_labels_split_indicated_from_ruled_out():
     assert case.labels["PolitenessRuledOut"].value == "fucking"
 
 
-def test_evaluator_scores_a_real_density_not_a_raw_count():
-    reply = "could you please fix the fucking bug"
-    case = run([LexguardEvaluator(Politeness)], "fix the bug", reply)
-    density = Politeness.density(reply)
-    assert case.scores["PolitenessIndicatedDensity"].value == density.indicated
-    assert case.scores["PolitenessRuledOutDensity"].value == density.ruled_out
+def test_evaluator_emits_no_density_scores_by_default():
+    case = run([LexguardEvaluator(Politeness | Slop)], "fix the bug", "could you please fix it")
+    assert case.scores == {}
 
-    clean = run([LexguardEvaluator(Slop)], "explain", "caching skips repeated work")
-    assert clean.scores["SlopIndicatedDensity"].value == 0.0
-    assert "SlopRuledOutDensity" not in clean.scores
+
+def test_evaluator_density_reads_higher_is_better():
+    reply = "could you please fix the fucking bug"
+    case = run([LexguardEvaluator(Politeness, density=True)], "fix the bug", reply)
+    # wanted present: the raw hit density
+    assert case.scores["PolitenessDensity"].value == Politeness.density(reply).indicated
+
+    sloppy = "a crucial deep dive into caching"
+    case = run([LexguardEvaluator(Slop, density=True)], "explain", sloppy)
+    # wanted absent: one minus the hit density, so a clean reply scores 1.0
+    assert case.scores["NotSlopDensity"].value == 1.0 - Slop.density(sloppy).indicated
+    clean = run([LexguardEvaluator(Slop, density=True)], "explain", "caching skips repeated work")
+    assert clean.scores["NotSlopDensity"].value == 1.0
 
 
 def test_evaluator_omits_hit_labels_when_nothing_matched():
     case = run([LexguardEvaluator(Slop)], "explain", "caching skips repeated work")
     assert "SlopIndicated" not in case.labels
     assert "SlopRuledOut" not in case.labels
+
+
+def test_evaluator_serializes_labels_not_word_lists():
+    from lexguard.suites import GENERIC
+
+    # pydantic-evals writes the spec into every result it emits, so it must stay small for the
+    # biggest bundles
+    for evaluator in GENERIC:
+        spec = evaluator.as_spec().model_dump_json()
+        assert len(spec) < 500, spec
+        target = evaluator.lexicon
+        members = target.members if isinstance(target, Bundle) else (target,)
+        assert all(f'"{member.label}"' in spec for member in members)
+
+    assert LexguardEvaluator(Slop).as_spec().arguments == ("Slop",)
+    assert LexguardEvaluator(Politeness | Slop, density=True).as_spec().arguments == {
+        "lexicon": ["Politeness", "Slop"],
+        "density": True,
+    }
+
+
+def test_evaluator_version_is_lexguards():
+    from lexguard import __version__
+
+    assert LexguardEvaluator(Slop).get_evaluator_version() == __version__
+
+
+def test_observe_identifies_itself_the_same_compact_way():
+    from lexguard import __version__
+
+    # a label rides along on every result too, so it gets the labels-only spec and version tag
+    assert Observe(Politeness | Slop).as_spec().arguments == (["Politeness", "Slop"],)
+    assert Observe(Slop).as_spec().arguments == ("Slop",)
+    assert Observe(Slop).get_evaluator_version() == __version__

@@ -165,6 +165,24 @@ class TestInspectAI:
         result = asyncio.run(lexguard_scorer(Slop)(state, Target("")))
         assert "ruled_out" not in result.metadata
 
+    def test_scorers_are_named_for_their_lexicons(self, tmp_path):
+        pytest.importorskip("inspect_ai")
+        from inspect_ai import Task, eval
+        from inspect_ai.dataset import Sample
+        from inspect_ai.solver import generate
+
+        from lexguard.integrations.evals.inspect_ai import lexguard_scorer
+
+        task = Task(
+            dataset=[Sample(input="explain caching")],
+            solver=generate(),
+            scorer=[lexguard_scorer(Slop), lexguard_scorer(Politeness)],
+        )
+        log = eval(task, model="mockllm/model", display="none", log_dir=str(tmp_path))[0]
+        assert log.results is not None
+        # not Inspect's default closure name with a numeric suffix per duplicate
+        assert [score.name for score in log.results.scores] == ["Slop", "Politeness"]
+
 
 class TestGuardrails:
     def test_guard_allows_clean_text(self):

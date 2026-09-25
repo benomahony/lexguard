@@ -66,21 +66,22 @@ print(sorted(name for name, result in report.cases[0].assertions.items() if not 
 
 ## Which terms fired, and how dense
 
-`LexguardEvaluator` reports two extra things per lexicon beyond the pass/fail assertion:
+`LexguardEvaluator` reports which words matched beyond the pass/fail assertion, and optionally how
+dense they are:
 
 - `{Label}Indicated` / `{Label}RuledOut` **labels** — which words matched, comma-joined, split by
   which list they came from. Either is omitted when nothing from that side fired, so a clean case
   adds no extra labels.
-- `{Label}IndicatedDensity` / `{Label}RuledOutDensity` **scores** — `Lexicon.density()`: the
-  fraction of words that are hits, always in `[0, 1]`. Unlike the labels, these land in
-  `case.scores`, pydantic-evals' real numeric-metric bucket, and are always present (0.0 on a
-  clean case), so `report.averages()` gives a genuine per-dataset rate rather than a count you'd
-  have to average yourself.
+- With `density=True`, one **score** per lexicon from `Lexicon.density()` (the fraction of words
+  that are hits), oriented so higher always reads as better: `{Label}Density` for a lexicon you
+  want present, `Not{Label}Density` (one minus the density) for one you want absent. Off by
+  default, because backends such as Logfire render every score as a quality percentage, and a raw
+  "0% slop" reads as a failure next to the pass rates.
 
 ```py
 from pydantic_evals import Case, Dataset
 
-from lexguard import Politeness
+from lexguard import Politeness, Slop
 from lexguard.integrations.evals.pydantic_evals import LexguardEvaluator
 
 
@@ -91,23 +92,24 @@ async def agent(prompt: str) -> str:
 report = Dataset(
     name="tone",
     cases=[Case(inputs="fix the bug")],
-    evaluators=[LexguardEvaluator(Politeness)],
+    evaluators=[LexguardEvaluator(Politeness | Slop, density=True)],
 ).evaluate_sync(agent)
 case = report.cases[0]
 print(case.labels["PolitenessIndicated"].value)
 #> could you, please
 print(case.labels["PolitenessRuledOut"].value)
 #> fucking
-print(case.scores["PolitenessRuledOutDensity"].value)
-#> 0.14285714285714285
+print(case.scores["PolitenessDensity"].value)
+#> 0.2857142857142857
+print(case.scores["NotSlopDensity"].value)
+#> 1.0
 ```
 
 `case.assertions["Politeness"].value` is always exactly `True` or `False` — it can't say whether a
 reply barely failed or is riddled with the problem. Two `Slop` hits in a three-sentence answer and
-two in a five-page report both fail identically there, but their `SlopIndicatedDensity` scores
-won't match — the first is a much higher density. Lean on the scores once outputs get long enough
-that whether the concept appears at all stops being the interesting question and how often it does
-becomes the one.
+two in a five-page report both fail identically there, but their `NotSlopDensity` scores won't
+match — the first is much lower. Turn density on once outputs get long enough that whether the
+concept appears at all stops being the interesting question and how often it does becomes the one.
 
 ## Wanting a concept present
 
@@ -192,6 +194,35 @@ async def check_reply(prompt: str, reply: str) -> bool:
 print(asyncio.run(check_reply("explain caching", "let us delve into the intricate tapestry")))
 #> False
 ```
+
+## Exporting to Logfire
+
+Logfire's default scrubbing redacts anything matching `auth`, which catches the
+`UnsourcedAuthority` label and turns its results into `[Scrubbed due to 'Auth']`. A scrubbing
+callback can let that label through while still redacting a real credential alongside it:
+
+```py
+import logfire
+
+
+def keep_unsourced_authority(match: logfire.ScrubMatch) -> object:
+    # only the label itself is allowed through: if anything else in the string still matches a
+    # scrubbing pattern once the label is removed, redact as usual
+    found = match.pattern_match
+    if found.re.search(found.string.replace("UnsourcedAuthority", "")) is None:
+        return match.value
+    return None
+
+
+logfire.configure(
+    send_to_logfire="if-token-present",
+    scrubbing=logfire.ScrubbingOptions(callback=keep_unsourced_authority),
+)
+```
+
+Each `LexguardEvaluator` and `Observe` result names its lexicons by label only, not their full
+word lists, and is tagged with lexguard's version as its evaluator version, so a dashboard can tell
+results from older word lists apart from current ones.
 
 ## Install
 

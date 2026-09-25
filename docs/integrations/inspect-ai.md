@@ -3,7 +3,9 @@
 `lexguard_scorer` wraps a single `Lexicon` as an Inspect AI `Scorer`, checked against the
 completion. Whether it asserts presence or absence is the lexicon's own `fail_when_neutral` (see
 [writing a lexicon](../writing-a-lexicon.md#fail_when_neutral-what-a-match-means)). Scores
-`CORRECT` on a pass and `INCORRECT` otherwise, with the usual diagnosis as the explanation.
+`CORRECT` on a pass and `INCORRECT` otherwise, with the usual diagnosis as the explanation. Each
+scorer is named for its lexicon's label (`Slop`, `UnsourcedAuthority`), the same key the other
+adapters use, so several in one task stay distinct in the log.
 
 ```py
 import asyncio
