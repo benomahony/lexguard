@@ -241,7 +241,7 @@ print({name: len(group) for name, group in GROUPS.items()})
     "tone": 7,
     "safety": 4,
     "progress": 3,
-    "topic": 15,
+    "topic": 16,
 }
 """
 ```

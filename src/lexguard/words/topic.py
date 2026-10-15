@@ -2,6 +2,61 @@ from __future__ import annotations
 
 from lexguard.lexicon import Lexicon
 
+AiBrand = Lexicon(
+    name="ai_brand",
+    indicates=[
+        "amazon bedrock",
+        "amazon q",
+        "agentforce",
+        "anthropic",
+        "aws bedrock",
+        "bing chat",
+        "character ai",
+        "chatgpt",
+        "claude ai",
+        "claude code",
+        "claude haiku",
+        "claude opus",
+        "claude sonnet",
+        "copilot studio",
+        "cortex analyst",
+        "dall",
+        "databricks assistant",
+        "databricks genie",
+        "dbrx",
+        "deepseek",
+        "gemini advanced",
+        "gemini flash",
+        "gemini pro",
+        "genie space",
+        "github copilot",
+        "google bard",
+        "google gemini",
+        "gpt",
+        "grok ai",
+        "hugging face",
+        "huggingface",
+        "ibm watson",
+        "jasper ai",
+        "meta ai",
+        "meta llama",
+        "microsoft copilot",
+        "midjourney",
+        "mistral ai",
+        "mosaic ai",
+        "notion ai",
+        "openai",
+        "perplexity ai",
+        "salesforce einstein",
+        "snowflake cortex",
+        "stability ai",
+        "stable diffusion",
+        "vertex ai",
+        "watsonx",
+    ],
+    fix="don't name a third-party AI product or vendor; describe the capability instead",
+)
+
 Children = Lexicon(
     name="children",
     indicates=[
@@ -338,6 +393,7 @@ Work = Lexicon(
 )
 
 __all__ = [
+    "AiBrand",
     "Children",
     "Communication",
     "Garden",

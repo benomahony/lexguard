@@ -105,6 +105,7 @@ from lexguard.words.tone import Politeness as Politeness
 from lexguard.words.tone import Rudeness as Rudeness
 from lexguard.words.tone import SelfReference as SelfReference
 from lexguard.words.tone import Sycophancy as Sycophancy
+from lexguard.words.topic import AiBrand as AiBrand
 from lexguard.words.topic import Children as Children
 from lexguard.words.topic import Communication as Communication
 from lexguard.words.topic import Garden as Garden

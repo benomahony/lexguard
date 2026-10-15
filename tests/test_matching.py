@@ -4,6 +4,7 @@ import pytest
 
 from lexguard import (
     Actionable,
+    AiBrand,
     Apology,
     Approximation,
     CitationDemand,
@@ -80,6 +81,19 @@ def test_scope_creep_not_masked_by_requested_wording():
     assert ScopeCreep.matches(
         "as requested i fixed the parser; while i was at it i also refactored the config"
     )
+
+
+def test_ai_brand_fires_on_named_ai_products():
+    assert AiBrand.matches("ask Databricks Genie to build the query")
+    assert AiBrand.matches("I drafted this with GPT-4o")
+    assert AiBrand.matches("ChatGPT says otherwise")
+
+
+def test_ai_brand_ignores_everyday_homonyms():
+    assert not AiBrand.matches("claude monet painted water lilies")
+    assert not AiBrand.matches("she's a gemini, born in june")
+    assert not AiBrand.matches("the llama farm opens at nine")
+    assert not AiBrand.matches("perplexity on the held-out set dropped")
 
 
 def test_stuck_fires_on_retry_and_dead_end_language():

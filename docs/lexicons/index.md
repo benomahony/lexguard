@@ -20,5 +20,5 @@ meaning, not a split by who is speaking. Run any of them over whichever turn you
 - [Tone](tone.md): how it comes across (politeness, rudeness, sycophancy, persona, affect)
 - [Safety](safety.md): security and disclosure (refusal, prompt injection, secrets, config leaks)
 - [Progress](progress.md): how the interaction is going (rejection, being stuck, scope creep)
-- [Topic](topic.md): what the message is about (money, travel, household, people)
+- [Topic](topic.md): what the message is about (money, travel, household, people, AI brands)
 - [Bundles](bundles.md): prebuilt groupings of the lexicons above
