@@ -160,6 +160,7 @@ Rudeness = Lexicon(
         "stupid question",
         "thanks for nothing",
         "whatever",
+        "bloody",
     ],
     fix="drop the sarcasm, insults, and profanity; answer plainly and respectfully",
     evidence=(
